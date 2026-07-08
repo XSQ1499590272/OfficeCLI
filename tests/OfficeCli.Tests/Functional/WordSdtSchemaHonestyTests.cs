@@ -56,12 +56,9 @@ public class WordSdtSchemaHonestyTests : IDisposable
         var values = typeNode.GetProperty("values")
             .EnumerateArray().Select(e => e.GetString()).ToList();
 
-        // The implementation supports: text, richtext, dropdown, combobox, date.
-        // picture and checkbox are not implemented → must not appear.
-        values.Should().NotContain("picture", "picture SDT is not implemented");
-        values.Should().NotContain("checkbox", "checkbox SDT is not implemented");
-
-        values.Should().Contain(new[] { "text", "richtext", "dropdown", "combobox", "date" });
+        values.Should().Contain(new[] { "text", "richtext", "dropdown", "combobox", "date", "group", "picture", "checkbox" });
+        values.Should().NotContain(new[] { "buildingBlockGallery", "repeatingSection" },
+            "these SDT variants are not implemented at add-time");
 
         // Set must be false — the builder cannot change variant post-creation.
         typeNode.GetProperty("set").GetBoolean().Should().BeFalse(
@@ -135,18 +132,22 @@ public class WordSdtSchemaHonestyTests : IDisposable
     }
 
     [Fact]
-    public void Add_UnsupportedType_Checkbox_Throws()
+    public void Add_Checkbox_Succeeds_And_GetReturnsCheckedState()
     {
         var path = CreateTemp("docx");
         BlankDocCreator.Create(path);
         using var handler = new WordHandler(path, editable: true);
 
-        var act = () => handler.Add("/body", "sdt", null, new()
+        var sdtPath = handler.Add("/body", "sdt", null, new()
         {
-            ["type"] = "checkbox"
+            ["type"] = "checkbox",
+            ["checked"] = "true"
         });
 
-        act.Should().Throw<NotSupportedException>()
-            .WithMessage("*checkbox*not implemented*");
+        sdtPath.Should().NotBeNull();
+        var node = handler.Get(sdtPath!);
+        node.Should().NotBeNull();
+        node!.Format["type"].Should().Be("checkbox");
+        node.Format["checked"].Should().Be(true);
     }
 }

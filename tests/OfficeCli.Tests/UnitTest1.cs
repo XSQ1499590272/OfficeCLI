@@ -211,7 +211,7 @@ public class OleAndImageTests : IDisposable
     }
 
     [Fact]
-    public void Query_Picture_DetectsOleObject()
+    public void Query_Ole_DetectsOleObject()
     {
         var path = CreateTestDocx(doc =>
         {
@@ -220,7 +220,7 @@ public class OleAndImageTests : IDisposable
         });
 
         using var handler = new WordHandler(path, false);
-        var results = handler.Query("picture");
+        var results = handler.Query("ole");
 
         Assert.Single(results);
         Assert.Equal("ole", results[0].Type);
@@ -228,7 +228,7 @@ public class OleAndImageTests : IDisposable
     }
 
     [Fact]
-    public void Query_Picture_ReturnsBothDrawingAndOle()
+    public void Query_Picture_AndOle_StaySeparate()
     {
         var path = CreateTestDocx(doc =>
         {
@@ -239,13 +239,14 @@ public class OleAndImageTests : IDisposable
         });
 
         using var handler = new WordHandler(path, false);
-        var results = handler.Query("picture");
+        var pictures = handler.Query("picture");
+        var oles = handler.Query("ole");
 
-        Assert.Equal(3, results.Count);
-        Assert.Equal("picture", results[0].Type);
-        Assert.Equal("ole", results[1].Type);
-        Assert.Equal("ole", results[2].Type);
-        Assert.Equal("Excel.Sheet.12", results[2].Format["progId"]);
+        Assert.Single(pictures);
+        Assert.Equal("picture", pictures[0].Type);
+        Assert.Equal(2, oles.Count);
+        Assert.All(oles, r => Assert.Equal("ole", r.Type));
+        Assert.Equal("Excel.Sheet.12", oles[1].Format["progId"]);
     }
 
     [Fact]
