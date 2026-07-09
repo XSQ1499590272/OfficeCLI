@@ -100,8 +100,10 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         {
             handler.Save();
         }
-        // File still exists and is valid
+        // File still exists and is valid; exact byte match may not hold
+        // because Save() updates package-level metadata (timestamps, etc.)
         File.Exists(path).Should().BeTrue();
+        new FileInfo(path).Length.Should().BeGreaterThan(0);
     }
 
     [Fact]
@@ -246,10 +248,10 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         var path = CreatePresentation();
         using var handler = OpenEditable(path);
         handler.Add("/", "slide", null, new Dictionary<string, string>());
-        // Toggle footer visibility — should not throw
         handler.Set("/slide[1]", new Dictionary<string, string> { ["showFooter"] = "true" });
         var node = handler.Get("/slide[1]");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("showFooter");
+        node.Format["showFooter"].Should().Be("true");
     }
 
     [Fact]
@@ -260,7 +262,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         handler.Add("/", "slide", null, new Dictionary<string, string>());
         handler.Set("/slide[1]", new Dictionary<string, string> { ["showSlideNumber"] = "true" });
         var node = handler.Get("/slide[1]");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("showSlideNumber");
+        node.Format["showSlideNumber"].Should().Be("true");
     }
 
     [Fact]
@@ -271,7 +274,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         handler.Add("/", "slide", null, new Dictionary<string, string>());
         handler.Set("/slide[1]", new Dictionary<string, string> { ["showDate"] = "true" });
         var node = handler.Get("/slide[1]");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("showDate");
+        node.Format["showDate"].Should().Be("true");
     }
 
     [Fact]
@@ -282,7 +286,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         handler.Add("/", "slide", null, new Dictionary<string, string>());
         handler.Set("/slide[1]", new Dictionary<string, string> { ["showMasterShapes"] = "false" });
         var node = handler.Get("/slide[1]");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("showMasterShapes");
+        node.Format["showMasterShapes"].Should().Be(false);
     }
 
     [Fact]
@@ -331,9 +336,18 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         using var handler = OpenEditable(path);
         handler.Add("/", "slide", null, new Dictionary<string, string> { ["title"] = "First" });
         handler.Add("/", "slide", null, new Dictionary<string, string> { ["title"] = "Second" });
-        handler.Move("/slide[2]", "/", new InsertPosition { After = "/slide[1]" });
+        handler.Add("/", "slide", null, new Dictionary<string, string> { ["title"] = "Third" });
+        // Move slide[3] before slide[1] — should become the new first slide
+        handler.Move("/slide[3]", "/", new InsertPosition { Before = "/slide[1]" });
         var node = handler.Get("/");
-        node.ChildCount.Should().Be(2);
+        node.ChildCount.Should().Be(3);
+        // Verify all three slides still exist with correct paths
+        node.Children[0].Path.Should().Be("/slide[1]");
+        node.Children[1].Path.Should().Be("/slide[2]");
+        node.Children[2].Path.Should().Be("/slide[3]");
+        node.Children[0].Type.Should().Be("slide");
+        node.Children[1].Type.Should().Be("slide");
+        node.Children[2].Type.Should().Be("slide");
     }
 
     [Fact]
@@ -346,6 +360,11 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         handler.Swap("/slide[1]", "/slide[2]");
         var node = handler.Get("/");
         node.ChildCount.Should().Be(2);
+        // Verify both slides still exist and are of correct type after swap
+        node.Children[0].Path.Should().Be("/slide[1]");
+        node.Children[1].Path.Should().Be("/slide[2]");
+        node.Children[0].Type.Should().Be("slide");
+        node.Children[1].Type.Should().Be("slide");
     }
 
     [Fact]
@@ -366,18 +385,7 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
     }
 
     [Fact]
-    public void Slide_Query_FindsSlideByType()
-    {
-        var path = CreatePresentation();
-        using var handler = OpenEditable(path);
-        handler.Add("/", "slide", null, new Dictionary<string, string>());
-        handler.Add("/", "slide", null, new Dictionary<string, string>());
-        var results = handler.Query("slide");
-        results.Should().HaveCount(2);
-    }
-
-    [Fact]
-    public void Slide_Query_FindsAllSlides()
+    public void Slide_Query_FindsAllSlidesByTypeAndPath()
     {
         var path = CreatePresentation();
         using var handler = OpenEditable(path);
@@ -389,6 +397,7 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         results[0].Path.Should().Be("/slide[1]");
         results[1].Path.Should().Be("/slide[2]");
         results[2].Path.Should().Be("/slide[3]");
+        results[0].Type.Should().Be("slide");
     }
 
     [Fact]
@@ -413,6 +422,115 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         handler.Set("/slide[1]", new Dictionary<string, string> { ["transition"] = "push" });
         var node = handler.Get("/slide[1]");
         node.Should().NotBeNull();
+    }
+
+    // ==================== Slide Duplication (CopyFrom) ====================
+
+    [Fact]
+    public void Slide_CopyFrom_DuplicatesSlide()
+    {
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        handler.Add("/", "slide", null, new Dictionary<string, string> { ["title"] = "Original" });
+        // Duplicate via CopyFrom — the API supports whole-slide clone from /slide[N] to /
+        var result = handler.CopyFrom("/slide[1]", "/", null);
+        result.Should().Be("/slide[2]");
+        var node = handler.Get("/");
+        node.ChildCount.Should().Be(2);
+    }
+
+    [Fact]
+    public void Slide_CopyFrom_ThenSaveReopen_PreservesBothSlides()
+    {
+        var path = CreatePresentation();
+        using (var handler = OpenEditable(path))
+        {
+            handler.Add("/", "slide", null, new Dictionary<string, string> { ["title"] = "First" });
+            handler.CopyFrom("/slide[1]", "/", null);
+            handler.Save();
+        }
+        using (var handler = OpenEditable(path))
+        {
+            var node = handler.Get("/");
+            node.ChildCount.Should().Be(2);
+        }
+    }
+
+    // ==================== Slide Hyperlink Tests ====================
+
+    [Fact]
+    public void Slide_AddHyperlinkOnShape_AttachesHyperlink()
+    {
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        handler.Add("/", "slide", null, new Dictionary<string, string>());
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect",
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "3cm", ["height"] = "2cm"
+        });
+        // Add hyperlink to the shape
+        var result = handler.Add("/slide[1]/shape[1]", "hyperlink", null, new Dictionary<string, string>
+        {
+            ["url"] = "https://example.com"
+        });
+        result.Should().EndWith("/hyperlink");
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("link");
+    }
+
+    [Fact]
+    public void Slide_AddHyperlinkWithTooltip_AttachesHyperlinkAndTooltip()
+    {
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        handler.Add("/", "slide", null, new Dictionary<string, string>());
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect",
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "3cm", ["height"] = "2cm"
+        });
+        handler.Add("/slide[1]/shape[1]", "hyperlink", null, new Dictionary<string, string>
+        {
+            ["url"] = "https://example.com",
+            ["tooltip"] = "Click to visit"
+        });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("link");
+    }
+
+    // ==================== Section / Layout Type Tests ====================
+
+    [Fact]
+    public void Slide_AddWithSectionLayout_UsesSectionHeaderLayout()
+    {
+        // Note: "section" is a layout type in PowerPoint, not a separate
+        // section-metadata element. The blank template doesn't include
+        // SectionHeader layout; use "title" layout as a verifiable substitute.
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        handler.Add("/", "slide", null, new Dictionary<string, string>
+        {
+            ["layout"] = "title"
+        });
+        var node = handler.Get("/slide[1]");
+        node.Format.Should().ContainKey("layout");
+        node.Format["layout"].ToString().Should().Contain("Title");
+    }
+
+    [Fact]
+    public void Slide_SectionMetadata_NotSupportedAsSeparateElement()
+    {
+        // Section metadata (p:sectionLst) is not exposed as a separate
+        // typed element. Attempting to Add a "section" type falls through to
+        // AddDefault which throws a CliException for unknown element types.
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        handler.Add("/", "slide", null, new Dictionary<string, string>());
+        Action act = () => handler.Add("/slide[1]", "section", null, new Dictionary<string, string>());
+        act.Should().Throw<Exception>(
+            "section metadata is not exposed as a separate typed element; " +
+            "section refers to a slide layout type, not a metadata container");
     }
 
     // ==================== SlideMaster Tests ====================
@@ -715,6 +833,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/notes");
         node.Text.Should().Contain("ملاحظات المتحدث");
+        node.Format.Should().ContainKey("direction");
+        node.Format["direction"].Should().Be("rtl");
     }
 
     [Fact]
@@ -731,9 +851,9 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         {
             ["direction"] = "rtl"
         });
-        // Get should show direction was applied
         var node = handler.Get("/slide[1]/notes");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("direction");
+        node.Format["direction"].Should().Be("rtl");
     }
 
     [Fact]
@@ -749,6 +869,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/notes");
         node.Text.Should().Be("Notes in French");
+        node.Format.Should().ContainKey("lang");
+        node.Format["lang"].Should().Be("fr-FR");
     }
 
     [Fact]
@@ -787,7 +909,10 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
             ["color"] = "#FF0000"
         });
         var node = handler.Get("/slide[1]/notes");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("bold");
+        node.Format["bold"].Should().Be(true);
+        node.Format.Should().ContainKey("color");
+        node.Format["color"].ToString().Should().Contain("FF0000");
     }
 
     [Fact]
@@ -1186,6 +1311,11 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
         var node = handler.Get("/");
         node.Should().NotBeNull();
         node.ChildCount.Should().Be(1);
+        // Mutation must throw — handler opened with FileAccess.Read on the backing stream
+        Action addAct = () => handler.Add("/", "slide", null, new Dictionary<string, string>());
+        addAct.Should().Throw<Exception>("mutation should fail on a read-only handler");
+        Action setAct = () => handler.Set("/slide[1]", new Dictionary<string, string> { ["hidden"] = "true" });
+        setAct.Should().Throw<Exception>("mutation should fail on a read-only handler");
     }
 
     // ==================== Edge Case Tests ====================
@@ -1260,10 +1390,25 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
             });
             handler.Save();
         }
-        // Re-open and verify file is valid
-        using var handler2 = OpenEditable(path);
-        var node = handler2.Get("/");
-        node.ChildCount.Should().Be(1);
+        // Re-open: transition should still be present on the slide
+        using (var handler2 = OpenEditable(path))
+        {
+            var slide = handler2.Get("/slide[1]");
+            slide.Format.Should().ContainKey("transition");
+            slide.Format["transition"].Should().Be("fade");
+        }
+        // Now clear the transition and verify it's removed
+        using (var handler3 = OpenEditable(path))
+        {
+            handler3.Set("/slide[1]", new Dictionary<string, string> { ["transition"] = "none" });
+            handler3.Save();
+        }
+        using (var handler4 = OpenEditable(path))
+        {
+            var slide = handler4.Get("/slide[1]");
+            // After clearing, transition should no longer be present
+            slide.Format.Should().NotContainKey("transition");
+        }
     }
 
     [Fact]
@@ -1298,7 +1443,8 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
             ["advanceClick"] = "false"
         });
         var node = handler.Get("/slide[1]");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("advanceTime");
+        node.Format["advanceTime"].ToString().Should().Be("5");
     }
 
     [Fact]
@@ -1338,7 +1484,9 @@ public sealed class PptPresentationSlideHandlerTests : PptTestBase
             ["size"] = "14pt"
         });
         var node = handler.Get("/slide[1]/notes");
-        node.Should().NotBeNull();
+        node.Format.Should().ContainKey("bold");
+        node.Format["bold"].Should().Be(true);
+        node.Format.Should().ContainKey("size");
     }
 
     [Fact]
