@@ -276,22 +276,23 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
     }
 
     [Fact]
-    public void Get_SlideNotesPath_ResolvesOrReportsAbsent()
+    public void Get_SlideNotesPath_ThrowsWhenNoNotes()
     {
         var path = CreatePresentationWithSlide();
         using var handler = OpenEditable(path);
-        // Blank presentations typically have no notes, so Get("/slide[1]/notes")
-        // will either return a notes node or throw -- both outcomes verify the
-        // path is recognized.
-        try
-        {
-            var node = handler.Get("/slide[1]/notes");
-            node.Type.Should().Be("notes");
-        }
-        catch (ArgumentException)
-        {
-            // Expected: blank pptx may have no notes part
-        }
+        // Blank presentations have no notes, so Get("/slide[1]/notes") throws.
+        Action act = () => handler.Get("/slide[1]/notes");
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Get_SlideNotesPath_ResolvesAfterAddingNotes()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "notes", null, new Dictionary<string, string> { ["text"] = "Speaker note" });
+        var node = handler.Get("/slide[1]/notes");
+        node.Type.Should().Be("notes");
     }
 
     [Fact]
@@ -313,6 +314,44 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
         node.Path.Should().Be("/slidemaster[1]");
         node.Children.Should().NotBeNull();
         node.Children!.Should().Contain(c => c.Type == "slidelayout");
+    }
+
+    [Fact]
+    public void Get_SlideShapePath_ResolvesWithCorrectType()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string> { ["text"] = "Hello" });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Type.Should().Be("textbox");
+        node.Text.Should().Be("Hello");
+    }
+
+    [Fact]
+    public void Get_SlideGroupShapePath_ResolvesNestedShape()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        // Create an empty group with geometry
+        handler.Add("/slide[1]", "group", null, new Dictionary<string, string>
+        {
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "5cm", ["height"] = "5cm"
+        });
+        handler.Add("/slide[1]/group[1]", "shape", null, new Dictionary<string, string> { ["text"] = "Nested" });
+        var node = handler.Get("/slide[1]/group[1]/shape[1]");
+        node.Type.Should().Be("textbox");
+        node.Text.Should().Be("Nested");
+    }
+
+    [Fact]
+    public void Get_SlideTableRowCellPath_ResolvesCell()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "table", null, new Dictionary<string, string> { ["rows"] = "2", ["cols"] = "2" });
+        // Tables use tr/tc path segment names and @id-based indexing in output
+        var node = handler.Get("/slide[1]/table[1]/tr[1]/tc[1]");
+        node.Type.Should().Be("tc");
     }
 
     // ==================== Raw XML Tests: raw action ====================
@@ -384,6 +423,43 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
         using var handler = OpenEditable(path);
         Action act = () => handler.Raw("/notesMaster");
         act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Raw_NoteSlidePart_ReturnsNonEmptyXmlAfterAddingNotes()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "notes", null, new Dictionary<string, string> { ["text"] = "Speaker note" });
+        var xml = handler.Raw("/noteSlide[1]");
+        xml.Should().NotBeNullOrEmpty();
+        xml.Should().Contain("<p:notes");
+    }
+
+    [Fact]
+    public void Raw_ChartPart_ReturnsNonEmptyXmlAfterAddingChart()
+    {
+        var path = CreatePresentationWithSlide();
+        using (var handler = OpenEditable(path))
+        {
+            handler.Add("/slide[1]", "chart", null, new Dictionary<string, string>
+            {
+                ["data"] = "Series1:1,2,3"
+            });
+            handler.Save();
+        }
+        // The chart part is stored in the zip; find it by listing OPC entries
+        // that contain "chart" in their path, then read via Raw.
+        using var archive = System.IO.Compression.ZipFile.OpenRead(path);
+        var chartEntry = archive.Entries
+            .FirstOrDefault(e => e.FullName.Contains("chart", StringComparison.OrdinalIgnoreCase)
+                                 && e.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase));
+        chartEntry.Should().NotBeNull("should have a chart XML part in the zip");
+        var chartPath = "/" + chartEntry!.FullName;
+        using var handler2 = OpenReadOnly(path);
+        var xml = handler2.Raw(chartPath);
+        xml.Should().NotBeNullOrEmpty();
+        xml.Should().Contain("chartSpace");
     }
 
     // ==================== Raw XML Tests: raw-set actions ====================
@@ -640,33 +716,6 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
     // ==================== Help / Schema Tests ====================
 
     [Fact]
-    public void SchemaHelp_PresentationElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "presentation", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"presentation\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_SlideElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "slide", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"slide\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_ShapeElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "shape", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"shape\"");
-    }
-
-    [Fact]
     public void SchemaHelp_AllPptxSchemaElements_RenderWithJson()
     {
         var schemaDir = Path.Combine(RepoRoot(), "schemas", "help", "pptx");
@@ -681,114 +730,6 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
             result.Stdout.Should().Contain("\"element\"",
                 $"help pptx {elementName} --json should contain \"element\"");
         }
-    }
-
-    [Fact]
-    public void SchemaHelp_SlideMasterElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "slidemaster", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"slidemaster\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_SlideLayoutElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "slidelayout", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"slidelayout\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_ThemeElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "theme", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"theme\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_RawElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "raw", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"raw\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_TableElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "table", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"table\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_TableRowElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "table-row", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"row\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_TableCellElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "table-cell", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"cell\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_TableColumnElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "table-column", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"column\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_ChartElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "chart", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"chart\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_NotesElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "notes", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"notes\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_ParagraphElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "paragraph", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"paragraph\"");
-    }
-
-    [Fact]
-    public void SchemaHelp_RunElement_RendersWithJson()
-    {
-        var result = RunCliOk("help", "pptx", "run", "--json");
-        result.Stdout.Should().NotBeNullOrEmpty();
-        result.Stdout.Should().Contain("\"element\"");
-        result.Stdout.Should().Contain("\"run\"");
     }
 
     // ==================== Negative Tests ====================
@@ -869,20 +810,12 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
     }
 
     [Fact]
-    public void Get_UnsupportedElementTypeName_ThrowsOrReturnsEmpty()
+    public void Get_UnsupportedElementTypeName_ThrowsArgumentException()
     {
         var path = CreatePresentationWithSlide();
         using var handler = OpenEditable(path);
-        try
-        {
-            handler.Get("/slide[1]/unknown[1]");
-            // Should not reach here for an unsupported path segment
-            Assert.Fail("Expected exception for unsupported path segment");
-        }
-        catch (ArgumentException)
-        {
-            // Expected: path resolution fails for unknown element types
-        }
+        Action act = () => handler.Get("/slide[1]/unknown[1]");
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -957,7 +890,8 @@ public sealed class PptPathSelectorRawUnitTests : PptTestBase
     [Fact]
     public void RawXmlHelper_Execute_ReordersKnownSchemaChildrenForSlides()
     {
-        using var document = PresentationDocument.Create(new MemoryStream(), PresentationDocumentType.Presentation);
+        using var stream = new MemoryStream();
+        using var document = PresentationDocument.Create(stream, PresentationDocumentType.Presentation);
         var presentationPart = document.AddPresentationPart();
         presentationPart.Presentation = new P.Presentation(new P.SlideIdList());
         var slidePart = presentationPart.AddNewPart<SlidePart>("rId1");
