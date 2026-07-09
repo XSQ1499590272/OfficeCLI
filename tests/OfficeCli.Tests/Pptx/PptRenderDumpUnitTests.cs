@@ -18,14 +18,6 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
         return path;
     }
 
-    private string CreatePresentationWithSlide()
-    {
-        var path = CreatePresentation();
-        using var handler = OpenEditable(path);
-        handler.Add("/", "slide", null, new Dictionary<string, string>());
-        return path;
-    }
-
     // ==================== HTML PREVIEW TESTS ====================
 
     [Fact]
@@ -85,7 +77,7 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
     }
 
     [Fact]
-    public void HtmlPreview_ShapeRendered_ContainsDataPathAttribute()
+    public void HtmlPreview_ShapeRendered_ContainsShapeKeyword()
     {
         var path = CreateSlide();
         using (var handler = OpenEditable(path))
@@ -98,6 +90,7 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
         using var ro = OpenReadOnly(path);
         var html = ro.ViewAsHtml();
 
+        // The shape keyword ("rect") appears in the rendered HTML
         html.Should().Contain("rect");
     }
 
@@ -282,7 +275,7 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
     }
 
     [Fact]
-    public void HtmlPreview_HiddenSlide_IsStillRenderedButHasHiddenIndicator()
+    public void HtmlPreview_HiddenSlide_IsIncludedInOutput()
     {
         var path = CreatePresentation();
         using (var handler = OpenEditable(path))
@@ -300,8 +293,34 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
         using var ro = OpenReadOnly(path);
         var html = ro.ViewAsHtml();
 
-        // Hidden slides are still rendered in HTML, but Get shows hidden=true
+        // Hidden slides are still rendered in HTML output (not excluded from preview)
         html.Should().Contain("Hidden slide content");
+        // The Get tree surfaces hidden=true so consumers can detect this status
+        var slide = ro.Get("/slide[1]");
+        slide.Format.Should().ContainKey("hidden");
+        slide.Format["hidden"].Should().Be(true);
+    }
+
+    [Fact]
+    public void HtmlPreview_SlideWithComment_CommentsAreNotRendered()
+    {
+        // Comments are stored in a separate OOXML part (slideComments.xml) and
+        // are not included in the HTML preview output. This test documents that
+        // expectation — if comments are later added to the HTML renderer, this
+        // test should be updated to assert their presence.
+        var path = CreateSlide();
+        using (var handler = OpenEditable(path))
+        {
+            handler.Add("/slide[1]", "comment", null, new Dictionary<string, string>
+            {
+                ["text"] = "Review this content"
+            });
+        }
+        using var ro = OpenReadOnly(path);
+        var html = ro.ViewAsHtml();
+
+        // Comments are not rendered in HTML preview; the slide content is present
+        html.Should().NotContain("Review this content", "comments are not rendered in HTML preview");
     }
 
     [Fact]
@@ -561,9 +580,12 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
     [Fact]
     public void Screenshot_HasChromeFamily_ReturnsBoolean()
     {
-        // This just tests the method doesn't throw; it may or may not find a browser
+        // CI typically has no Chrome; dev machines may or may not. The test
+        // verifies the method runs without throwing — the return value is
+        // host-dependent. When a browser IS found, we assert true.
         var has = HtmlScreenshot.HasChromeFamily();
-        has.Should().Be(has); // trivial assertion; the value depends on the test host
+        if (!has) return; // No Chrome-family browser on this host
+        has.Should().BeTrue();
     }
 
     [Fact]
@@ -860,6 +882,81 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
     }
 
     [Fact]
+    public void Dump_AnimationAndTransition_EmitItems()
+    {
+        var path = CreateSlide();
+        using (var handler = OpenEditable(path))
+        {
+            handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+            {
+                ["shape"] = "rect",
+                ["x"] = "2cm", ["y"] = "2cm", ["width"] = "3cm", ["height"] = "3cm"
+            });
+            // Add an animation on the shape (matches existing Animation_* tests)
+            handler.Add("/slide[1]/shape[1]", "animation", null, new Dictionary<string, string>
+            {
+                ["effect"] = "fade"
+            });
+            // Set a slide transition via Set
+            handler.Set("/slide[1]", new Dictionary<string, string>
+            {
+                ["transition"] = "fade"
+            });
+        }
+        using var ro = OpenReadOnly(path);
+
+        // Verify animation is queryable after reopen
+        var anims = ro.Query("animation");
+        anims.Should().NotBeEmpty("animation should persist after save/reopen");
+
+        var (items, _) = PptxBatchEmitter.EmitPptx(ro);
+
+        // Animation timing is emitted as a raw-set passthrough (not semantic
+        // add-animation rows) due to broad exotic-timing detection that routes
+        // all <p:anim*> elements through raw-set for byte-fidelity.
+        items.Should().Contain(i => i.Command == "raw-set"
+                                   && i.Part != null && i.Part.StartsWith("/slide[")
+                                   && i.Xml != null && i.Xml.Contains("<p:timing"),
+            "dump should raw-set passthrough the animation timing tree");
+
+        // The transition prop should be on the add slide row (standard transitions
+        // like fade are not exotic and survive as semantic props)
+        items.Should().Contain(i => i.Command == "add" && i.Type == "slide"
+                                   && i.Props != null && i.Props.ContainsKey("transition"),
+            "dump should preserve transition on the slide add row");
+    }
+
+    [Fact]
+    public void Dump_OleAndModel3D_EmitItems()
+    {
+        var path = CreateSlide();
+        var glbPath = CreateTinyGlb(NewTempPath(".glb"));
+        var olePayloadPath = CreateOlePayload(NewTempPath(".dat"));
+        using (var handler = OpenEditable(path))
+        {
+            handler.Add("/slide[1]", "model3d", null, new Dictionary<string, string>
+            {
+                ["src"] = glbPath,
+                ["x"] = "1cm", ["y"] = "1cm", ["width"] = "5cm", ["height"] = "5cm"
+            });
+            handler.Add("/slide[1]", "ole", null, new Dictionary<string, string>
+            {
+                ["src"] = olePayloadPath,
+                ["progid"] = "Word.Document",
+                ["x"] = "8cm", ["y"] = "1cm", ["width"] = "5cm", ["height"] = "5cm"
+            });
+        }
+        using var ro = OpenReadOnly(path);
+        var (items, warnings) = PptxBatchEmitter.EmitPptx(ro);
+
+        // OLE and model3d items are emitted as add-part rows
+        items.Should().Contain(i => i.Command == "add-part" && i.Type == "model3d",
+            "dump should emit model3d add-part items");
+        items.Should().Contain(i => i.Command == "add-part" && i.Type == "ole",
+            "dump should emit ole add-part items");
+    }
+
+    [Fact]
     public void Dump_HiddenSlide_PreservesHiddenFlag()
     {
         var path = CreatePresentation();
@@ -897,6 +994,17 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
 
         var validCommands = new[] { "add", "set", "remove", "raw-set" };
         items.All(i => validCommands.Contains(i.Command)).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Dump_Warnings_ForContentWithUnsupportedElements()
+    {
+        var path = CreateSlide();
+        using var ro = OpenReadOnly(path);
+        var (items, warnings) = PptxBatchEmitter.EmitPptx(ro);
+
+        // Even if warnings are empty, the list should be non-null
+        warnings.Should().NotBeNull();
     }
 
     // ==================== BATCH BEHAVIOR TESTS ====================
@@ -1016,6 +1124,17 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
 
         results.Should().HaveCount(1);
         results[0].Success.Should().BeTrue();
+
+        // Verify the result serializes to valid JSON with expected structure
+        var json = JsonSerializer.Serialize(results, BatchJsonContext.Default.ListBatchResult);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        root.ValueKind.Should().Be(JsonValueKind.Array, "results should serialize as a JSON array");
+        root.GetArrayLength().Should().Be(1);
+        root[0].TryGetProperty("success", out var successProp).Should().BeTrue();
+        successProp.GetBoolean().Should().BeTrue();
+        root[0].TryGetProperty("index", out var indexProp).Should().BeTrue();
+        root[0].TryGetProperty("output", out _).Should().BeTrue("successful results should have an output property");
     }
 
     [Fact]
@@ -1192,17 +1311,6 @@ public sealed class PptRenderDumpUnitTests : PptTestBase
         deserialized!.Should().HaveCount(2);
         deserialized![0].Command.Should().Be("add");
         deserialized![0].Type.Should().Be("slide");
-    }
-
-    [Fact]
-    public void Dump_Warnings_ForContentWithUnsupportedElements()
-    {
-        var path = CreateSlide();
-        using var ro = OpenReadOnly(path);
-        var (items, warnings) = PptxBatchEmitter.EmitPptx(ro);
-
-        // Even if warnings are empty, the list should be non-null
-        warnings.Should().NotBeNull();
     }
 
     [Fact]
