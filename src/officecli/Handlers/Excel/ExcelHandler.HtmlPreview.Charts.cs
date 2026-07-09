@@ -59,28 +59,20 @@ public partial class ExcelHandler
             // own column-sum (which is hidden-column- and sheet-default-width-aware)
             // drops this sub-column remainder, leaving the card a fraction of a
             // column narrow vs Excel; the loop adds it back.
-            result.Add((fromRow, toRow, fromCol, toCol, ChartColOffsetPt(gf), chartSb.ToString()));
+            var anchor = gf.Parent as XDR.TwoCellAnchor;
+            var from = anchor?.FromMarker;
+            var to = anchor?.ToMarker;
+            var colOffsetPt = 0d;
+            if (from != null && to != null)
+            {
+                var fromOff = long.TryParse(from.ColumnOffset?.Text, out var fco) ? fco : 0;
+                var toOff = long.TryParse(to.ColumnOffset?.Text, out var tco) ? tco : 0;
+                colOffsetPt = (toOff - fromOff) / EmuConverter.EmuPerPointF;
+            }
+            result.Add((fromRow, toRow, fromCol, toCol, colOffsetPt, chartSb.ToString()));
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// Partial-column EMU offset of a chart's TwoCellAnchor, in points:
-    /// (toColumnOffset − fromColumnOffset) — the fraction of the from/to columns
-    /// the card starts/ends inside. The overlay loop adds this to its whole-column
-    /// sum so the card width matches Excel's sub-column anchor. Returns 0 when the
-    /// frame is not a TwoCellAnchor (no sub-column geometry to recover).
-    /// </summary>
-    private static double ChartColOffsetPt(XDR.GraphicFrame gf)
-    {
-        var anchor = gf.Parent as XDR.TwoCellAnchor;
-        var from = anchor?.FromMarker;
-        var to = anchor?.ToMarker;
-        if (from == null || to == null) return 0;
-        var fromOff = long.TryParse(from.ColumnOffset?.Text, out var fco) ? fco : 0;
-        var toOff = long.TryParse(to.ColumnOffset?.Text, out var tco) ? tco : 0;
-        return (toOff - fromOff) / EmuConverter.EmuPerPointF;
     }
 
     private void RenderExcelChart(StringBuilder sb, XDR.GraphicFrame gf,
