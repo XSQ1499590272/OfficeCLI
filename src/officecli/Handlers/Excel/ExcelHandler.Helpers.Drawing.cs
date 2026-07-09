@@ -1017,11 +1017,9 @@ public partial class ExcelHandler
         if (emu < 0)
             throw new ArgumentException($"Picture/shape {name} must be non-negative (got '{value}').");
 
-        const long emuPerColApprox = 609600;
-        const long emuPerRowApprox = 190500;
         if (name == "y")
-            return (int)(emu / emuPerRowApprox);
-        return (int)(emu / emuPerColApprox);
+            return (int)(emu / EmuPerRowApprox);
+        return (int)(emu / EmuPerColApprox);
     }
 
     /// <summary>
@@ -1063,11 +1061,9 @@ public partial class ExcelHandler
         // 1 default Excel row    ≈ 15pt ≈ 0.529cm ≈ 190500 EMU.
         // For width/height passed as a unit, choose the larger of the two
         // converters so "6cm" yields a sensible ~9 columns result either axis.
-        const long emuPerColApprox = 609600;
-        const long emuPerRowApprox = 190500;
         if (name == "height")
-            return Math.Max(1, (int)(emu / emuPerRowApprox));
-        return Math.Max(1, (int)(emu / emuPerColApprox));
+            return Math.Max(1, (int)(emu / EmuPerRowApprox));
+        return Math.Max(1, (int)(emu / EmuPerColApprox));
     }
 
     // CONSISTENCY(ole-width-units): OLE round-trip preserves sub-cell precision
