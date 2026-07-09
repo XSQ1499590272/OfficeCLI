@@ -1072,6 +1072,7 @@ public partial class ExcelHandler
     // Picture/shape branches keep the integer behavior for now.
     private const long EmuPerColApprox = 609600;
     private const long EmuPerRowApprox = 190500;
+    private const int AnchorMaxCellIndex = 16384;
 
     /// <summary>
     /// Parse a width/height anchor value into EMU. Plain integers are treated
@@ -1093,16 +1094,15 @@ public partial class ExcelHandler
             // axis-specific MaxRows=1048576) keeps the heuristic symmetric
             // with ParseAnchorOriginCell so x/y/width/height all flip to
             // EMU at the same boundary.
-            const int MaxCellIndex = 16384;
             // R39-2: cell-count form is rejected above the grid limit so
             // mistakes like `width=20000` raise a clear error instead of
             // being silently treated as raw EMU. Users passing EMU should
             // use a unit-qualified form (`914400emu`, `1in`) which is parsed
             // through EmuConverter further down. CONSISTENCY with
             // ParseAnchorOriginCell.
-            if (plainInt > MaxCellIndex - 1)
+            if (plainInt > AnchorMaxCellIndex - 1)
                 throw new ArgumentException(
-                    $"Picture/shape {name} column/row index must be in [0, {MaxCellIndex - 1}] (got '{value}'). For EMU-scale sizes use a unit-qualified value like '1in' / '6cm' / '72pt'.");
+                    $"Picture/shape {name} column/row index must be in [0, {AnchorMaxCellIndex - 1}] (got '{value}'). For EMU-scale sizes use a unit-qualified value like '1in' / '6cm' / '72pt'.");
             long perCell = (name == "height") ? EmuPerRowApprox : EmuPerColApprox;
             return plainInt * perCell;
         }
@@ -1210,7 +1210,6 @@ public partial class ExcelHandler
             // EMU in practice). Use the same threshold for x and y so users
             // passing inch-EMU (914400) consistently land on a sensible cell
             // on either axis.
-            const int MaxCellIndex = 16384;
             // R39-2: bare cell-count form must reject above-grid values
             // outright. Previously, x=20000 hit the "large bare int = EMU"
             // branch and divided by 609600, silently coercing the origin
@@ -1219,9 +1218,9 @@ public partial class ExcelHandler
             // max, it's either a typo or an EMU value mistakenly fed
             // without a unit suffix. Either way, refuse rather than silently
             // remap. CONSISTENCY with R30-1 negative guard.
-            if (plainInt > MaxCellIndex - 1)
+            if (plainInt > AnchorMaxCellIndex - 1)
                 throw new ArgumentException(
-                    $"Picture/shape {name} column/row index must be in [0, {MaxCellIndex - 1}] (got '{value}'). For EMU-scale offsets use a unit-qualified value like '1in' / '6cm' / '72pt'.");
+                    $"Picture/shape {name} column/row index must be in [0, {AnchorMaxCellIndex - 1}] (got '{value}'). For EMU-scale offsets use a unit-qualified value like '1in' / '6cm' / '72pt'.");
             return (int)plainInt;
         }
 
