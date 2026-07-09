@@ -6,11 +6,11 @@ public abstract class WordTestBase : IDisposable
 {
     private readonly List<string> _tempFiles = new();
 
-    protected string CreateBlankDocx()
+    protected string CreateBlankDocx(string? locale = null)
     {
         var path = Path.Combine(Path.GetTempPath(), $"officecli_word_{Guid.NewGuid():N}.docx");
         _tempFiles.Add(path);
-        BlankDocCreator.Create(path);
+        BlankDocCreator.Create(path, locale);
         return path;
     }
 

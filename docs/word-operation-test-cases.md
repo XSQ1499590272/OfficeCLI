@@ -50,11 +50,11 @@
 | WORD-UNIT-008 | unit | P0 | `schemas/help/docx/paragraph.json` | `WordHandler.Add/Get/Set` 段落 canonical key | `align/spaceBefore/spaceAfter/lineSpacing` 写入和读取一致 | 已有单元覆盖 |
 | WORD-UNIT-009 | unit | P0 | `schemas/help/docx/run.json` | run 格式写入和 readback | 文本、bold、italic、font、size、color、underline readback 正确 | 已有单元覆盖 |
 | WORD-UNIT-010 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Selector.cs` | selector 解析和匹配 | `paragraph[style=...] > run[bold=true]`、`:contains()`、`:empty` 命中正确 | 已有单元覆盖 |
-| WORD-UNIT-011 | unit | P1 | `schemas/help/docx/table-cell.json` | table/cell 合并的局部行为 | `gridspan/hmerge/vmerge` 后索引和被吸收 cell 行为正确 | 已有自动覆盖 |
-| WORD-UNIT-012 | unit | P1 | `schemas/help/docx/section.json` | section 长度和方向 readback | orientation、margin、columns 可读；更多单位归一化待补 | 已有自动覆盖 |
+| WORD-UNIT-011 | unit | P1 | `schemas/help/docx/table-cell.json` | table/cell 合并的局部行为 | `gridspan/hmerge/vmerge` 后索引和被吸收 cell 行为正确；见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-012 | unit | P1 | `schemas/help/docx/section.json` | section 长度和方向 readback | orientation、margin、columns 可读；`in`/`pt`/`dxa` 输入归一化为 cm readback 已固定；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-013 | unit | P1 | `schemas/help/docx/bookmark.json` | bookmark/formfield 名称校验 | bookmark 重名/路径特殊字符当前保留；formfield 路径特殊字符和空白名拒绝 | 已有自动覆盖 |
-| WORD-UNIT-014 | unit | P1 | `schemas/help/docx/revision.json` | revision marker 局部生成 | run scope ins/del/format revision marker 类型、author、id 正确；paragraph/table scope 待补 | 已有自动覆盖 |
-| WORD-UNIT-015 | unit | P1 | `schemas/help/docx/raw.json` | raw XML 写入失败不污染文档 | unknown part、XPath 无匹配抛出可解释错误且文档不变；非法 XML 待补 | 已有自动覆盖 |
+| WORD-UNIT-014 | unit | P1 | `schemas/help/docx/revision.json` | revision marker 局部生成 | run scope ins/del/format revision marker 类型、author、id 正确；paragraph format、table/cell format、row ins/format 当前读回已固定；见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-015 | unit | P1 | `schemas/help/docx/raw.json` | raw XML 写入失败不污染文档 | unknown part、XPath 无匹配、非法 XML fragment 抛出可解释错误且文档不变；见 `tests/OfficeCli.Tests/Unit/WordRawAndFindReplaceTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-016 | unit | P1 | `README.md` | batch item props 解析 | props `["key=value"]` 数组、JSON object 标量转换、malformed entry 跳过/错误 envelope 行为固定 | 已有自动覆盖 |
 | WORD-UNIT-017 | unit | P1 | `README.md` | dump emitter 小型片段输出 | paragraph/table/picture 小片段生成的 batch item 形状和 replay 已固定 | 已有自动覆盖 |
 
@@ -62,89 +62,118 @@
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-018 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | positional path 导航 | `/body/p[1]`、`/body/p[1]/r[1]`、`/body/tbl[1]/tr[1]/tc[1]` 命中正确节点 | 已有自动覆盖 |
-| WORD-UNIT-019 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | stable id path 导航 | `p[@paraId=...]`、bookmark name、`sdt[@sdtId=...]` 可重开后命中 | 已有自动覆盖 |
+| WORD-UNIT-018 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | positional path 导航 | `/body/p[1]`、`/body/p[1]/r[1]`、`/body/tbl[1]/tr[1]/tc[1]` 命中正确节点；见 `tests/OfficeCli.Tests/Unit/WordNavigationTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-019 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | stable id path 导航 | `p[@paraId=...]`、bookmark name 重开后命中；`sdt[@sdtId=...]` 已在 functional 固定 | 已有单元覆盖 |
 | WORD-UNIT-020 | unit | P1 | `src/officecli/Core/PathIndex.cs` | path index 解析与格式化 | 1-based CLI 索引和数组索引互转稳定；当前仅做 `-1/+1`，不做非法索引校验 | 已有自动覆盖 |
 | WORD-UNIT-021 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Selector.cs` | selector 属性等值和不等值 | `paragraph[align=...]`、`[align!=...]` 按当前规则过滤 | 已有自动覆盖 |
 | WORD-UNIT-022 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Selector.cs` | selector child combinator | `paragraph[style=...] > run[bold=true]` 只返回满足父子条件的节点 | 已有自动覆盖 |
-| WORD-UNIT-023 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Selector.cs` | selector pseudo | `:contains()`、`:empty`、`:no-alt` 命中当前行为 | 已有自动覆盖 |
+| WORD-UNIT-023 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Selector.cs` | selector pseudo | `:contains()`、`:empty`、`:no-alt` 命中当前行为；`:contains()`/`:empty` 已在 `tests/OfficeCli.Tests/Unit/WordSelectorTests.cs` 固定，`:no-alt` 已在 functional 固定 | 已有单元覆盖 |
 | WORD-UNIT-024 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Query.cs` | query 后置过滤 | `paragraph[text~=...]` 当前直接查询不收窄；`type=paragraph` 返回 paragraph 节点 | 已有自动覆盖 |
-| WORD-UNIT-025 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | header/footer 路径导航 | header/footer 内段落、run、图片路径命中 host part 内节点 | 已有自动覆盖 |
-| WORD-UNIT-026 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Navigation.DocSettings.cs` | document settings path | `/settings`、`/docDefaults` 路径读写命中正确 part；compatibility 路径待补 | 已有自动覆盖 |
+| WORD-UNIT-025 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Navigation.cs` | header/footer 路径导航 | header/footer 内段落、run 路径命中 host part 内节点；图片路径已在 integration 固定；见 `tests/OfficeCli.Tests/Unit/WordHeaderFooterTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-026 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Navigation.DocSettings.cs` | document settings path | `/settings`、`/docDefaults` 路径读写命中正确 part；compatibility.mode 与 compatibility flag/preset readback 固定；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
 
 ### 文本、段落、样式与文档设置
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-027 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Text.cs` | add paragraph 基础文本 | 添加后 body 子节点顺序正确；文本和 paraId 存在 | 已有自动覆盖 |
+| WORD-UNIT-027 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Text.cs` | add paragraph 基础文本 | 添加后 body 子节点顺序正确；文本和 paraId 存在；见 `tests/OfficeCli.Tests/Unit/WordBodyMutationTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-028 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Helpers.RunFormat.cs` | run 格式应用 | bold/italic/underline/color/font/size 写入到 rPr 并可 readback | 已有自动覆盖 |
-| WORD-UNIT-029 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set run text | 修改文本不破坏已有 run 格式；空文本行为待补 | 已有自动覆盖 |
-| WORD-UNIT-030 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set paragraph props | align/spacing 写入 pPr 并 canonical readback；indent/listStyle 待补 | 已有自动覆盖 |
-| WORD-UNIT-031 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Style.cs` | styleId/styleName 解析 | custom styleId、display name 传入后的当前段落 readback 行为已固定；built-in alias 待补 | 已有自动覆盖 |
-| WORD-UNIT-032 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.StyleList.cs` | add/set/get style | paragraph style 的 id/name/type/basedOn/readback、重复 custom id 错误已固定；character/table style 待补 | 已有自动覆盖 |
-| WORD-UNIT-033 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.DocDefaults.cs` | docDefaults | 默认字体、字号、bold 写入并影响 direct `/docDefaults` 与 effective readback；语言、RTL 待补 | 已有自动覆盖 |
-| WORD-UNIT-034 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.DocSettings.cs` | doc settings | root 与 `/settings` 路径的 docGrid、charSpacingControl 已固定；compatibility 待补 | 已有自动覆盖 |
-| WORD-UNIT-035 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.SectionLayout.cs` | section layout | margin、orientation、columns readback 固定；page size、rtlGutter 待补 | 已有自动覆盖 |
-| WORD-UNIT-036 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.FindReplace.cs` | find/replace 局部文本 | 普通 find、regex find、replace、bare find 错误已固定；跨 run/超链接边界限制待补 | 已有自动覆盖 |
-| WORD-UNIT-037 | unit | P2 | `src/officecli/Handlers/Word/WordHandler.I18n.cs` | i18n/RTL 属性 | run 级 lang.latin/ea/cs、rtl、complex-script 字体/字号/bold/italic readback 固定；段落级继承待补 | 已有自动覆盖 |
+| WORD-UNIT-029 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set run text | 修改文本不破坏已有 run 格式；空文本 set 后保留 run 节点与格式；见 `tests/OfficeCli.Tests/Unit/WordRunTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-030 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set paragraph props | align/spacing 写入 pPr 并 canonical readback；listStyle、rightIndent、hangingIndent readback 固定；firstLineIndent 与 hangingIndent 同设时当前不出现在 readback；见 `tests/OfficeCli.Tests/Unit/WordParagraphTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-031 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Style.cs` | styleId/styleName 解析 | custom styleId、display name、空白文档实际存在的 `Normal` styleName 解析、未定义且含空格的 `Heading 1` 当前跳过行为已固定；见 `tests/OfficeCli.Tests/Unit/WordStyleAndNumberingTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-032 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.StyleList.cs` | add/set/get style | paragraph/character/table style 的 id/name/type/basedOn/readback、重复 custom id 错误已固定；见 `tests/OfficeCli.Tests/Unit/WordStyleAndNumberingTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-033 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.DocDefaults.cs` | docDefaults | 默认字体、字号、bold 写入并影响 direct `/docDefaults` 与 effective readback；RTL、alignment、spacing 的 `/docDefaults` readback 已固定；当前 `docDefaults.lang.*` 非 setter 支持面，后续若开放需补；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-034 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.DocSettings.cs` | doc settings | root 与 `/settings` 路径的 docGrid、charSpacingControl、compatibility.mode、compatibility flag/preset 已固定；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-035 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.SectionLayout.cs` | section layout | margin、orientation、columns、page size、direction、rtlGutter readback 固定；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-036 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.FindReplace.cs` | find/replace 局部文本 | 普通 find、regex find、replace、bare find 错误、普通跨 run replace、跨 hyperlink 边界 replace 拒绝且不变更文本已固定；见 `tests/OfficeCli.Tests/Unit/WordRawAndFindReplaceTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-037 | unit | P2 | `src/officecli/Handlers/Word/WordHandler.I18n.cs` | i18n/RTL 属性 | run 级 lang.latin/ea/cs、rtl、complex-script 字体/字号/bold/italic readback 固定；RTL locale 写入 `lang.cs/locale`，新段落从 section 继承 `effective.direction/effective.rtl` 已固定；见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
 
 ### 表格、列表与编号
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-038 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Table.cs` | add table | rows/cols/gridCol/cell paragraph 初始化结构固定 | 已有自动覆盖 |
-| WORD-UNIT-039 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set cell text/format | cell text、shd/fill、align、valign、padding readback 固定 | 已有自动覆盖 |
-| WORD-UNIT-040 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | gridspan/hmerge | 合并后被吸收 cell 删除、后续 tc 索引变化固定 | 已有自动覆盖 |
-| WORD-UNIT-041 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | vmerge | restart/continue 写入规则和 readback 固定 | 已有自动覆盖 |
+| WORD-UNIT-038 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Table.cs` | add table | rows/cols/gridCol/cell paragraph 初始化结构固定；见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-039 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | set cell text/format | cell text、shd/fill、align、valign、padding readback 固定；见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-040 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | gridspan/hmerge | 合并后被吸收 cell 删除、后续 tc 索引变化固定；见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-041 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | vmerge | restart/continue 写入规则和 readback 固定；continue 见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-042 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.SectionTable.cs` | table border/layout | border shorthand/sub-property、layout、cellSpacing、indent、colWidths 写入固定 | 已有自动覆盖 |
 | WORD-UNIT-043 | unit | P1 | `schemas/help/docx/table-row.json` | row add/set/remove | row height/header/readback 和删除后索引行为固定 | 已有自动覆盖 |
-| WORD-UNIT-044 | unit | P1 | `schemas/help/docx/table-column.json` | virtual column add/remove | gridCol 与每行 cell 同步；列删除后索引固定 | 已有自动覆盖 |
-| WORD-UNIT-045 | unit | P0 | `schemas/help/docx/numbering.json` | listStyle 高层编号 | bullet/ordered/none 当前 numId/abstractNum 行为和 listStyle/numFmt/numLevel readback 固定 | 已有自动覆盖 |
-| WORD-UNIT-046 | unit | P1 | `schemas/help/docx/abstractNum.json` | abstractNum/level | 9 级默认 level、format/start/text/indent 写入固定 | 已有自动覆盖 |
-| WORD-UNIT-047 | unit | P1 | `schemas/help/docx/num.json` | num instance | abstractNumId 引用、startOverride、非法引用行为固定 | 已有自动覆盖 |
+| WORD-UNIT-044 | unit | P1 | `schemas/help/docx/table-column.json` | virtual column add/remove | gridCol 与每行 cell 同步；列删除后索引固定；见 `tests/OfficeCli.Tests/Unit/WordTableTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-045 | unit | P0 | `schemas/help/docx/numbering.json` | listStyle 高层编号 | bullet/ordered/none 当前 numId/abstractNum 行为和 listStyle/numFmt/numLevel readback 固定；见 `tests/OfficeCli.Tests/Unit/WordStyleAndNumberingTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-046 | unit | P1 | `schemas/help/docx/abstractNum.json` | abstractNum/level | 9 级默认 level、format/start/text/indent 写入固定；见 `tests/OfficeCli.Tests/Unit/WordStyleAndNumberingTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-047 | unit | P1 | `schemas/help/docx/num.json` | num instance | abstractNumId 引用、startOverride、非法引用行为固定；非法引用已在 functional 固定 | 已有单元覆盖 |
 
 ### 媒体、绘图、图表与关系
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-048 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | add picture file/data URI | ImagePart、relId、docPr、尺寸、alt 写入固定 | 已有自动覆盖 |
-| WORD-UNIT-049 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | anchored picture props | wrap、h/v position、relative frame、behindText、h/v align 写入固定 | 已有自动覆盖 |
+| WORD-UNIT-048 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | add picture file/data URI | ImagePart、relId、docPr、尺寸、alt 写入固定；见 `tests/OfficeCli.Tests/Unit/WordMediaQueryTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-049 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | anchored picture props | wrap、h/v position、relative frame、behindText、h/v align 写入固定；基础 anchor 见 `tests/OfficeCli.Tests/Unit/WordMediaQueryTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-050 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.ImageHelpers.cs` | picture crop/decorative/link | crop canonical readback、decorative 扩展、hyperlink rel 固定 | 已有自动覆盖 |
-| WORD-UNIT-051 | unit | P0 | `src/officecli/Core/OleHelper.cs` | OLE data URI 和 content type | data URI decode、embedded package content-type/fileSize readback 固定；legacy OLE object 分类待补 | 已有自动覆盖 |
-| WORD-UNIT-052 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | add OLE | EmbeddedPackagePart、ProgID、display、名称、尺寸 readback 固定；EmbeddedObjectPart 待补 | 已有自动覆盖 |
-| WORD-UNIT-053 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Chart.cs` | chart add/readback | chart type、title、series、categories、尺寸、value axis 基础 readback 固定 | 已有自动覆盖 |
-| WORD-UNIT-054 | unit | P1 | `src/officecli/Core/Chart/ChartHelper.cs` | chart series parser | 通过公共 chart contract 固定 inline values/categories、range-like input、颜色格式解析；helper 直接单测待补 | 部分自动覆盖 |
-| WORD-UNIT-055 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | inlined parts materialize | relId 两阶段重写、child part、external rel 当前行为固定 | 待补 |
-| WORD-UNIT-056 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Diagram.cs` | diagram add | native mermaid 输入生成 group/textbox 结构、set/remove 和缺少 source 失败路径已通过 contract 固定 | 已有自动覆盖 |
-| WORD-UNIT-057 | unit | P2 | `src/officecli/Handlers/Word/WordHandler.HtmlPreview.*.cs` | HTML preview basic render | 段落/表格最小 HTML、图片 data URI 和 alt 文本已固定 | 已有自动覆盖 |
+| WORD-UNIT-051 | unit | P0 | `src/officecli/Core/OleHelper.cs` | OLE data URI 和 content type | data URI decode、embedded package/legacy object content-type/fileSize readback 固定；见 `tests/OfficeCli.Tests/Unit/WordMediaQueryTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-052 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | add OLE | EmbeddedPackagePart、EmbeddedObjectPart、ProgID、display、名称、尺寸 readback 固定；见 `tests/OfficeCli.Tests/Unit/WordMediaQueryTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-053 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Chart.cs` | chart add/readback | chart type、title、series、categories、尺寸、value axis 基础 readback 固定；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-054 | unit | P1 | `src/officecli/Core/Chart/ChartHelper.cs` | chart series parser | 通过公共 chart readback 固定 inline values/categories、range-like input、颜色格式解析；helper 直接单测固定 chartType、range/category、series data、series color 当前解析行为；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-055 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Media.cs` | inlined parts materialize | top-level chart part materialize、host relId 重写、child chart style part、host external rel、per-part external rel 重建已固定；见 `tests/OfficeCli.Tests/Unit/WordMediaQueryTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-056 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Add.Diagram.cs` | diagram add | native mermaid 输入生成 group/textbox 结构、set/remove 和缺少 source 失败路径固定；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-057 | unit | P2 | `src/officecli/Handlers/Word/WordHandler.HtmlPreview.*.cs` | HTML preview basic render | 段落/表格最小 HTML、图片 data URI 和 alt 文本固定；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
 
 ### 引用、字段、表单与内容控件
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-058 | unit | P1 | `schemas/help/docx/hyperlink.json` | hyperlink external/internal | url rel、anchor、text、style readback 固定 | 已有自动覆盖 |
-| WORD-UNIT-059 | unit | P1 | `schemas/help/docx/bookmark.json` | bookmark pair | start/end 成对、id/name 生成和非法 name 校验固定 | 已有自动覆盖 |
-| WORD-UNIT-060 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Field.cs` | field chain | begin/instr/separate/result/end 结构和 query/get 固定 | 已有自动覆盖 |
-| WORD-UNIT-061 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.SeqEval.cs` | SEQ field evaluation | add SEQ field 的 body-order 编号缓存、`\\r N` reset 当前字段结果、ROMAN 格式、`recalcFields=seq` 按当前 instruction 重写缓存行为固定 | 已有自动覆盖 |
-| WORD-UNIT-062 | unit | P1 | `schemas/help/docx/footnote.json` | footnote/endnote | 正文 reference 与 note part 内容成对，remove 行为固定 | 已有自动覆盖 |
-| WORD-UNIT-063 | unit | P1 | `schemas/help/docx/comment.json` | comment range | comment range marker、CommentsPart 内容、author/date readback 固定 | 已有自动覆盖 |
-| WORD-UNIT-064 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.FormFields.cs` | formfield | text/check/dropdown formfield 的 bookmark namespace 和 default state 固定 | 已有自动覆盖 |
-| WORD-UNIT-065 | unit | P0 | `schemas/help/docx/sdt.json` | SDT per-type props | dropdown/combobox/date/picture/group/richtext add/get-only props 已固定；checkbox 已有历史覆盖 | 已有自动覆盖 |
+| WORD-UNIT-058 | unit | P1 | `schemas/help/docx/hyperlink.json` | hyperlink external/internal | url rel、anchor、text、style readback 固定；见 `tests/OfficeCli.Tests/Unit/WordReferenceTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-059 | unit | P1 | `schemas/help/docx/bookmark.json` | bookmark pair | start/end 成对、id/name 生成和非法 name 校验固定；见 `tests/OfficeCli.Tests/Unit/WordReferenceTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-060 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Helpers.Field.cs` | field chain | begin/instr/separate/result/end 结构、query/get、`/field[N]` 虚拟路径直接 remove 被拒绝、`instrText`/`fieldChar` 结构 run 删除后的折叠 field 消失行为固定；见 `tests/OfficeCli.Tests/Unit/WordFieldAndFormTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-061 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.SeqEval.cs` | SEQ field evaluation | add SEQ field 的 body-order 编号缓存、`\\r N` reset 当前字段结果、ROMAN 格式、`recalcFields=seq` 按当前 instruction 重写缓存行为固定；基础 SEQ 见 `tests/OfficeCli.Tests/Unit/WordFieldAndFormTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-062 | unit | P1 | `schemas/help/docx/footnote.json` | footnote/endnote | 正文 reference 与 note part 内容成对，remove 行为固定；见 `tests/OfficeCli.Tests/Unit/WordNotesAndCommentsTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-063 | unit | P1 | `schemas/help/docx/comment.json` | comment range | comment range marker、CommentsPart 内容、author/date readback 固定；见 `tests/OfficeCli.Tests/Unit/WordNotesAndCommentsTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-064 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.FormFields.cs` | formfield | text/check/dropdown formfield 的 bookmark namespace 和 default state 固定；见 `tests/OfficeCli.Tests/Unit/WordFieldAndFormTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-065 | unit | P0 | `schemas/help/docx/sdt.json` | SDT per-type props | dropdown/combobox/date/picture/group/richtext add/get-only props 已固定；checkbox 已有历史覆盖；见 `tests/OfficeCli.Tests/Unit/WordSdtTests.cs` | 已有单元覆盖 |
+
+### 分节内联标记与权限
+
+| ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
+|---|---|---:|---|---|---|---|
+| WORD-UNIT-076 | unit | P1 | `schemas/help/docx/pagebreak.json` | page/column break | add pagebreak 后 query/get 返回 `breakType` 和稳定路径；见 `tests/OfficeCli.Tests/Unit/WordBreakTabPermissionTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-077 | unit | P1 | `schemas/help/docx/tab.json`, `schemas/help/docx/ptab.json` | tab stop 与 positional tab | tab add/set/remove 当前会留下空 `w:tabs` schema 错误；ptab add/set/query 无 validate 错误；见 `tests/OfficeCli.Tests/Unit/WordBreakTabPermissionTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-078 | unit | P2 | `schemas/help/docx/permStart.json` | editing permission range marker | permStart/permEnd 成对属性、删除 marker 不删文本、非法 id 不污染文档；见 `tests/OfficeCli.Tests/Unit/WordBreakTabPermissionTests.cs` | 已有单元覆盖 |
+
+### 基础 mutation 与错误边界
+
+| ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
+|---|---|---:|---|---|---|---|
+| WORD-UNIT-079 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Query.cs`, `src/officecli/Handlers/Word/WordHandler.Mutations.cs` | query/remove 基础行为 | query `:contains()` 返回稳定路径；remove 删除目标段落但保留兄弟节点；见 `tests/OfficeCli.Tests/Unit/WordBodyMutationTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-080 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Mutations.cs` | move/copy 基础行为 | move 重新排序 body 段落且不丢文本；copy 克隆段落并保留文本；见 `tests/OfficeCli.Tests/Unit/WordBodyMutationTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-081 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Add.cs`, `src/officecli/Handlers/Word/WordHandler.Set.Element.cs` | 失败不污染文档 | invalid parent、picture 缺 src/非法尺寸、unsupported set、损坏 docx 当前错误行为不写入半成品；见 `tests/OfficeCli.Tests/Unit/WordErrorBoundaryTests.cs` | 已有单元覆盖 |
+
+### 复杂对象基础单元
+
+| ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
+|---|---|---:|---|---|---|---|
+| WORD-UNIT-082 | unit | P1 | `schemas/help/docx/equation.json` | equation add/set/remove | display equation 返回 `/body/oMathPara[N]`，inline equation 返回 `/oMath[N]`，set formula 更新文本，remove 后 query 为空；见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-083 | unit | P1 | `schemas/help/docx/textbox.json` | textbox add/set/get | textbox 内容树可通过 `/body/textbox[N]/p/r` 寻址；shape surface 可 set，text/position add-only 当前行为固定；见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-084 | unit | P2 | `schemas/help/docx/shape.json` | floating shape add/set/remove | shape raw drawing tree、geometry/fill/size 子路径读回；set legacy alias 和 remove 行为固定；见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-085 | unit | P1 | `schemas/help/docx/watermark.json` | watermark text/image 当前行为 | text watermark add/set/remove、非法 rotation、image 当前退回默认 text watermark 行为固定；见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-086 | unit | P1 | `schemas/help/docx/chart.json` | chart add/get/query 基础面 | `Add("chart")` 返回 `/chart[N]`；`get/query` 可读 chartType/title/categories/series/size；`validate` 为空；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-087 | unit | P1 | `schemas/help/docx/chart-series.json`, `schemas/help/docx/chart-axis.json` | chart series/axis set | series name/values、range-backed refs/color、value axis title/min/max/format readback；非法 series 数值当前会清空 values 并留下 schema 错误；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-088 | unit | P1 | `schemas/help/docx/diagram.json` | native diagram 当前边界 | native mermaid 生成 group 和首个 textbox；group set/remove；缺少 source 不创建半成品；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-089 | unit | P2 | `src/officecli/Handlers/Word/WordHandler.HtmlPreview.*.cs` | HTML preview 当前输出 | 段落、表格、图片 data URI、alt 文本出现在 HTML 中；见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
 
 ### 修订、raw、batch 与 dump
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-UNIT-066 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Revision.cs` | run revision marker | ins/del/format marker 和 text/query readback 固定；moveFrom/moveTo 待补 | 已有自动覆盖 |
-| WORD-UNIT-067 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Revision.cs` | paragraph/table revision marker | paragraph/table/cell format、row ins 当前结构已通过 contract 固定；trPr change 待补 | 部分自动覆盖 |
+| WORD-UNIT-066 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Revision.cs` | run revision marker | ins/del/format marker 和 text/query readback 固定；run-level tracked move 生成 moveFrom/moveTo 共享 id/author 并可 query；见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-067 | unit | P0 | `src/officecli/Handlers/Word/WordHandler.Set.Revision.cs` | paragraph/table revision marker | paragraph format、paragraph ins 拒绝、table/cell format、row ins、row format/trPrChange 当前结构已通过 unit 固定；见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-068 | unit | P1 | `src/officecli/Handlers/Word/WordHandler.Set.Revision.cs` | accept/reject revision | run insertion/deletion/format/move accept/reject 当前结果已通过 contract 固定 | 已有自动覆盖 |
-| WORD-UNIT-069 | unit | P1 | `src/officecli/Core/RawXmlHelper.cs` | raw XML helper | XPath 命中、命名空间、写属性/节点、非法 XML 行为固定 | 已有自动覆盖 |
+| WORD-UNIT-069 | unit | P1 | `src/officecli/Core/RawXmlHelper.cs` | raw XML helper | XPath 命中、命名空间、写属性/节点、非法 XML 行为固定；Word handler raw/raw-set 见 `tests/OfficeCli.Tests/Unit/WordRawAndFindReplaceTests.cs` | 已有单元覆盖 |
 | WORD-UNIT-070 | unit | P1 | `src/officecli/BatchTypes.cs` | batch props 解析 | array props、object props、malformed array entry 当前宽容/错误规则固定；裸 string props 不支持 | 已有自动覆盖 |
 | WORD-UNIT-071 | unit | P1 | `src/officecli/Core/BatchExecutor.cs` | batch 执行策略 | 默认继续、stop-on-error、单项错误 envelope 当前行为固定 | 已有自动覆盖 |
-| WORD-UNIT-072 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.cs` | dump emitter root | `/body` 子树 dump item target path 和 replay 已固定；完整 document 资源顺序待补 | 部分自动覆盖 |
-| WORD-UNIT-073 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.Paragraph.cs` | paragraph dump emitter | paragraph text item 输出已固定；run/hyperlink/field/textbox 待补 | 部分自动覆盖 |
-| WORD-UNIT-074 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.Table.cs` | table dump emitter | table rows/cols 和 cell text set item 输出已固定；gridspan/vmerge 待补 | 部分自动覆盖 |
-| WORD-UNIT-075 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.AuxParts.cs` | aux part dump emitter | picture data URI/name/alt 输出和 replay 已固定；chart/OLE/inlined parts 待补 | 部分自动覆盖 |
+| WORD-UNIT-072 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.cs` | dump emitter root | `/body` 子树 dump item target path 和 replay 已固定；完整 document dump 的 numbering/styles/docDefaults/theme/settings 等关键资源项在 body item 之前输出已由 `tests/OfficeCli.Tests/Unit/WordDumpEmitterTests.cs` 固定 | 已有单元覆盖 |
+| WORD-UNIT-073 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.Paragraph.cs` | paragraph dump emitter | paragraph text item、显式 run/hyperlink/field、textbox add item 与内部文本 set 输出已由 `tests/OfficeCli.Tests/Unit/WordDumpEmitterTests.cs` 固定 | 已有单元覆盖 |
+| WORD-UNIT-074 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.Table.cs` | table dump emitter | table rows/cols、cell text set item、gridspan/colspan、vmerge 输出已固定；见 `tests/OfficeCli.Tests/Unit/WordDumpEmitterTests.cs` | 已有单元覆盖 |
+| WORD-UNIT-075 | unit | P1 | `src/officecli/Handlers/Word/WordBatchEmitter.AuxParts.cs` | aux part dump emitter | picture data URI/name/alt 输出和 replay 已固定；full dump 中 chart/OLE 不产生 unsupported warning 且发出 `add chart`/`add ole` 已固定；inlinedparts complex carrier 的 part/child/per-part external props 已由 `tests/OfficeCli.Tests/Unit/WordDumpEmitterTests.cs` 固定 | 已有单元覆盖 |
 
 ## 基础命令与端到端链路
 
@@ -176,7 +205,7 @@
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
 | WORD-DOC-001 | contract | P0 | `schemas/help/docx/document.json` | 设置文档属性 `author/title/keywords/description/lastModifiedBy` | `get /` 返回 canonical key；别名 `creator` 可写入 author | 已有自动覆盖 |
-| WORD-DOC-002 | contract | P1 | `schemas/help/docx/document.json` | 设置 `docDefaults.*`、CJK grid、compatibility | `docDefaults` effective 值、`docGrid.*`、`charSpacingControl` 已固定；compatibility 待补 | 已有自动覆盖 |
+| WORD-DOC-002 | contract | P1 | `schemas/help/docx/document.json` | 设置 `docDefaults.*`、CJK grid、compatibility | `docDefaults` effective 值、`docGrid.*`、`charSpacingControl`、`compatibility.mode`、compatibility flag/preset 已固定；单元见 `tests/OfficeCli.Tests/Unit/WordDocumentSettingsTests.cs` | 已有单元覆盖 |
 | WORD-DOC-003 | integration | P0 | `schemas/help/docx/body.json` | body 下段落、表格、section 顺序读取 | `get /body --depth 1` 返回有序子节点 | 已有自动覆盖 |
 | WORD-DOC-004 | contract | P0 | `schemas/help/docx/paragraph.json` | 新增段落文本、样式、对齐、间距、缩进 | `get` 返回 `align/spaceBefore/spaceAfter/lineSpacing` 等 canonical key | 已有自动覆盖 |
 | WORD-DOC-005 | contract | P1 | `schemas/help/docx/paragraph.json` | 段落有效样式继承 `effective.*` | 直接属性缺省时出现 `effective.X` 和 `effective.X.src` | 已有自动覆盖 |
@@ -187,7 +216,7 @@
 | WORD-DOC-010 | contract | P1 | `schemas/help/docx/pagebreak.json` | 添加 page/column break | `query pagebreak` 返回类型；`view outline/text` 不丢正文 | 已有自动覆盖 |
 | WORD-DOC-011 | contract | P1 | `schemas/help/docx/tab.json` | 段落 tab stop 添加、修改、删除 | `get` 返回位置、align、leader；删除后读取模型不再出现，但当前实现会留下空 `w:tabs` schema 错误 | 已有自动覆盖 |
 | WORD-DOC-012 | contract | P2 | `schemas/help/docx/ptab.json` | header/footer 中 positional tab | body 段落 ptab add/set/get 已固定；header/footer 场景待补 | 已有自动覆盖 |
-| WORD-DOC-013 | contract | P0 | `schemas/help/docx/style.json` | 新增 paragraph/character/table style | `get /styles/<id>` 返回类型、name、basedOn、格式属性 | 已有自动覆盖 |
+| WORD-DOC-013 | contract | P0 | `schemas/help/docx/style.json` | 新增 paragraph/character/table style | `get /styles/<id>` 返回类型、name、basedOn、格式属性；单元见 `tests/OfficeCli.Tests/Unit/WordStyleAndNumberingTests.cs` | 已有单元覆盖 |
 | WORD-DOC-014 | contract | P1 | `schemas/help/docx/styles.json` | styles 容器查询和添加 style | `query style` 包含新增样式；重复 custom id 抛错且不污染 styles | 已有自动覆盖 |
 | WORD-DOC-015 | integration | P1 | `examples/word/document-formatting.*` | 页面背景、默认字体、metadata 等文档格式示例 | 关键 document props 可读；`validate` 通过 | 示例待改造 |
 | WORD-DOC-016 | contract | P0 | `schemas/help/docx/section.json` | section 尺寸、边距、方向、栏、页码、RTL gutter | `get /body/sectPr[1]` 返回 canonical 长度和方向值 | 已有自动覆盖 |
@@ -222,18 +251,18 @@
 | WORD-MEDIA-005 | integration | P1 | `examples/word/pictures.*` | 图片示例转集成测试 | 8 个场景生成；关键图片路径和属性可读 | 示例待改造 |
 | WORD-MEDIA-006 | integration | P1 | `schemas/help/docx/ole.json` | CLI 查询 OLE 对象并与 picture 区分 | handler 查询 OLE 返回 `progId/display/size`；真实 CLI e2e 待补 | 已有自动覆盖 |
 | WORD-MEDIA-007 | contract | P1 | `schemas/help/docx/ole.json` | add OLE / embedded package | OLE rel、contentType、fileSize、尺寸可读；dump-batch 后 rel 不悬空待补 | 已有自动覆盖 |
-| WORD-MEDIA-008 | contract | P1 | `schemas/help/docx/chart.json` | 添加 chart 和基础属性 | `query chart` 返回类型、标题、数据范围；`validate` 通过 | 已有自动覆盖 |
-| WORD-MEDIA-009 | contract | P1 | `schemas/help/docx/chart-series.json` | 添加/修改 chart series | series 名称和值修改可读；range-backed categories/values 和 series color 读回固定 | 已有自动覆盖 |
-| WORD-MEDIA-010 | contract | P2 | `schemas/help/docx/chart-axis.json` | chart axis set/get | value axis title、min/max、number format 可读 | 已有自动覆盖 |
+| WORD-MEDIA-008 | contract | P1 | `schemas/help/docx/chart.json` | 添加 chart 和基础属性 | `query chart` 返回类型、标题、数据范围；`validate` 通过；单元见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-MEDIA-009 | contract | P1 | `schemas/help/docx/chart-series.json` | 添加/修改 chart series | series 名称和值修改可读；range-backed categories/values 和 series color 读回固定；单元见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
+| WORD-MEDIA-010 | contract | P2 | `schemas/help/docx/chart-axis.json` | chart axis set/get | value axis title、min/max、number format 可读；单元见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
 | WORD-MEDIA-011 | integration | P1 | `examples/word/charts.*` | 图表示例转集成测试 | 图表数量、series、axis 关键属性可读 | 示例待改造 |
-| WORD-MEDIA-012 | contract | P1 | `schemas/help/docx/equation.json` | LaTeX-ish equation add/get/set/remove | inline/display 模式、formula readback、set/remove 当前行为固定 | 已有自动覆盖 |
+| WORD-MEDIA-012 | contract | P1 | `schemas/help/docx/equation.json` | LaTeX-ish equation add/get/set/remove | inline/display 模式、formula readback、set/remove 当前行为固定；单元见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
 | WORD-MEDIA-013 | integration | P1 | `examples/word/formulas.*` | 公式示例转集成测试 | 公式数量和关键公式文本可读 | 示例待改造 |
-| WORD-MEDIA-014 | contract | P1 | `schemas/help/docx/diagram.json` | mermaid diagram add | native diagram 返回 `/body/group[N]`；当前 `/body/textbox[N]` 仅暴露 grouped drawing 的首个文本框；group resize/remove 当前行为固定；`validate` 通过 | 已有自动覆盖 |
+| WORD-MEDIA-014 | contract | P1 | `schemas/help/docx/diagram.json` | mermaid diagram add | native diagram 返回 `/body/group[N]`；当前 `/body/textbox[N]` 仅暴露 grouped drawing 的首个文本框；group resize/remove 当前行为固定；`validate` 通过；单元见 `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | 已有单元覆盖 |
 | WORD-MEDIA-015 | integration | P2 | `examples/word/diagram.*` | diagram 示例转集成测试 | 关键图形或渲染输出存在；复杂视觉先不做像素断言 | 示例待改造 |
-| WORD-MEDIA-016 | contract | P1 | `schemas/help/docx/textbox.json` | textbox add/set/get | 内容树可通过 `/body/textbox[N]/p/r` 寻址；`fill/line/width/height/geometry` set 面可执行；`text/position` add-only 边界固定 | 已有自动覆盖 |
+| WORD-MEDIA-016 | contract | P1 | `schemas/help/docx/textbox.json` | textbox add/set/get | 内容树可通过 `/body/textbox[N]/p/r` 寻址；`fill/line/width/height/geometry` set 面可执行；`text/position` add-only 边界固定；单元见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
 | WORD-MEDIA-017 | integration | P1 | `examples/word/textbox.*` | 文本框示例转集成测试 | textbox 数量和关键属性可读 | 示例待改造 |
-| WORD-MEDIA-018 | contract | P2 | `schemas/help/docx/shape.json` | floating shape add/set/get/remove | raw drawing tree、geometry/fill/size 子路径读回；`fill/line/width/height/geometry` set 面可执行；position add-only 边界和 remove 后不再可导航固定 | 已有自动覆盖 |
-| WORD-MEDIA-019 | contract | P1 | `schemas/help/docx/watermark.json` | text/image watermark | text watermark add/get/query/set/remove、VML 属性读回、非法 rotation 固定；handler 层 `image` 当前退回默认 text watermark 的行为已固定，真实 image watermark 待补 | 部分自动覆盖 |
+| WORD-MEDIA-018 | contract | P2 | `schemas/help/docx/shape.json` | floating shape add/set/get/remove | raw drawing tree、geometry/fill/size 子路径读回；`fill/line/width/height/geometry` set 面可执行；position add-only 边界和 remove 后不再可导航固定；单元见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
+| WORD-MEDIA-019 | contract | P1 | `schemas/help/docx/watermark.json` | text/image watermark | text watermark add/get/query/set/remove、VML 属性读回、非法 rotation 固定；handler 层 `image` 当前退回默认 text watermark 的行为已固定，真实 image watermark 待补；单元见 `tests/OfficeCli.Tests/Unit/WordComplexObjectTests.cs` | 已有单元覆盖 |
 | WORD-MEDIA-020 | regression | P0 | `README.md` | `dump -> batch` 保留图片 part 和 rel | 新文档图片可 `query/get`、image part bytes 与源 data URI 一致，且 `validate` 通过 | 已有自动覆盖 |
 | WORD-MEDIA-021 | regression | P0 | `README.md` | `dump -> batch` 保留 OLE / embedded package | `query ole` 返回 progId/name/contentType/fileSize；`validate` 通过 | 已有自动覆盖 |
 | WORD-MEDIA-022 | regression | P1 | `README.md` | `dump -> batch` 保留 chart 的 externalData / embedded workbook | chart/series/cache 可读且 `validate` 通过；workbook rel 存在待补 | 部分自动覆盖 |
@@ -247,9 +276,9 @@
 | WORD-REF-002 | contract | P1 | `schemas/help/docx/hyperlink.json` | 内部 bookmark anchor hyperlink | anchor 指向合法 bookmark；非法目标有报错 | 已有自动覆盖 |
 | WORD-REF-003 | contract | P1 | `schemas/help/docx/bookmark.json` | bookmark start/end 成对创建和改名 | `query bookmark` 返回 name；非法 name 被拒绝 | 已有自动覆盖 |
 | WORD-REF-004 | contract | P1 | `schemas/help/docx/toc.json` | TOC field 插入和属性 | `query toc` 返回 field；`refresh` 可选更新 | 已有自动覆盖 |
-| WORD-REF-005 | contract | P1 | `schemas/help/docx/field.json` | complex field add/get/set/remove | begin/instr/separate/result/end 结构完整；remove 待补 | 已有自动覆盖 |
-| WORD-REF-006 | contract | P1 | `schemas/help/docx/instrtext.json` | instrText query/set/remove | 指令文本可读写；remove 待补 | 已有自动覆盖 |
-| WORD-REF-007 | contract | P2 | `schemas/help/docx/fieldchar.json` | fieldChar get/query/remove | begin/separate/end 类型可读；删除行为待补 | 已有自动覆盖 |
+| WORD-REF-005 | contract | P1 | `schemas/help/docx/field.json` | complex field add/get/set/remove | begin/instr/separate/result/end 结构完整；`query field` 返回的 `/field[N]` 当前为虚拟路径，直接 remove 被拒绝；见 `tests/OfficeCli.Tests/Unit/WordFieldAndFormTests.cs` | 已有单元覆盖 |
+| WORD-REF-006 | contract | P1 | `schemas/help/docx/instrtext.json` | instrText query/set/remove | 指令文本可读写；remove `instrText` 实际 run 后 instruction 和折叠 field 查询消失 | 已有单元覆盖 |
+| WORD-REF-007 | contract | P2 | `schemas/help/docx/fieldchar.json` | fieldChar get/query/remove | begin/separate/end 类型可读；remove 单个 marker run 后目标 marker 消失，折叠 field 查询消失 | 已有单元覆盖 |
 | WORD-REF-008 | integration | P1 | `examples/word/fields.*` | fields 示例转集成测试 | PAGE/REF/SEQ 等关键 field 可查询 | 示例待改造 |
 | WORD-REF-009 | contract | P1 | `schemas/help/docx/footnote.json` | footnote add/set/get/remove | 正文引用和 FootnotesPart note 成对存在 | 已有自动覆盖 |
 | WORD-REF-010 | contract | P1 | `schemas/help/docx/endnote.json` | endnote add/set/get/remove | 正文引用和 EndnotesPart note 成对存在 | 已有自动覆盖 |
@@ -268,9 +297,9 @@
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
 | WORD-REV-001 | contract | P0 | `schemas/help/docx/revision.json` | run insertion/deletion/format revision | `query revision` 返回 type、author、id、path、text；date 字段形态待补 | 已有自动覆盖 |
-| WORD-REV-002 | contract | P0 | `schemas/help/docx/revision.json` | paragraph add/remove/set with `revision.author` | paragraph format revision 可查询；synthetic revision 当前读回 `revision.type=paragraph`，host paragraph 读回 `format`；当前 paragraph `revision.type=ins` via set 明确拒绝；add/remove tracked paragraph 待补 | 部分自动覆盖 |
-| WORD-REV-003 | contract | P1 | `schemas/help/docx/revision.json` | moveFrom/moveTo 配对 `revision.id` | run 级 moveFrom/moveTo 两半共享 id；synthetic revision path 按 type 消歧；range marker 成对待补 | 部分自动覆盖 |
-| WORD-REV-004 | contract | P1 | `schemas/help/docx/revision.json` | table/row/cell scope revision | table/cell format marker、row 级 ins marker 可查询，synthetic row type 当前为 `rowIns`、host row 为 `ins`；trPr format 和 cell del/ins 待补 | 部分自动覆盖 |
+| WORD-REV-002 | contract | P0 | `schemas/help/docx/revision.json` | paragraph add/remove/set with `revision.author` | paragraph format revision 可查询；synthetic revision 当前读回 `revision.type=paragraph`，host paragraph 读回 `format`；当前 paragraph `revision.type=ins` via set 明确拒绝；单元见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs`；add/remove tracked paragraph 待补 | 已有单元覆盖 |
+| WORD-REV-003 | contract | P1 | `schemas/help/docx/revision.json` | moveFrom/moveTo 配对 `revision.id` | run 级 moveFrom/moveTo 两半共享 id；synthetic revision path 按 type 消歧；单元见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs`；range marker 细节待补 | 已有单元覆盖 |
+| WORD-REV-004 | contract | P1 | `schemas/help/docx/revision.json` | table/row/cell scope revision | table/cell format marker、row 级 ins marker 可查询，synthetic row type 当前为 `rowIns`、host row 为 `ins`；单元见 `tests/OfficeCli.Tests/Unit/WordRevisionTests.cs`；trPr format 和 cell del/ins 待补 | 已有单元覆盖 |
 | WORD-REV-005 | contract | P1 | `schemas/help/docx/revision.json` | section property revision | `sectPrChange` author/id 可读；section orientation 更新可读；synthetic revision type 当前为 `format` | 已有自动覆盖 |
 | WORD-REV-006 | contract | P1 | `schemas/help/docx/revision.json` | accept/reject 单个 revision | run insertion/deletion/format/move accept/reject 当前结果固定 | 已有自动覆盖 |
 | WORD-REV-007 | integration | P1 | `examples/word/revisions.*` | revisions 示例转集成测试 | 8 个 revision 场景生成；accept/reject temp copy 验证 | 示例待改造 |
@@ -288,7 +317,7 @@
 | WORD-NEG-003 | contract | P0 | `schemas/help/docx/*.json` | 缺少 required prop，例如 picture `src`、sdt `type` | 命令失败；不创建半成品节点或 dangling rel | 已有自动覆盖 |
 | WORD-NEG-004 | contract | P1 | `schemas/help/docx/*.json` | 不支持属性或只读属性 set | paragraph unsupported 属性返回 unsupported 且不应用该属性；当前实现可能刷新 textId，不承诺 XML 完全不变 | 已有自动覆盖 |
 | WORD-NEG-005 | contract | P1 | `schemas/help/docx/bookmark.json` | 重复 bookmark/formfield 名称或非法名称 | bookmark 重名保留；formfield 非法名被拒绝且不新增 formfield | 已有自动覆盖 |
-| WORD-NEG-006 | contract | P1 | `schemas/help/docx/header.json` | 重复添加同一 section 的同类型 header/footer | default header 重复添加抛错且原 header 不丢失；footer/first/even 类型待补 | 已有自动覆盖 |
+| WORD-NEG-006 | contract | P1 | `schemas/help/docx/header.json` | 重复添加同一 section 的同类型 header/footer | default/first/even header/footer 重复添加均抛错，原有 part 不丢失；见 `tests/OfficeCli.Tests/Unit/WordHeaderFooterTests.cs` | 已有单元覆盖 |
 | WORD-NEG-007 | integration | P1 | `README.md` | batch 中间失败：默认继续与 `--stop-on-error` | 默认后续命令继续；`--stop-on-error` 停在失败项；结果可解释 | 已有自动覆盖 |
 | WORD-NEG-008 | regression | P1 | `README.md` | `raw-set`、`dump-batch` 失败时避免关系悬空 | raw-set 失败后不新增 validate 错误且已存在 chart relationship 仍可解析；dump-batch 失败路径待补 | 部分自动覆盖 |
 | WORD-NEG-009 | integration | P2 | `README.md` | 打开损坏或非 docx 文件 | 损坏 `.docx` 打开失败、CLI JSON 返回 `corrupt_file`，且原始 bytes 不被覆盖 | 已有自动覆盖 |
@@ -329,6 +358,10 @@
 | WORD-FREEZE-028 | WORD-NEG-003 | contract | `tests/OfficeCli.Tests/Functional/WordErrorContractTests.cs` | 缺 required prop 不创建半成品节点或 dangling rel |
 | WORD-FREEZE-029 | WORD-NEG-007 | integration | `tests/OfficeCli.Tests/Integration/WordBatchTests.cs` | batch 默认继续，`--stop-on-error` 停止 |
 | WORD-FREEZE-030 | WORD-CMD-010 | e2e | `tests/OfficeCli.Tests/E2E/WordViewSmokeTests.cs` | `view text/annotated/outline/stats/issues --json` 输出结构稳定 |
+| WORD-FREEZE-031 | WORD-UNIT-086 | unit | `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | chart add/get/query 基础 readback 和 `validate` 空结果 |
+| WORD-FREEZE-032 | WORD-UNIT-087 | unit | `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | chart series/axis set、range refs/color 和非法数值当前错误边界 |
+| WORD-FREEZE-033 | WORD-UNIT-088 | unit | `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | native diagram group/textbox、resize/remove、缺 source 不污染 |
+| WORD-FREEZE-034 | WORD-UNIT-089 | unit | `tests/OfficeCli.Tests/Unit/WordChartDiagramPreviewTests.cs` | HTML preview 段落、表格、图片 data URI 和 alt 文本 |
 
 ## 首批建议落地顺序
 

@@ -58,6 +58,29 @@ public class WordRunTests : WordTestBase
     }
 
     [Fact]
+    public void SetRunText_ToEmptyKeepsRunAndFormatting()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paraPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var runPath = handler.Add(paraPath, "run", null, new()
+        {
+            ["text"] = "clear me",
+            ["italic"] = "true",
+            ["underline"] = "single"
+        });
+
+        handler.Set(runPath, new() { ["text"] = "" });
+
+        var node = handler.Get(runPath);
+        Assert.Equal("run", node.Type);
+        Assert.Equal("", node.Text);
+        Assert.Equal(true, Fmt(node)["italic"]);
+        Assert.Equal("single", Fmt(node)["underline"]);
+    }
+
+    [Fact]
     public void AddRun_ReadsBackScriptSpecificFormatting()
     {
         var path = CreateBlankDocx();

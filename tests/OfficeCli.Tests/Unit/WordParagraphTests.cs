@@ -52,4 +52,29 @@ public class WordParagraphTests : WordTestBase
         Assert.Equal("9pt", Fmt(node)["spaceAfter"]);
         Assert.Equal("2x", Fmt(node)["lineSpacing"]);
     }
+
+    [Fact]
+    public void SetParagraph_ListStyleAndIndentReadBackCurrentConflictBehavior()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paraPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "Indented item" });
+
+        var unsupported = handler.Set(paraPath, new()
+        {
+            ["firstLineIndent"] = "12pt",
+            ["rightIndent"] = "18pt",
+            ["hangingIndent"] = "6pt",
+            ["listStyle"] = "bullet"
+        });
+
+        var node = handler.Get(paraPath);
+        Assert.Empty(unsupported);
+        Assert.False(Fmt(node).ContainsKey("firstLineIndent"));
+        Assert.Equal("18pt", Fmt(node)["rightIndent"]);
+        Assert.Equal("6pt", Fmt(node)["hangingIndent"]);
+        Assert.Equal("bullet", Fmt(node)["listStyle"]);
+        Assert.Empty(handler.Validate());
+    }
 }
