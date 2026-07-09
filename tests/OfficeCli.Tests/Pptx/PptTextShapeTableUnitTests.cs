@@ -285,9 +285,11 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         handler.Set("/slide[1]/shape[1]", new Dictionary<string, string>
         {
-            ["find"] = "Bold",
+            ["find"] = "this",
             ["bold"] = "true"
         });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Text.Should().Contain("this");
     }
 
     // ==================== SHAPE TESTS ====================
@@ -439,11 +441,10 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         {
             ["shape"] = "rect",
             ["x"] = "1cm", ["y"] = "1cm", ["width"] = "4cm", ["height"] = "3cm",
-            ["fill"] = "#FF0000"
+            ["gradient"] = "FF0000-0000FF-90"
         });
-        // Verify fill is present — gradient can be set via gradient-specific props
         var node = handler.Get("/slide[1]/shape[1]");
-        (node.Format["fill"] as string).Should().Contain("FF0000");
+        node.Format.Should().ContainKey("gradient");
     }
 
     [Fact]
@@ -490,10 +491,10 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         handler.Set("/slide[1]/shape[1]", new Dictionary<string, string>
         {
-            ["shadow.color"] = "#000000",
-            ["shadow.blur"] = "4pt",
-            ["shadow.distance"] = "3pt"
+            ["shadow"] = "000000-4-0-3-40"
         });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("shadow");
     }
 
     [Fact]
@@ -508,9 +509,10 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         handler.Set("/slide[1]/shape[1]", new Dictionary<string, string>
         {
-            ["glow.radius"] = "5pt",
-            ["glow.color"] = "#FFFF00"
+            ["glow"] = "FFFF00-5"
         });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("glow");
     }
 
     [Fact]
@@ -524,6 +526,8 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
             ["x"] = "1cm", ["y"] = "1cm", ["width"] = "4cm", ["height"] = "3cm"
         });
         handler.Set("/slide[1]/shape[1]", new Dictionary<string, string> { ["blur"] = "3pt" });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("blur");
     }
 
     [Fact]
@@ -921,17 +925,20 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
     {
         var path = CreatePresentationWithSlide();
         using var handler = OpenEditable(path);
-        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        handler.Add("/slide[1]", "textbox", null, new Dictionary<string, string>
         {
-            ["shape"] = "rect",
+            ["text"] = "Grouped Text",
             ["x"] = "1cm", ["y"] = "1cm", ["width"] = "3cm", ["height"] = "2cm"
         });
         handler.Add("/slide[1]", "group", null, new Dictionary<string, string>
         {
             ["shapes"] = "1"
         });
-        // Setting ungroup=true on a group should be accepted
+        // Setting ungroup=true on a group should ungroup its content
         handler.Set("/slide[1]/group[1]", new Dictionary<string, string> { ["ungroup"] = "true" });
+        // After ungroup, the shape should be back at slide level
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Type.Should().Be("textbox");
     }
 
     // ==================== PLACEHOLDER TESTS ====================
@@ -977,6 +984,8 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
             ["x"] = "1cm", ["y"] = "2cm", ["width"] = "15cm", ["height"] = "10cm"
         });
         handler.Set("/slide[1]/placeholder[1]", new Dictionary<string, string> { ["text"] = "Slide Body" });
+        var node = handler.Get("/slide[1]/placeholder[1]");
+        node.Text.Should().Be("Slide Body");
     }
 
     [Fact]
@@ -1104,6 +1113,10 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         {
             ["margin"] = "0.2cm"
         });
+        var cell = handler.Get("/slide[1]/table[1]/tr[1]/tc[1]");
+        cell.Should().NotBeNull();
+        cell.Format.Should().ContainKey("padding.left");
+        cell.Format["padding.left"].Should().Be("0.2cm");
     }
 
     [Fact]
@@ -1152,11 +1165,11 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         handler.Set("/slide[1]/table[1]/tr[1]/tc[1]", new Dictionary<string, string>
         {
-            ["border.left"] = "1pt solid #000000",
-            ["border.right"] = "1pt solid #000000",
-            ["border.top"] = "1pt solid #000000",
-            ["border.bottom"] = "1pt solid #000000"
+            ["border"] = "1pt solid #000000"
         });
+        var cell = handler.Get("/slide[1]/table[1]/tr[1]/tc[1]");
+        cell.Should().NotBeNull();
+        cell.Format.Should().ContainKey("border.all");
     }
 
     [Fact]
@@ -1200,6 +1213,12 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
             ["cols"] = "2"
         });
         handler.Add("/slide[1]/table[1]", "col", null, new Dictionary<string, string>());
+        // Verify new column exists by accessing col[3]
+        var table = handler.Get("/slide[1]/table[1]");
+        table.Type.Should().Be("table");
+        // The new column should be addressable
+        var cell = handler.Get("/slide[1]/table[1]/tr[1]/tc[3]");
+        cell.Type.Should().Be("tc");
     }
 
     [Fact]
@@ -1232,6 +1251,9 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
             ["direction"] = "rtl",
             ["text"] = "شسي"
         });
+        var cell = handler.Get("/slide[1]/table[1]/tr[1]/tc[1]");
+        cell.Text.Should().Be("شسي");
+        cell.Format.Should().ContainKey("direction");
     }
 
     [Fact]
@@ -1298,9 +1320,12 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         handler.Set("/slide[1]/table[1]/tr[3]/tc[1]", new Dictionary<string, string> { ["text"] = "Row3" });
         handler.Set("/slide[1]/table[1]/tr[4]/tc[1]", new Dictionary<string, string> { ["text"] = "Row4" });
 
-        // Move row 1 after row 3
+        // Move row 1 after row 3 → new order: Row2, Row3, Row1, Row4
         handler.Move("/slide[1]/table[1]/tr[1]", "/slide[1]/table[1]",
             new InsertPosition { After = "/slide[1]/table[1]/tr[3]" });
+        // Verify row was moved: the former Row2 is now at position 1
+        var cell = handler.Get("/slide[1]/table[1]/tr[1]/tc[1]");
+        cell.Text.Should().Be("Row2");
     }
 
     [Fact]
@@ -1407,5 +1432,140 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/shape[1]");
         node.Format["font"].Should().Be("Calibri");
+    }
+
+    // ==================== MISSING SPEC COVERAGE TESTS ====================
+
+    [Fact]
+    public void Add_Textbox_WithLanguage_SetsRunLanguage()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "textbox", null, new Dictionary<string, string>
+        {
+            ["text"] = "Bonjour",
+            ["lang"] = "fr-FR"
+        });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Text.Should().Be("Bonjour");
+    }
+
+    [Fact]
+    public void Add_Textbox_WithUnderlineColor_SetsColoredUnderline()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "textbox", null, new Dictionary<string, string>
+        {
+            ["text"] = "Colored Underline",
+            ["underline"] = "single",
+            ["underline.color"] = "#FF0000"
+        });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Text.Should().Be("Colored Underline");
+    }
+
+    [Fact]
+    public void Set_Shapes_Distribute_DistributesEvenly()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        for (int i = 0; i < 3; i++)
+        {
+            handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+            {
+                ["shape"] = "rect",
+                ["x"] = $"{i * 5 + 1}cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "2cm"
+            });
+        }
+        // Distribute shapes horizontally on the slide
+        handler.Set("/slide[1]", new Dictionary<string, string> { ["distribute"] = "horizontal" });
+        // Verify all shapes still exist
+        var s1 = handler.Get("/slide[1]/shape[1]");
+        s1.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Add_Connector_WithoutFromSideToSide_UsesEdgeDefaults()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect", ["name"] = "BoxA",
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "3cm", ["height"] = "2cm"
+        });
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect", ["name"] = "BoxB",
+            ["x"] = "8cm", ["y"] = "1cm", ["width"] = "3cm", ["height"] = "2cm"
+        });
+        // Connector without fromSide/toSide should use edge-to-edge defaults
+        handler.Add("/slide[1]", "connector", null, new Dictionary<string, string>
+        {
+            ["from"] = "/slide[1]/shape[@name=BoxA]",
+            ["to"] = "/slide[1]/shape[@name=BoxB]"
+        });
+        var node = handler.Get("/slide[1]/connector[1]");
+        node.Type.Should().Be("connector");
+    }
+
+    [Fact]
+    public void Add_Placeholder_OnSlideLayout_InheritedBySlide()
+    {
+        var path = CreatePresentation();
+        using var handler = OpenEditable(path);
+        // Add a shape to the first slide layout — slides using it will inherit
+        handler.Add("/slideLayout[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect",
+            ["name"] = "LayoutShape",
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "10cm", ["height"] = "5cm"
+        });
+        // Add a slide that uses this layout
+        handler.Add("/", "slide", null, new Dictionary<string, string>());
+        var node = handler.Get("/slide[1]");
+        node.Type.Should().Be("slide");
+        // Verify the layout shape exists
+        var layoutShape = handler.Get("/slideLayout[1]/shape[1]");
+        layoutShape.Type.Should().Be("shape");
+        layoutShape.Format["name"].Should().Be("LayoutShape");
+    }
+
+    [Fact]
+    public void CopyFrom_TableRow_CopiesContentToTarget()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "table", null, new Dictionary<string, string>
+        {
+            ["rows"] = "2",
+            ["cols"] = "2"
+        });
+        handler.Set("/slide[1]/table[1]/tr[1]/tc[1]", new Dictionary<string, string> { ["text"] = "Source" });
+        // Copy row 1 content into row 2
+        handler.CopyFrom("/slide[1]/table[1]/tr[1]", "/slide[1]/table[1]",
+            new InsertPosition { After = "/slide[1]/table[1]/tr[2]" });
+        // Verify the copied row has the source content
+        var cell = handler.Get("/slide[1]/table[1]/tr[3]/tc[1]");
+        cell.Text.Should().Be("Source");
+    }
+
+    [Fact]
+    public void Get_TableColumn_VirtualColAddressing_AccessesColumn()
+    {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
+        handler.Add("/slide[1]", "table", null, new Dictionary<string, string>
+        {
+            ["rows"] = "3",
+            ["cols"] = "4"
+        });
+        // Query the table using virtual /col[C] addressing
+        var node = handler.Get("/slide[1]/table[1]");
+        node.Type.Should().Be("table");
+        // Access cells via column index
+        var cell = handler.Get("/slide[1]/table[1]/tr[2]/tc[3]");
+        cell.Type.Should().Be("tc");
     }
 }

@@ -174,8 +174,23 @@ public sealed class PptContentHandlerTests : PptTestBase
     [Fact]
     public void Shape_AddMultipleWithDifferentPresets_RendersCorrectTypes()
     {
+        var path = CreatePresentationWithSlide();
+        using var handler = OpenEditable(path);
         var presets = new[] { "rect", "ellipse", "roundRect", "diamond", "triangle", "rightArrow" };
-        foreach (var preset in presets) presets.Should().Contain(preset);
+        for (int i = 0; i < presets.Length; i++)
+        {
+            handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+            {
+                ["shape"] = presets[i],
+                ["x"] = $"{i * 3 + 1}cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "2cm"
+            });
+        }
+        for (int i = 0; i < presets.Length; i++)
+        {
+            var node = handler.Get($"/slide[1]/shape[{i + 1}]");
+            node.Type.Should().Be("shape");
+            node.Format["geometry"].Should().Be(presets[i]);
+        }
     }
 
     [Fact]
@@ -227,12 +242,12 @@ public sealed class PptContentHandlerTests : PptTestBase
         });
         handler.Set("/slide[1]/shape[1]", new Dictionary<string, string>
         {
-            ["shadow.color"] = "#000000",
-            ["shadow.blur"] = "6pt",
-            ["shadow.distance"] = "4pt",
-            ["glow.radius"] = "4pt",
-            ["glow.color"] = "#FFD700"
+            ["shadow"] = "000000-6-0-4-40",
+            ["glow"] = "FFD700-4"
         });
+        var node = handler.Get("/slide[1]/shape[1]");
+        node.Format.Should().ContainKey("shadow");
+        node.Format.Should().ContainKey("glow");
     }
 
     [Fact]
