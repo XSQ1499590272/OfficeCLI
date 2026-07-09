@@ -1448,6 +1448,9 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/shape[1]");
         node.Text.Should().Be("Bonjour");
+        // lang is a run-only attribute — verify at run level
+        var run = handler.Get("/slide[1]/shape[1]/paragraph[1]/run[1]");
+        run.Format["lang"].Should().Be("fr-FR");
     }
 
     [Fact]
@@ -1463,6 +1466,8 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/shape[1]");
         node.Text.Should().Be("Colored Underline");
+        node.Format["underline"].Should().Be("single");
+        node.Format["underline.color"].Should().Be("#FF0000");
     }
 
     [Fact]
@@ -1470,19 +1475,30 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
     {
         var path = CreatePresentationWithSlide();
         using var handler = OpenEditable(path);
-        for (int i = 0; i < 3; i++)
+        // Create 3 shapes with intentionally uneven horizontal gaps
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
         {
-            handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
-            {
-                ["shape"] = "rect",
-                ["x"] = $"{i * 5 + 1}cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "2cm"
-            });
-        }
-        // Distribute shapes horizontally on the slide
+            ["shape"] = "rect",
+            ["x"] = "1cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "1cm"
+        });
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect",
+            ["x"] = "3.5cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "1cm"
+        });
+        handler.Add("/slide[1]", "shape", null, new Dictionary<string, string>
+        {
+            ["shape"] = "rect",
+            ["x"] = "12cm", ["y"] = "1cm", ["width"] = "2cm", ["height"] = "1cm"
+        });
+        // Record pre-distribution position of the middle shape
+        var s2Before = handler.Get("/slide[1]/shape[2]");
+        var xBefore = s2Before.Format["x"];
+        // Distribute shapes horizontally
         handler.Set("/slide[1]", new Dictionary<string, string> { ["distribute"] = "horizontal" });
-        // Verify all shapes still exist
-        var s1 = handler.Get("/slide[1]/shape[1]");
-        s1.Should().NotBeNull();
+        // Verify the middle shape moved (distribution changed its position)
+        var s2After = handler.Get("/slide[1]/shape[2]");
+        s2After.Format["x"].Should().NotBe(xBefore);
     }
 
     [Fact]
@@ -1508,11 +1524,18 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/connector[1]");
         node.Type.Should().Be("connector");
+        // Verify connector has both endpoint references set
+        node.Format.Should().ContainKey("startShape");
+        node.Format.Should().ContainKey("endShape");
     }
 
     [Fact]
     public void Add_Placeholder_OnSlideLayout_InheritedBySlide()
     {
+        // NOTE: AddPlaceholder does not support slideLayout paths — the handler
+        // rejects placeholder additions to layouts. This test instead verifies
+        // that adding a regular shape to a slideLayout works and is visible
+        // through Get, which is the closest available API for layout inheritance.
         var path = CreatePresentation();
         using var handler = OpenEditable(path);
         // Add a shape to the first slide layout — slides using it will inherit
@@ -1561,11 +1584,8 @@ public sealed class PptTextShapeTableUnitTests : PptTestBase
             ["rows"] = "3",
             ["cols"] = "4"
         });
-        // Query the table using virtual /col[C] addressing
-        var node = handler.Get("/slide[1]/table[1]");
-        node.Type.Should().Be("table");
-        // Access cells via column index
-        var cell = handler.Get("/slide[1]/table[1]/tr[2]/tc[3]");
-        cell.Type.Should().Be("tc");
+        // Access a column via /col[C] virtual addressing
+        var colNode = handler.Get("/slide[1]/table[1]/col[3]");
+        colNode.Type.Should().Be("col");
     }
 }
