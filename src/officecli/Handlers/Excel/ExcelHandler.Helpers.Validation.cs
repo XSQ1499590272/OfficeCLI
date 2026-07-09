@@ -395,8 +395,6 @@ public partial class ExcelHandler
     private static readonly System.Text.RegularExpressions.Regex CanonicalNumericLiteral =
         new(@"^-?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-    internal static bool IsCanonicalNumericText(string text) => CanonicalNumericLiteral.IsMatch(text);
-
     /// <summary>Shape-check a sparkline data range ("A1:E1" or
     /// "Sheet1!A1:E1", whole rows/cols allowed). Arbitrary strings written
     /// into &lt;xne:f&gt; make real Excel refuse the file while schema

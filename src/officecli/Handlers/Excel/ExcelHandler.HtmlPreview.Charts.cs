@@ -16,17 +16,6 @@ namespace OfficeCli.Handlers;
 public partial class ExcelHandler
 {
     /// <summary>
-    /// Render all charts in a worksheet as SVG elements, respecting anchor positions.
-    /// Charts with overlapping row ranges are placed side-by-side using flex layout.
-    /// </summary>
-    private void RenderSheetCharts(StringBuilder sb, WorksheetPart worksheetPart)
-    {
-        var charts = CollectSheetCharts(worksheetPart);
-        foreach (var (_, _, _, _, _, html) in charts)
-            sb.Append(html);
-    }
-
-    /// <summary>
     /// Pre-render all charts and return them with their anchor row/col positions.
     /// Charts with overlapping row ranges are grouped into flex rows.
     /// </summary>

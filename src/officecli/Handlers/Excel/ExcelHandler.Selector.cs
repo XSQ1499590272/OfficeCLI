@@ -314,21 +314,6 @@ public partial class ExcelHandler
         return chartParts[index - 1];
     }
 
-    private DocumentFormat.OpenXml.Packaging.ChartPart GetGlobalChartPart(int index)
-    {
-        var allCharts = new List<DocumentFormat.OpenXml.Packaging.ChartPart>();
-        foreach (var (_, worksheetPart) in GetWorksheets())
-        {
-            if (worksheetPart.DrawingsPart != null)
-                allCharts.AddRange(worksheetPart.DrawingsPart.ChartParts);
-        }
-        if (allCharts.Count == 0)
-            throw new ArgumentException("No charts found in workbook");
-        if (index < 1 || index > allCharts.Count)
-            throw new ArgumentException($"Chart index {index} out of range (1..{allCharts.Count})");
-        return allCharts[index - 1];
-    }
-
     /// <summary>Charts addressable by a raw <c>chart[N]</c> path: the anchored
     /// charts (drawing order, both legacy and cx — matching query/get), followed
     /// by any chart parts NOT yet referenced by a graphicFrame. The trailing
