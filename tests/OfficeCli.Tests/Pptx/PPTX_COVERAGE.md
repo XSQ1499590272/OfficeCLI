@@ -4,11 +4,11 @@ Generated: 2026-07-09
 
 | Feature Area     | Unit Tests | Integration/E2E | Notes                          |
 |------------------|------------|-----------------|--------------------------------|
-| presentation     | None       | None            |                                |
-| slide            | None       | None            |                                |
-| slideMaster      | None       | None            |                                |
-| slideLayout      | None       | None            |                                |
-| theme            | None       | None            |                                |
+| presentation     | Yes        | None            | PptPresentationSlideHandlerTests |
+| slide            | Yes        | None            | PptPresentationSlideHandlerTests |
+| slideMaster      | Yes        | None            | PptPresentationSlideHandlerTests |
+| slideLayout      | Yes        | None            | PptPresentationSlideHandlerTests |
+| theme            | Yes        | None            | PptPresentationSlideHandlerTests |
 | raw              | None       | None            |                                |
 | paragraph        | None       | None            |                                |
 | run              | None       | None            |                                |
@@ -28,9 +28,9 @@ Generated: 2026-07-09
 | group            | None       | None            |                                |
 | placeholder      | None       | None            |                                |
 | hyperlink        | None       | None            |                                |
-| comment          | None       | None            |                                |
-| moderncomment    | None       | None            |                                |
-| notes            | None       | None            |                                |
+| comment          | Yes        | None            | PptPresentationSlideHandlerTests |
+| moderncomment    | Yes        | None            | PptPresentationSlideHandlerTests |
+| notes            | Yes        | None            | PptPresentationSlideHandlerTests |
 | animation        | None       | None            |                                |
 | transition       | None       | None            |                                |
 | equation         | None       | None            |                                |
