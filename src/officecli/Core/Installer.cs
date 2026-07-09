@@ -186,8 +186,10 @@ internal static class Installer
     {
         try
         {
-            // Opt-out
-            if (Environment.GetEnvironmentVariable("OFFICECLI_NO_AUTO_INSTALL") == "1")
+            // Opt-in: bundled agent integrations should never write user PATH,
+            // skills, or MCP config unless the host explicitly enables it.
+            if (Environment.GetEnvironmentVariable("OFFICECLI_ENABLE_AUTO_INSTALL") != "1" ||
+                Environment.GetEnvironmentVariable("OFFICECLI_NO_AUTO_INSTALL") == "1")
                 return;
 
             // Only trigger on bare `officecli` invocation (exploratory / discovery call).

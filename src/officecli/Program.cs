@@ -201,12 +201,14 @@ if (args.Length >= 2 && args[0] == "config")
 // Log command
 OfficeCli.Core.CliLogger.LogCommand(args);
 
-// Auto-install: if running outside ~/.local/bin/officecli, copy self there.
-// Fresh install → full Run() (binary + skills + MCP). Upgrade → binary only.
+// Auto-install is opt-in; embedded agent builds should not write user PATH,
+// skills, or MCP config unless the host explicitly asks for it.
 OfficeCli.Core.Installer.MaybeAutoInstall(args);
 
-// Non-blocking update check: spawns background upgrade if stale
-if (Environment.GetEnvironmentVariable("OFFICECLI_SKIP_UPDATE") != "1")
+// Non-blocking update check: opt-in to avoid surprise network/process work
+// when officecli is bundled as another app's internal tool.
+if (Environment.GetEnvironmentVariable("OFFICECLI_ENABLE_UPDATE") == "1" &&
+    Environment.GetEnvironmentVariable("OFFICECLI_SKIP_UPDATE") != "1")
     OfficeCli.Core.UpdateChecker.CheckInBackground();
 
 var rootCommand = OfficeCli.CommandBuilder.BuildRootCommand();
