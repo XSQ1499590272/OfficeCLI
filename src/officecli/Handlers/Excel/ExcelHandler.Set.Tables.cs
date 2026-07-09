@@ -811,10 +811,9 @@ public partial class ExcelHandler
         var refId = idExt?.GetFirstChild<X14.Id>()?.Text;
         if (string.IsNullOrEmpty(refId)) return null;
 
-        const string cfExtUri = "{78C0D931-6437-407d-A8EE-F0AAD7539E65}";
         var wsExtList = ws.GetFirstChild<WorksheetExtensionList>();
         if (wsExtList == null) return null;
-        foreach (var wsExt in wsExtList.Elements<WorksheetExtension>().Where(e => e.Uri == cfExtUri))
+        foreach (var wsExt in wsExtList.Elements<WorksheetExtension>().Where(e => e.Uri == ConditionalFormattingExtUri))
         {
             foreach (var x14Cfs in wsExt.Elements<X14.ConditionalFormattings>())
             foreach (var x14Cf in x14Cfs.Elements<X14.ConditionalFormatting>())

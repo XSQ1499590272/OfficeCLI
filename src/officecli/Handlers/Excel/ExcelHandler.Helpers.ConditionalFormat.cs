@@ -15,6 +15,7 @@ namespace OfficeCli.Handlers;
 
 public partial class ExcelHandler
 {
+    private const string ConditionalFormattingExtUri = "{78C0D931-6437-407d-A8EE-F0AAD7539E65}";
 
     /// <summary>
     /// Insert a ConditionalFormatting element after all existing CF elements (preserving add order).
@@ -91,13 +92,12 @@ public partial class ExcelHandler
     /// </summary>
     internal static void EnsureWorksheetX14ConditionalFormatting(Worksheet ws, X14.ConditionalFormatting x14Cf)
     {
-        const string cfExtUri = "{78C0D931-6437-407d-A8EE-F0AAD7539E65}";
         const string x14Ns = "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main";
 
         EnsureWorksheetX14Ignorable(ws);
 
         var extList = ws.GetFirstChild<WorksheetExtensionList>() ?? ws.AppendChild(new WorksheetExtensionList());
-        var ext = extList.Elements<WorksheetExtension>().FirstOrDefault(e => e.Uri == cfExtUri);
+        var ext = extList.Elements<WorksheetExtension>().FirstOrDefault(e => e.Uri == ConditionalFormattingExtUri);
         X14.ConditionalFormattings cfContainer;
         if (ext != null)
         {
@@ -106,7 +106,7 @@ public partial class ExcelHandler
         }
         else
         {
-            ext = new WorksheetExtension { Uri = cfExtUri };
+            ext = new WorksheetExtension { Uri = ConditionalFormattingExtUri };
             ext.AddNamespaceDeclaration("x14", x14Ns);
             cfContainer = new X14.ConditionalFormattings();
             ext.Append(cfContainer);
