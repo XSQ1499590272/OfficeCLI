@@ -21,7 +21,9 @@ yarn-error.log*
 # Build outputs
 build/
 dist/
+temp/
 
 # OS/editor
 .DS_Store
+.idea/
 *.swp
