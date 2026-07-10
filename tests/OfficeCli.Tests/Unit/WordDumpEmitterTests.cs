@@ -278,4 +278,29 @@ public class WordDumpEmitterTests : WordTestBase
             && item.Path == "/body/textbox[1]/p[last()]"
             && item.Props?["text"] == "Sidebar note");
     }
+
+    [Fact]
+    public void DumpFullDocument_IsDeterministicAcrossConsecutiveCalls()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        handler.Add("/body", "paragraph", null, new() { ["text"] = "Stable dump" });
+        handler.Add("/body", "table", null, new()
+        {
+            ["data"] = "A,B;C,D",
+            ["layout"] = "fixed",
+            ["colWidths"] = "900,1200"
+        });
+
+        var first = WordBatchEmitter.EmitWordWithWarnings(handler);
+        var second = WordBatchEmitter.EmitWordWithWarnings(handler);
+
+        Assert.Empty(first.Warnings);
+        Assert.Empty(second.Warnings);
+        Assert.Equal(first.Items.Count, second.Items.Count);
+        Assert.Equal(
+            System.Text.Json.JsonSerializer.Serialize(first.Items),
+            System.Text.Json.JsonSerializer.Serialize(second.Items));
+    }
 }

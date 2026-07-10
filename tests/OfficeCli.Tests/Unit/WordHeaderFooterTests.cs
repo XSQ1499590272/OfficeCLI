@@ -94,4 +94,46 @@ public class WordHeaderFooterTests : WordTestBase
         Assert.Contains(footers, f => f.Text == "First-page footer");
         Assert.Contains(footers, f => f.Text == "Even-page footer");
     }
+
+    [Fact]
+    public void AddFirstAndEvenHeaderFooter_EnablesSectionAndDocumentFlags()
+    {
+        var path = CreateBlankDocx();
+
+        using (var handler = new WordHandler(path, editable: true))
+        {
+            handler.Add("/", "header", null, new() { ["type"] = "first", ["text"] = "First" });
+            handler.Add("/", "header", null, new() { ["type"] = "even", ["text"] = "Even" });
+            handler.Add("/", "footer", null, new() { ["type"] = "first", ["text"] = "First footer" });
+            handler.Add("/", "footer", null, new() { ["type"] = "even", ["text"] = "Even footer" });
+
+            Assert.Equal(2, handler.Query("header").Count);
+            Assert.Equal(2, handler.Query("footer").Count);
+        }
+
+        using var document = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(path, false);
+        var settings = document.MainDocumentPart!.DocumentSettingsPart!.Settings!;
+        var section = document.MainDocumentPart.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.SectionProperties>()
+            .Single();
+
+        Assert.NotNull(settings.GetFirstChild<DocumentFormat.OpenXml.Wordprocessing.EvenAndOddHeaders>());
+        Assert.NotNull(section.GetFirstChild<DocumentFormat.OpenXml.Wordprocessing.TitlePage>());
+        Assert.Equal(2, section.Elements<DocumentFormat.OpenXml.Wordprocessing.HeaderReference>().Count());
+        Assert.Equal(2, section.Elements<DocumentFormat.OpenXml.Wordprocessing.FooterReference>().Count());
+    }
+
+    [Fact]
+    public void AddHeaderFooter_RejectsUnknownTypeWithoutCreatingPart()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        Assert.Throws<ArgumentException>(() =>
+            handler.Add("/", "header", null, new() { ["type"] = "invalid", ["text"] = "bad" }));
+        Assert.Throws<ArgumentException>(() =>
+            handler.Add("/", "footer", null, new() { ["type"] = "invalid", ["text"] = "bad" }));
+
+        Assert.Empty(handler.Query("header"));
+        Assert.Empty(handler.Query("footer"));
+    }
 }

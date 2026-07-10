@@ -88,4 +88,30 @@ public class WordSelectorTests : WordTestBase
 
         Assert.Single(handler.Query("paragraph"));
     }
+
+    [Fact]
+    public void QuerySelector_AcceptsAtPrefixedAttributesAndComparisonsContainingGreaterThan()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var target = handler.Add("/body", "paragraph", null, new()
+        {
+            ["text"] = "at-prefixed selector",
+            ["align"] = "right",
+            ["size"] = "14"
+        });
+        handler.Add("/body", "paragraph", null, new()
+        {
+            ["text"] = "other selector",
+            ["align"] = "left",
+            ["size"] = "10"
+        });
+
+        var atPrefixed = Assert.Single(handler.Query("paragraph[@align=right]"));
+        var greaterThan = handler.Query("paragraph[size>=14pt]");
+
+        Assert.Equal(target, atPrefixed.Path);
+        Assert.Contains(greaterThan, node => node.Path == target);
+    }
 }

@@ -211,4 +211,74 @@ public class WordDocumentSettingsTests : WordTestBase
         Assert.Equal("/section[1]", Fmt(paragraph)["effective.direction.src"]);
         Assert.Empty(handler.Validate());
     }
+
+    [Theory]
+    [InlineData("nextPage")]
+    [InlineData("continuous")]
+    [InlineData("evenPage")]
+    [InlineData("oddPage")]
+    [InlineData("nextColumn")]
+    public void AddSection_SupportsAllSectionBreakTypes(string breakType)
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var sectionPath = handler.Add("/body", "section", null, new() { ["type"] = breakType });
+
+        Assert.Equal(breakType switch
+        {
+            "nextPage" => "nextPage",
+            "continuous" => "continuous",
+            "evenPage" => "evenPage",
+            "oddPage" => "oddPage",
+            "nextColumn" => "nextColumn",
+            _ => throw new InvalidOperationException()
+        }, Fmt(handler.Get(sectionPath))["type"]);
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
+    public void AddSection_ReadsBackPageNumberingAndColumnSeparatorOptions()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var sectionPath = handler.Add("/body", "section", null, new()
+        {
+            ["titlePage"] = "true",
+            ["pageNumFmt"] = "upperRoman",
+            ["pageStart"] = "3",
+            ["columns"] = "2",
+            ["columns.separator"] = "true",
+            ["lineNumbers"] = "restartPage",
+            ["lineNumberCountBy"] = "5",
+            ["lineNumberDistance"] = "720",
+            ["lineNumberStart"] = "1"
+        });
+
+        var section = handler.Get(sectionPath);
+
+        Assert.Equal(true, Fmt(section)["titlePage"]);
+        Assert.Equal("upperRoman", Fmt(section)["pageNumFmt"]);
+        Assert.Equal(3, Fmt(section)["pageStart"]);
+        Assert.Equal(true, Fmt(section)["columns.separator"]);
+        Assert.Equal("restartPage", Fmt(section)["lineNumbers"]);
+        Assert.Equal(5, Convert.ToInt32(Fmt(section)["lineNumberCountBy"]));
+        Assert.Equal(720, Convert.ToInt32(Fmt(section)["lineNumberDistance"]));
+        Assert.Equal(1, Convert.ToInt32(Fmt(section)["lineNumberStart"]));
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
+    public void AddSection_RejectsUnknownBreakTypeWithoutCreatingSection()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var exception = Assert.Throws<ArgumentException>(() =>
+            handler.Add("/body", "section", null, new() { ["type"] = "unsupported" }));
+
+        Assert.Contains("Invalid section break type", exception.Message);
+        Assert.Single(handler.Query("section"));
+    }
 }

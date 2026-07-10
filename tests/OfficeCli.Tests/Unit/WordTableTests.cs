@@ -97,4 +97,60 @@ public class WordTableTests : WordTestBase
         Assert.Equal("X", table.Children[0].Children[1].Text);
         Assert.Empty(handler.Validate());
     }
+
+    [Fact]
+    public void SetRowAndCellPropertyMatrix_ReadsBackCurrentCanonicalValues()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        handler.Add("/body", "table", null, new() { ["data"] = "A,B" });
+
+        handler.Set("/body/tbl[1]/tr[1]", new()
+        {
+            ["height.atleast"] = "720",
+            ["header"] = "true",
+            ["cantSplit"] = "true",
+            ["hidden"] = "true",
+            ["cellSpacing"] = "40",
+            ["rowAlign"] = "right",
+            ["gridBefore"] = "1",
+            ["wBefore"] = "240"
+        });
+        handler.Set("/body/tbl[1]/tr[1]/tc[1]", new()
+        {
+            ["width"] = "50%",
+            ["fill"] = "FFF2CC",
+            ["tcFitText"] = "true",
+            ["nowrap"] = "true",
+            ["textDirection"] = "tbRlV",
+            ["padding.top"] = "60",
+            ["padding.bottom"] = "80",
+            ["padding.left"] = "100",
+            ["padding.right"] = "120"
+        });
+
+        var row = handler.Get("/body/tbl[1]/tr[1]");
+        var cell = handler.Get("/body/tbl[1]/tr[1]/tc[1]");
+
+        Assert.Equal("720dxa", Fmt(row)["height"]);
+        Assert.Equal("atLeast", Fmt(row)["height.rule"]);
+        Assert.Equal(true, Fmt(row)["header"]);
+        Assert.Equal(true, Fmt(row)["cantSplit"]);
+        Assert.Equal(true, Fmt(row)["hidden"]);
+        Assert.Equal(40, Convert.ToInt32(Fmt(row)["cellSpacing"]));
+        Assert.Equal("right", Fmt(row)["rowAlign"]);
+        Assert.Equal("1", Fmt(row)["gridBefore"]);
+        Assert.Equal("240dxa", Fmt(row)["wBefore"]);
+        Assert.Equal("50%", Fmt(cell)["width"]);
+        Assert.Equal("#FFF2CC", Fmt(cell)["fill"]);
+        Assert.Equal(true, Fmt(cell)["tcFitText"]);
+        Assert.Equal(true, Fmt(cell)["nowrap"]);
+        Assert.Equal("tbRlV", Fmt(cell)["textDirection"]);
+        Assert.Equal(60, Fmt(cell)["padding.top"]);
+        Assert.Equal(80, Fmt(cell)["padding.bottom"]);
+        Assert.Equal(100, Fmt(cell)["padding.left"]);
+        Assert.Equal(120, Fmt(cell)["padding.right"]);
+        Assert.Empty(handler.Validate());
+    }
 }

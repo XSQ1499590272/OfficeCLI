@@ -307,4 +307,37 @@ public class WordMediaQueryTests : WordTestBase
         Assert.DoesNotContain("\"rExt\"", body.OuterXml);
         Assert.Contains($"\"{hyperlinkRel.Id}\"", body.OuterXml);
     }
+
+    [Fact]
+    public void QueryPicture_ReadsOptionalCropAccessibilityLinkAndAnchorMetadata()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        handler.Add("/body", "picture", null, new()
+        {
+            ["src"] = TinyPngDataUri,
+            ["name"] = "optional.png",
+            ["alt"] = "Optional image",
+            ["crop"] = "10,20,30,40",
+            ["decorative"] = "true",
+            ["hidden"] = "true",
+            ["link"] = "https://example.com/image",
+            ["wrap"] = "square",
+            ["relativeHeight"] = "42"
+        });
+
+        var picture = Assert.Single(handler.Query("picture"));
+        var format = Fmt(picture);
+
+        Assert.Equal("optional.png", format["name"]);
+        Assert.Equal("Optional image", format["alt"]);
+        Assert.Equal("10,20,30,40", format["crop"]);
+        Assert.Equal(true, format["decorative"]);
+        Assert.Equal(true, format["hidden"]);
+        Assert.Equal("https://example.com/image", format["link"]);
+        Assert.Equal("square", format["wrap"]);
+        Assert.Equal("42", format["relativeHeight"]);
+        Assert.Empty(handler.Validate());
+    }
 }

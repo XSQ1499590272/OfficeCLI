@@ -49,4 +49,42 @@ public class WordTypedAttributeFallbackTests
         Assert.NotNull(fonts);
         Assert.Equal("Arial", fonts!.Ascii?.Value);
     }
+
+    [Fact]
+    public void TrySet_MergesCaseInsensitiveFontAliasesIntoOneRunFontsElement()
+    {
+        var runProperties = new RunProperties();
+
+        Assert.True(TypedAttributeFallback.TrySet(runProperties, "FONT.ascii", "Arial"));
+        Assert.True(TypedAttributeFallback.TrySet(runProperties, "font.hAnsi", "Arial Unicode MS"));
+
+        var fonts = Assert.Single(runProperties.Elements<RunFonts>());
+        Assert.Equal("Arial", fonts.Ascii?.Value);
+        Assert.Equal("Arial Unicode MS", fonts.HighAnsi?.Value);
+    }
+
+    [Fact]
+    public void TrySet_RequiresExistingNestedContainerAndPreservesNestedColorValue()
+    {
+        var paragraphProperties = new ParagraphProperties(
+            new ParagraphBorders(new TopBorder()));
+
+        Assert.True(TypedAttributeFallback.TrySet(
+            paragraphProperties, "border.top.color", "#112233"));
+        Assert.Equal("#112233", paragraphProperties.GetFirstChild<ParagraphBorders>()!
+            .GetFirstChild<TopBorder>()!.Color?.Value);
+
+        var missing = new ParagraphProperties();
+        Assert.False(TypedAttributeFallback.TrySet(missing, "border.top.color", "#112233"));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("unknown")]
+    [InlineData(".attr")]
+    [InlineData("element.")]
+    public void TrySet_RejectsMalformedOrUndottedKeys(string key)
+    {
+        Assert.False(TypedAttributeFallback.TrySet(new ParagraphProperties(), key, "value"));
+    }
 }

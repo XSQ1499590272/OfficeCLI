@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using OfficeCli.Core;
 using OfficeCli.Handlers;
 
 namespace OfficeCli.Tests.Unit;
@@ -40,5 +41,27 @@ public class WordTextInputBoundaryTests : WordTestBase
             handler.Add("/body", "paragraph", null, new() { ["text"] = "bad\u0001text" }));
 
         Assert.Empty(handler.Query("paragraph"));
+    }
+
+    [Fact]
+    public void TextEscape_ResolvesSupportedEscapesInOnePass()
+    {
+        Assert.Equal("line1\nline2\tvalue\rreturn\\", TextEscape.Resolve("line1\\nline2\\tvalue\\rreturn\\\\"));
+        Assert.Equal("literal\\n", TextEscape.Resolve("literal\\\\n"));
+    }
+
+    [Fact]
+    public void TextEscape_PreservesUnknownAndTrailingBackslashSequences()
+    {
+        Assert.Equal("unknown\\q", TextEscape.Resolve("unknown\\q"));
+        Assert.Equal("trailing\\", TextEscape.Resolve("trailing\\"));
+        Assert.Equal("plain", TextEscape.Resolve("plain"));
+    }
+
+    [Fact]
+    public void TextEscape_TreatsNullAndEmptyAsEmpty()
+    {
+        Assert.Equal(string.Empty, TextEscape.Resolve(null));
+        Assert.Equal(string.Empty, TextEscape.Resolve(string.Empty));
     }
 }

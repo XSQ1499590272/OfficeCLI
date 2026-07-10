@@ -1356,7 +1356,7 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
     }
 
     [Fact]
-    public void MoveAndCopyCli_ResidentForwardChangesMemoryButCurrentFlushBoundaryIsExplicit()
+    public void MoveAndCopyCli_ResidentForwardChangesMemoryAndExplicitSavePersistsIt()
     {
         var path = CreateBlankDocx();
         foreach (var text in new[] { "resident move A", "resident move B", "resident move C" })
@@ -1393,22 +1393,23 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
             Assert.True(OfficeCli.ResidentClient.TryConnect(path, out _), "copy was not forwarded to the live resident");
 
             var live = AssertJsonSuccess(RunOfficeCli("query", path, "paragraph", "--json"));
-            Assert.Equal(
-                ["resident move C", "resident move A", "resident move C", "resident move B"],
-                live.GetProperty("results").EnumerateArray()
-                    .Select(result => result.GetProperty("text").GetString() ?? "")
-                    .ToArray());
+            var liveTexts = live.GetProperty("results").EnumerateArray()
+                .Select(result => result.GetProperty("text").GetString() ?? "")
+                .ToArray();
+            Assert.True(
+                liveTexts.SequenceEqual(["resident move C", "resident move A", "resident move C", "resident move B"]),
+                live.GetRawText());
 
             var saved = RunOfficeCli("save", path, "--json");
-            Assert.Equal(1, saved.ExitCode);
-            AssertJsonFailure(saved, "io_error");
+            var savedData = AssertJsonSuccess(saved);
+            Assert.Contains("Saved", savedData.GetString() ?? savedData.GetRawText());
 
             Assert.True(OfficeCli.ResidentClient.SendClose(path));
             Assert.True(resident.WaitForExit(5_000), "resident did not close");
 
             using var reopened = new WordHandler(path, editable: false);
             Assert.Equal(
-                ["resident move A", "resident move B", "resident move C"],
+                ["resident move C", "resident move A", "resident move C", "resident move B"],
                 reopened.Query("paragraph").Select(paragraph => paragraph.Text ?? "").ToArray());
         }
         finally
@@ -1700,6 +1701,7 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
             {
                 document.Add("/body", "table", null, new() { ["rows"] = "1", ["cols"] = "1" });
                 document.Set("/body/tbl[1]/tr[1]", new() { ["c1"] = "watch table cell" });
+                document.Add("/body", "paragraph", null, new() { ["text"] = "TODO-123" });
             }
 
             watchProcess = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start watch");
@@ -1735,13 +1737,36 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
                 Assert.Equal("review this", mark.GetProperty("note").GetString());
             }
 
+            var invalidColor = RunOfficeCli(
+                "mark", path, "/body/p[1]",
+                "--prop", "color=javascript:alert(1)", "--json");
+            Assert.Equal(1, invalidColor.ExitCode);
+            Assert.Contains("invalid color", invalidColor.Stdout, StringComparison.OrdinalIgnoreCase);
+
+            var regexMarked = RunOfficeCli(
+                "mark", path, "/body/p[2]",
+                "--prop", "find=TODO-[0-9]+", "--prop", "regex=true",
+                "--prop", "color=00ff00", "--prop", "note=regex mark", "--json");
+            Assert.True(regexMarked.ExitCode == 0, regexMarked.Stderr);
+            using (var regexDocument = JsonDocument.Parse(regexMarked.Stdout))
+            {
+                var regexMark = regexDocument.RootElement;
+                Assert.Equal("/body/p[2]", regexMark.GetProperty("path").GetString());
+                Assert.Equal("r\"TODO-[0-9]+\"", regexMark.GetProperty("find").GetString());
+                Assert.Equal("#00FF00", regexMark.GetProperty("color").GetString());
+                Assert.Contains(regexMark.GetProperty("matched_text").EnumerateArray(),
+                    item => item.GetString() == "TODO-123");
+            }
+
             var listed = RunOfficeCli("get-marks", path, "--json");
             Assert.True(listed.ExitCode == 0, listed.Stderr);
             using (var listedDocument = JsonDocument.Parse(listed.Stdout))
             {
-                var listedMark = Assert.Single(listedDocument.RootElement.GetProperty("marks").EnumerateArray());
-                Assert.Equal(markId, listedMark.GetProperty("id").GetString());
-                Assert.Equal("/body/p[1]", listedMark.GetProperty("path").GetString());
+                var listedMarks = listedDocument.RootElement.GetProperty("marks").EnumerateArray().ToArray();
+                Assert.Equal(2, listedMarks.Length);
+                Assert.Contains(listedMarks, mark => mark.GetProperty("id").GetString() == markId);
+                Assert.Contains(listedMarks, mark => mark.GetProperty("path").GetString() == "/body/p[2]");
+                Assert.True(listedDocument.RootElement.GetProperty("version").GetInt32() >= 2);
             }
 
             var gotoResult = AssertJsonSuccess(RunOfficeCli(
@@ -1767,9 +1792,18 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
                 Assert.Contains("Cannot scroll", missingGotoDocument.RootElement.GetProperty("message").GetString());
             }
 
+            var conflictingUnmark = RunOfficeCli(
+                "unmark", path, "--path", "/body/p[1]", "--all", "--json");
+            Assert.Equal(2, conflictingUnmark.ExitCode);
+            Assert.Contains("either --path or --all", conflictingUnmark.Stdout);
+
             var unmarked = AssertJsonSuccess(RunOfficeCli(
                 "unmark", path, "--path", "/body/p[1]", "--json"));
             Assert.Contains("Removed 1 mark", unmarked.GetString() ?? unmarked.GetRawText());
+
+            var allUnmarked = AssertJsonSuccess(RunOfficeCli(
+                "unmark", path, "--all", "--json"));
+            Assert.Contains("Removed 1 mark", allUnmarked.GetString() ?? allUnmarked.GetRawText());
 
             var finalMarks = RunOfficeCli("get-marks", path, "--json");
             Assert.True(finalMarks.ExitCode == 0, finalMarks.Stderr);
