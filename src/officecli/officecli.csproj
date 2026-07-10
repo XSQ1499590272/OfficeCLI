@@ -13,6 +13,9 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
+    <!-- Compress embedded assemblies in the single-file bundle (about 32MB to 17MB).
+         Startup pays a small in-process decompress cost; measured about +19ms on warm help. -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <CETCompat>false</CETCompat>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
