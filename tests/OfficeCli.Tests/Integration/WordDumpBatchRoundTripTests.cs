@@ -222,6 +222,13 @@ public class WordDumpBatchRoundTripTests : OfficeCli.Tests.Unit.WordTestBase
                 ["name"] = "header.png",
                 ["alt"] = "Header image"
             });
+            var footerPath = source.Add("/", "footer", null, new() { ["text"] = "" });
+            source.Add(footerPath, "picture", null, new()
+            {
+                ["src"] = TinyPngDataUri,
+                ["name"] = "footer.png",
+                ["alt"] = "Footer image"
+            });
 
             var dumpedJson = JsonSerializer.Serialize(WordBatchEmitter.EmitWord(source));
 
@@ -229,11 +236,16 @@ public class WordDumpBatchRoundTripTests : OfficeCli.Tests.Unit.WordTestBase
             var output = BatchExecutor.ExecuteBatch(target, dumpedJson, json: false);
             var header = target.Get("/header[1]", depth: 5);
             var picture = Assert.Single(header.Children.SelectMany(p => p.Children), child => child.Type == "picture");
+            var footer = target.Get("/footer[1]", depth: 5);
+            var footerPicture = Assert.Single(footer.Children.SelectMany(p => p.Children), child => child.Type == "picture");
 
             Assert.Contains("0 failed", output);
             Assert.Equal("header", header.Type);
             Assert.Equal("header.png", Fmt(picture)["name"]);
             Assert.Equal("Header image", Fmt(picture)["alt"]);
+            Assert.Equal("footer", footer.Type);
+            Assert.Equal("footer.png", Fmt(footerPicture)["name"]);
+            Assert.Equal("Footer image", Fmt(footerPicture)["alt"]);
             Assert.Empty(target.Validate());
         }
     }

@@ -167,6 +167,45 @@ public class WordRevisionContractTests : OfficeCli.Tests.Unit.WordTestBase
     }
 
     [Fact]
+    public void RevisionDateReadbackAndDuplicateIdsUseTypeSpecificPaths()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var datedRun = handler.Add(paragraphPath, "run", null, new() { ["text"] = "dated" });
+        var undatedRun = handler.Add(paragraphPath, "run", null, new() { ["text"] = "undated" });
+
+        var operationStarted = DateTimeOffset.UtcNow.AddSeconds(-1);
+        handler.Set(datedRun, new()
+        {
+            ["revision.type"] = "ins",
+            ["revision.author"] = "Alice",
+            ["revision.date"] = "2026-01-02T03:04:05Z",
+            ["revision.id"] = "901"
+        });
+        handler.Set(undatedRun, new()
+        {
+            ["revision.type"] = "del",
+            ["revision.author"] = "Bob",
+            ["revision.id"] = "901"
+        });
+        var operationFinished = DateTimeOffset.UtcNow.AddSeconds(1);
+
+        var revisions = handler.Query("revision[@id=901]");
+        Assert.Equal(2, revisions.Count);
+        var insertion = Assert.Single(revisions, node => Fmt(node)["revision.type"]?.ToString() == "ins");
+        var deletion = Assert.Single(revisions, node => Fmt(node)["revision.type"]?.ToString() == "del");
+        Assert.EndsWith("[@type=insertion]", insertion.Path);
+        Assert.EndsWith("[@type=deletion]", deletion.Path);
+        var readbackDate = DateTimeOffset.Parse(Fmt(insertion)["revision.date"]!.ToString()!);
+        Assert.Equal(DateTimeOffset.Parse("2026-01-02T03:04:05Z"), readbackDate.ToUniversalTime());
+        var generatedDate = DateTimeOffset.Parse(Fmt(deletion)["revision.date"]!.ToString()!);
+        Assert.InRange(generatedDate.ToUniversalTime(), operationStarted, operationFinished);
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
     public void SetTableRowRevisionInsertion_QueryReturnsRowMarker()
     {
         var path = CreateBlankDocx();
@@ -329,6 +368,137 @@ public class WordRevisionContractTests : OfficeCli.Tests.Unit.WordTestBase
         Assert.Equal("new accepted", handler.Get(acceptedParagraph).Text);
         Assert.Equal("old rejected", handler.Get(rejectedParagraph).Text);
         Assert.Empty(handler.Query("revision"));
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
+    public void RevisionActionSupportsNativePathBulkFiltersAndRejectsStaleOrMixedRequests()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var aliceParagraph = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var aliceRejectedRun = handler.Add(aliceParagraph, "run", null, new() { ["text"] = "native reject" });
+        var aliceAcceptedRun = handler.Add(aliceParagraph, "run", null, new() { ["text"] = "bulk accept" });
+        var bobParagraph = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var bobRun = handler.Add(bobParagraph, "run", null, new() { ["text"] = "bulk reject" });
+
+        handler.Set(aliceRejectedRun, new()
+        {
+            ["revision.type"] = "ins",
+            ["revision.author"] = "Alice",
+            ["revision.id"] = "1001"
+        });
+        handler.Set(aliceAcceptedRun, new()
+        {
+            ["revision.type"] = "ins",
+            ["revision.author"] = "Alice",
+            ["revision.id"] = "1002"
+        });
+        handler.Set(bobRun, new()
+        {
+            ["revision.type"] = "ins",
+            ["revision.author"] = "Bob",
+            ["revision.id"] = "1003"
+        });
+
+        var nativePath = Assert.IsType<string>(Fmt(Assert.Single(handler.Query("revision[@id=1001]")))
+            ["revision.nativePath"]);
+        handler.Set(nativePath, new() { ["revision.action"] = "reject" });
+        handler.Set("/revision[@author=Alice]", new() { ["revision.action"] = "accept" });
+        handler.Set("/revision[@type=ins]", new() { ["revision.action"] = "reject" });
+
+        Assert.Equal("", handler.Get(aliceParagraph).Text);
+        Assert.Equal("", handler.Get(bobParagraph).Text);
+        Assert.Empty(handler.Query("revision"));
+
+        var staleId = Assert.Throws<ArgumentException>(() =>
+            handler.Set("/revision[@id=9999]", new() { ["revision.action"] = "accept" }));
+        Assert.Contains("no revision matches", staleId.Message);
+
+        var mixedRequest = Assert.Throws<ArgumentException>(() =>
+            handler.Set("/revision[@type=ins]", new()
+            {
+                ["revision.action"] = "accept",
+                ["revision.author"] = "Alice"
+            }));
+        Assert.Contains("cannot be mixed", mixedRequest.Message);
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
+    public void RemoveRunWithRevisionProps_CreatesDeletedMarkerAndAcceptRejectWork()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var rejectedParagraph = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var rejectedRun = handler.Add(rejectedParagraph, "run", null, new() { ["text"] = "restore me" });
+        var acceptedParagraph = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var acceptedRun = handler.Add(acceptedParagraph, "run", null, new() { ["text"] = "remove me" });
+
+        handler.Remove(rejectedRun, new()
+        {
+            ["revision.author"] = "Remove Reviewer",
+            ["revision.id"] = "1101"
+        });
+        handler.Remove(acceptedRun, new()
+        {
+            ["revision.author"] = "Remove Reviewer",
+            ["revision.id"] = "1102"
+        });
+
+        var rejected = Assert.Single(handler.Query("revision[@id=1101]"));
+        var accepted = Assert.Single(handler.Query("revision[@id=1102]"));
+        Assert.Equal("del", Fmt(rejected)["revision.type"]);
+        Assert.Equal("del", Fmt(accepted)["revision.type"]);
+        Assert.Equal("restore me", rejected.Text);
+        Assert.Equal("remove me", accepted.Text);
+        Assert.Equal("Remove Reviewer", Fmt(rejected)["revision.author"]);
+
+        handler.Set("/revision[@id=1101]", new() { ["revision.action"] = "reject" });
+        handler.Set("/revision[@id=1102]", new() { ["revision.action"] = "accept" });
+
+        Assert.Equal("restore me", handler.Get(rejectedParagraph).Text);
+        Assert.Equal("", handler.Get(acceptedParagraph).Text);
+        Assert.Empty(handler.Query("revision"));
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
+    public void RemoveParagraphRowAndCellWithRevisionProps_CreateStructuralMarkers()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "paragraph delete" });
+        handler.Add("/body", "table", null, new() { ["rows"] = "1", ["cols"] = "1" });
+        handler.Set("/body/tbl[1]/tr[1]", new() { ["c1"] = "cell delete" });
+
+        handler.Remove(paragraphPath, new()
+        {
+            ["revision.author"] = "Structure Reviewer",
+            ["revision.id"] = "1201"
+        });
+        handler.Remove("/body/tbl[1]/tr[1]", new()
+        {
+            ["revision.author"] = "Structure Reviewer",
+            ["revision.id"] = "1202"
+        });
+        handler.Remove("/body/tbl[1]/tr[1]/tc[1]", new()
+        {
+            ["revision.author"] = "Structure Reviewer",
+            ["revision.id"] = "1203"
+        });
+
+        foreach (var id in new[] { "1201", "1202", "1203" })
+        {
+            var revision = Assert.Single(handler.Query($"revision[@id={id}]"));
+            Assert.Equal("Structure Reviewer", Fmt(revision)["revision.author"]);
+            Assert.False(string.IsNullOrWhiteSpace(Fmt(revision)["revision.type"]?.ToString()));
+        }
+
+        Assert.NotEmpty(handler.Query("revision"));
         Assert.Empty(handler.Validate());
     }
 

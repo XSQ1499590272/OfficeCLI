@@ -115,4 +115,168 @@ public class WordRunTests : WordTestBase
         Assert.Equal(true, Fmt(node)["italic.cs"]);
         Assert.Equal("rtl", Fmt(node)["direction"]);
     }
+
+    [Fact]
+    public void AddRun_ReadsBackAdvancedToggleFormatting_AndExplicitFalseOverrides()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paraPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var runPath = handler.Add(paraPath, "run", null, new()
+        {
+            ["text"] = "Advanced",
+            ["highlight"] = "yellow",
+            ["strike"] = "true",
+            ["dstrike"] = "true",
+            ["caps"] = "true",
+            ["smallcaps"] = "true",
+            ["vanish"] = "true",
+            ["outline"] = "true",
+            ["shadow"] = "true",
+            ["emboss"] = "true",
+            ["imprint"] = "true",
+            ["noproof"] = "true"
+        });
+
+        var format = Fmt(handler.Get(runPath));
+        Assert.Equal("yellow", format["highlight"]);
+        foreach (var key in new[] { "strike", "dstrike", "caps", "smallcaps", "vanish", "outline", "shadow", "emboss", "imprint", "noproof" })
+            Assert.Equal(true, format[key]);
+
+        handler.Set(runPath, new()
+        {
+            ["strike"] = "false",
+            ["dstrike"] = "false",
+            ["caps"] = "false",
+            ["smallcaps"] = "false",
+            ["vanish"] = "false",
+            ["outline"] = "false",
+            ["shadow"] = "false",
+            ["emboss"] = "false",
+            ["imprint"] = "false",
+            ["noproof"] = "false",
+            ["highlight"] = "none"
+        });
+
+        format = Fmt(handler.Get(runPath));
+        Assert.Equal("none", format["highlight"]);
+        foreach (var key in new[] { "strike", "dstrike", "caps", "smallcaps", "vanish", "outline", "shadow", "emboss", "imprint", "noproof" })
+            Assert.Equal(false, format[key]);
+    }
+
+    [Fact]
+    public void AddRun_ReadsBackW14TextEffects_AndRejectsInvalidSpecs()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paraPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var runPath = handler.Add(paraPath, "run", null, new()
+        {
+            ["text"] = "Effects",
+            ["textOutline"] = "1pt;FF0000",
+            ["textFill"] = "00FF00",
+            ["w14shadow"] = "0000FF",
+            ["w14glow"] = "FF00FF;6;50",
+            ["w14reflection"] = "full"
+        });
+
+        var format = Fmt(handler.Get(runPath));
+        Assert.Equal("1pt;#FF0000", format["textOutline"]);
+        Assert.Equal("#00FF00", format["textFill"]);
+        Assert.Equal("#0000FF;4;45;3;40", format["w14shadow"]);
+        Assert.Equal("#FF00FF;6;50", format["w14glow"]);
+        Assert.Equal("full", format["w14reflection"]);
+        Assert.Throws<ArgumentException>(() =>
+            handler.Add(paraPath, "run", null, new() { ["text"] = "bad", ["textOutline"] = "wide;FF0000" }));
+    }
+
+    [Fact]
+    public void AddRun_ReadsBackShadingAndThemeLinkedColor()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paraPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "" });
+        var solidPath = handler.Add(paraPath, "run", null, new()
+        {
+            ["text"] = "Solid",
+            ["fill"] = "FFFF00",
+            ["color"] = "FFFFFF;themeColor=background1;themeTint=99"
+        });
+        var patternPath = handler.Add(paraPath, "run", null, new()
+        {
+            ["text"] = "Pattern",
+            ["shading"] = "pct20;FFFF00;0000FF;themeFill=accent1;themeColor=accent2"
+        });
+
+        var solid = Fmt(handler.Get(solidPath));
+        Assert.Equal("#FFFF00", solid["fill"]);
+        Assert.Equal("#FFFFFF;themeColor=background1;themeTint=99", solid["color"]);
+
+        var pattern = Fmt(handler.Get(patternPath));
+        Assert.Equal("pct20", pattern["shading.val"]);
+        Assert.Equal("#FFFF00", pattern["shading.fill"]);
+        Assert.Equal("#0000FF", pattern["shading.color"]);
+        Assert.Equal("accent1", pattern["shading.themeFill"]);
+        Assert.Equal("accent2", pattern["shading.themeColor"]);
+    }
+
+    [Fact]
+    public void SetParagraphRange_FormatsOnlyHalfOpenCharacterSpan()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "abcdef" });
+
+        handler.Set(paragraphPath, new()
+        {
+            ["range"] = "1:4",
+            ["bold"] = "true",
+            ["color"] = "FF0000"
+        });
+
+        var paragraph = handler.Get(paragraphPath, depth: 1);
+        var runs = paragraph.Children.Where(child => child.Type == "run").ToList();
+        Assert.Equal(new[] { "a", "bcd", "ef" }, runs.Select(r => r.Text).ToArray());
+        Assert.False(Fmt(runs[0]).ContainsKey("bold"));
+        Assert.Equal(true, Fmt(runs[1])["bold"]);
+        Assert.Equal("#FF0000", Fmt(runs[1])["color"]);
+        Assert.False(Fmt(runs[2]).ContainsKey("bold"));
+        Assert.Equal(1, handler.LastFindMatchCount);
+
+        Assert.Throws<ArgumentException>(() =>
+            handler.Set(paragraphPath, new() { ["find"] = "bc", ["range"] = "1:2", ["bold"] = "true" }));
+        Assert.Throws<ArgumentException>(() =>
+            handler.Set(paragraphPath, new() { ["range"] = "99:100", ["bold"] = "true" }));
+        Assert.Throws<ArgumentException>(() =>
+            handler.Set(paragraphPath, new() { ["range"] = "1:2", ["text"] = "x" }));
+    }
+
+    [Fact]
+    public void SetParagraphRange_FormatsMultipleDisjointSpansInPositionOrder()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "abcdefghij" });
+
+        handler.Set(paragraphPath, new()
+        {
+            ["range"] = "7:9,1:3",
+            ["bold"] = "true"
+        });
+
+        var runs = handler.Get(paragraphPath, depth: 1).Children
+            .Where(child => child.Type == "run").ToList();
+        Assert.Equal(["a", "bc", "defg", "hi", "j"], runs.Select(run => run.Text ?? "").ToArray());
+        Assert.False(Fmt(runs[0]).ContainsKey("bold"));
+        Assert.Equal(true, Fmt(runs[1])["bold"]);
+        Assert.False(Fmt(runs[2]).ContainsKey("bold"));
+        Assert.Equal(true, Fmt(runs[3])["bold"]);
+        Assert.False(Fmt(runs[4]).ContainsKey("bold"));
+        Assert.Equal(2, handler.LastFindMatchCount);
+    }
 }

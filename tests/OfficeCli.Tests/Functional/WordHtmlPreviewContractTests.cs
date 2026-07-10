@@ -45,4 +45,45 @@ public class WordHtmlPreviewContractTests : OfficeCli.Tests.Unit.WordTestBase
         Assert.Contains("src=\"data:image/png;base64,", html);
         Assert.Contains("alt=\"Preview image\"", html);
     }
+
+    [Fact]
+    public void ViewAsHtml_RendersComplexObjectsWithStableAnchorAndObjectMarkers()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        handler.Add("/body", "paragraph", null, new() { ["text"] = "Complex preview" });
+        handler.Add("/body", "chart", null, new()
+        {
+            ["chartType"] = "column",
+            ["title"] = "Preview chart",
+            ["categories"] = "Q1,Q2",
+            ["data"] = "Revenue:10,20"
+        });
+        handler.Add("/body", "shape", null, new()
+        {
+            ["geometry"] = "roundRect",
+            ["width"] = "4cm",
+            ["height"] = "2cm",
+            ["fill"] = "EAF2FF",
+            ["alt"] = "Preview shape"
+        });
+        handler.Add("/body", "textbox", null, new()
+        {
+            ["text"] = "Preview textbox",
+            ["width"] = "4cm",
+            ["height"] = "2cm"
+        });
+        handler.Add("/body", "watermark", null, new() { ["text"] = "DRAFT" });
+
+        var html = handler.ViewAsHtml();
+
+        Assert.Contains("data-path=\"/body/p[1]\"", html);
+        Assert.Contains("<svg", html);
+        Assert.Contains("Preview chart", html);
+        Assert.Contains("background-color:#EAF2FF", html);
+        Assert.Contains("Preview textbox", html);
+        Assert.Contains("vml-watermark", html);
+        Assert.Contains("DRAFT", html);
+    }
 }

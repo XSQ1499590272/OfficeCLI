@@ -11,15 +11,28 @@ public class WordDumpEmitterTests : WordTestBase
         var path = CreateBlankDocx();
 
         using var handler = new WordHandler(path, editable: true);
+        handler.Set("/", new()
+        {
+            ["creator"] = "Dump resource test",
+            ["title"] = "Resource order"
+        });
+        handler.Add("/numbering", "abstractNum", null, new()
+        {
+            ["id"] = "7",
+            ["type"] = "multilevel",
+            ["level0.format"] = "decimal",
+            ["level0.text"] = "%1."
+        });
         handler.Add("/body", "paragraph", null, new() { ["text"] = "Body text" });
 
-        var items = WordBatchEmitter.EmitWord(handler);
+        var (items, warnings) = WordBatchEmitter.EmitWordWithWarnings(handler);
         var bodyIndex = items.FindIndex(item =>
             item.Command == "add"
             && item.Parent == "/body"
             && item.Type == "p");
 
         Assert.True(bodyIndex > 0);
+        Assert.Empty(warnings);
         Assert.True(items.FindIndex(item =>
             item.Command == "raw-set"
             && item.Part == "/numbering") < bodyIndex);
@@ -32,6 +45,12 @@ public class WordDumpEmitterTests : WordTestBase
         Assert.True(items.FindIndex(item =>
             item.Command == "raw-set"
             && item.Part == "/settings") < bodyIndex);
+        Assert.True(items.FindIndex(item =>
+            item.Command == "raw-set"
+            && item.Part == "/docProps/core.xml") < bodyIndex);
+        Assert.True(items.FindIndex(item =>
+            item.Command == "raw-set"
+            && item.Part == "/docProps/app.xml") < bodyIndex);
     }
 
     [Fact]

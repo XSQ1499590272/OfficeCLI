@@ -98,6 +98,55 @@ public class WordMediaQueryTests : WordTestBase
     }
 
     [Fact]
+    public void TryExtractBinary_SavesPictureAndOlePayloads_ButNotTextNodes()
+    {
+        var path = CreateBlankDocx();
+        var outDir = Path.Combine(Path.GetTempPath(), $"officecli_extract_{Guid.NewGuid():N}");
+
+        try
+        {
+            using var handler = new WordHandler(path, editable: true);
+            handler.Add("/body", "picture", null, new()
+            {
+                ["src"] = TinyPngDataUri,
+                ["name"] = "tiny.png"
+            });
+            handler.Add("/body", "ole", null, new()
+            {
+                ["src"] = "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,SGVsbG8=",
+                ["oleKind"] = "package",
+                ["contentType"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ["progId"] = "Word.Document.12"
+            });
+            var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "plain text" });
+            var picturePath = Assert.Single(handler.Query("picture")).Path;
+            var olePath = Assert.Single(handler.Query("ole")).Path;
+
+            var pictureOut = Path.Combine(outDir, "nested", "tiny.png");
+            Assert.True(handler.TryExtractBinary(picturePath, pictureOut, out var pictureContentType, out var pictureBytes));
+            Assert.Equal("image/png", pictureContentType);
+            Assert.Equal(Convert.FromBase64String(TinyPngDataUri.Split(',')[1]), File.ReadAllBytes(pictureOut));
+            Assert.Equal(new FileInfo(pictureOut).Length, pictureBytes);
+
+            var oleOut = Path.Combine(outDir, "embedded.bin");
+            Assert.True(handler.TryExtractBinary(olePath, oleOut, out var oleContentType, out var oleBytes));
+            Assert.Equal("application/vnd.openxmlformats-officedocument.wordprocessingml.document", oleContentType);
+            Assert.Equal(System.Text.Encoding.ASCII.GetBytes("Hello"), File.ReadAllBytes(oleOut));
+            Assert.Equal(5, oleBytes);
+
+            var textOut = Path.Combine(outDir, "text.bin");
+            Assert.False(handler.TryExtractBinary(paragraphPath, textOut, out var textContentType, out var textBytes));
+            Assert.Null(textContentType);
+            Assert.Equal(0, textBytes);
+            Assert.False(File.Exists(textOut));
+        }
+        finally
+        {
+            try { if (Directory.Exists(outDir)) Directory.Delete(outDir, recursive: true); } catch { }
+        }
+    }
+
+    [Fact]
     public void AddOle_LegacyObjectUsesEmbeddedObjectPartAndReadsBackMetadata()
     {
         var path = CreateBlankDocx();

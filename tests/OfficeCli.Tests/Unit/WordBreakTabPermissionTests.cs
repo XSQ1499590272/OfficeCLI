@@ -71,6 +71,56 @@ public class WordBreakTabPermissionTests : WordTestBase
     }
 
     [Fact]
+    public void TabStop_AllowsNegativePosition_AndRejectsInvalidEnums()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new() { ["text"] = "tab host" });
+        handler.Add(paragraphPath, "tab", null, new()
+        {
+            ["pos"] = "-360",
+            ["val"] = "left",
+            ["leader"] = "middleDot"
+        });
+
+        var tab = Assert.Single((IEnumerable<Dictionary<string, object?>>)Fmt(handler.Get(paragraphPath))["tabs"]!);
+        Assert.Equal(-360, Convert.ToInt32(tab["pos"]));
+        Assert.Equal("left", tab["val"]);
+        Assert.Equal("middleDot", tab["leader"]);
+        Assert.Throws<ArgumentException>(() =>
+            handler.Add(paragraphPath, "tab", null, new() { ["pos"] = "0", ["val"] = "sideways" }));
+        Assert.Throws<ArgumentException>(() =>
+            handler.Add(paragraphPath, "tab", null, new() { ["pos"] = "0", ["leader"] = "sparkle" }));
+    }
+
+    [Fact]
+    public void PositionalTab_InHeaderFooter_CanCarryRunFormatting()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var headerPath = handler.Add("/", "header", null, new() { ["text"] = "Header" });
+        var ptabPath = handler.Add($"{headerPath}/p[1]", "ptab", null, new()
+        {
+            ["align"] = "right",
+            ["relativeTo"] = "margin",
+            ["leader"] = "dot",
+            ["bold"] = "true",
+            ["color"] = "FF0000"
+        });
+
+        var ptab = handler.Get(ptabPath);
+        Assert.Equal("ptab", ptab.Type);
+        Assert.Equal("right", Fmt(ptab)["align"]);
+        Assert.Equal("margin", Fmt(ptab)["relativeTo"]);
+        Assert.Equal("dot", Fmt(ptab)["leader"]);
+        Assert.Equal(true, Fmt(ptab)["bold"]);
+        Assert.Equal("#FF0000", Fmt(ptab)["color"]);
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
     public void PermissionMarkers_ReadBackRemoveAndRejectInvalidIds()
     {
         var path = CreateBlankDocx();

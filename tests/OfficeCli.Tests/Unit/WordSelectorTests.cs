@@ -69,4 +69,23 @@ public class WordSelectorTests : WordTestBase
         Assert.Equal(2, typeFallback.Count);
         Assert.All(typeFallback, node => Assert.Equal("paragraph", node.Type));
     }
+
+    [Fact]
+    public void QueryAndGet_RejectUnclosedSelectorOrPathInsteadOfReturningEmpty()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        handler.Add("/body", "paragraph", null, new() { ["text"] = "parse boundary" });
+
+        var selectorError = Assert.Throws<ArgumentException>(
+            () => handler.Query("paragraph[align=center"));
+        Assert.Contains("unclosed bracket", selectorError.Message);
+
+        var pathError = Assert.Throws<ArgumentException>(
+            () => handler.Get("/body/p[1"));
+        Assert.Contains("Malformed", pathError.Message);
+
+        Assert.Single(handler.Query("paragraph"));
+    }
 }

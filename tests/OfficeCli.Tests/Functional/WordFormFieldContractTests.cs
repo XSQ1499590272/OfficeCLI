@@ -120,4 +120,33 @@ public class WordFormFieldContractTests : OfficeCli.Tests.Unit.WordTestBase
             handler.Add("/body", "formfield", null, new() { ["name"] = "Bad Name" }));
         Assert.Empty(handler.Query("formfield"));
     }
+
+    [Fact]
+    public void SetFormField_InvalidDropdownInputFollowsCurrentCompatibilityBehavior()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var fieldPath = handler.Add("/body", "formfield", null, new()
+        {
+            ["name"] = "ChoiceGuard",
+            ["type"] = "dropdown",
+            ["items"] = "Alpha,Beta,Gamma",
+            ["result"] = "1"
+        });
+
+        var textUnsupported = handler.Set(fieldPath, new() { ["text"] = "Missing" });
+        Assert.Empty(textUnsupported);
+        var afterText = handler.Get(fieldPath);
+        Assert.Equal("Missing", afterText.Text);
+        Assert.Equal(1, Fmt(afterText)["result"]);
+
+        var resultUnsupported = handler.Set(fieldPath, new() { ["result"] = "99" });
+        Assert.Contains("result", resultUnsupported);
+
+        var current = handler.Get(fieldPath);
+        Assert.Equal("Missing", current.Text);
+        Assert.Equal(1, Fmt(current)["result"]);
+        Assert.Empty(handler.Validate());
+    }
 }
