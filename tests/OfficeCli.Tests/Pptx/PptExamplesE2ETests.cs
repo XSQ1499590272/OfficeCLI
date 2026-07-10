@@ -342,6 +342,23 @@ public sealed class PptExamplesE2ETests : PptTestBase
             var getResult = RunCli("get", file, "/");
             getResult.ExitCode.Should().Be(0,
                 $"officecli get on {Path.GetFileName(file)} should succeed.\nstderr:\n{getResult.Stderr}");
+
+            // Verify stdout contains real content — not just an empty success.
+            getResult.Stdout.Should().NotBeNullOrWhiteSpace(
+                $"officecli get on {Path.GetFileName(file)} should return content.");
+            getResult.Stdout!.Should().Contain("/slide[",
+                $"officecli get on {Path.GetFileName(file)} should reference at least one slide node.");
+
+            // Log the slide count for diagnostics.
+            var slideCount = 0;
+            var idx = 0;
+            while ((idx = getResult.Stdout.IndexOf("/slide[", idx, StringComparison.Ordinal)) != -1)
+            {
+                slideCount++;
+                idx++;
+            }
+
+            Debug.WriteLine($"[PptExamplesE2E] {Path.GetFileName(file)}: {slideCount} slide(s) detected.");
         }
     }
 }
