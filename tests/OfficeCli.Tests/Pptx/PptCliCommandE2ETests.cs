@@ -471,6 +471,9 @@ public sealed class PptCliCommandE2ETests : PptTestBase
         result.Stdout.Should().Contain("\"succeeded\"");
         RunCliOk("validate", path);
 
+        var getResult = RunCliOk("get", path, "/slide[1]/shape[1]");
+        getResult.Stdout.Should().Contain("BatchUpdated");
+
         var view = RunCliOk("view", path, "text");
         view.Stdout.Should().Contain("BatchUpdated");
     }
@@ -549,6 +552,7 @@ public sealed class PptCliCommandE2ETests : PptTestBase
             "--action", "setattr",
             "--xml", "cx=12192000");
         result.Stdout.Should().Contain("raw-set");
+        RunCliOk("validate", path);
     }
 
     // ==================== add-part ====================
@@ -560,6 +564,8 @@ public sealed class PptCliCommandE2ETests : PptTestBase
         RunCliOk("add", path, "/", "--type", "slide");
         var result = RunCliOk("add-part", path, "/slide[1]", "--type", "chart");
         result.Stdout.Should().Contain("Created chart part");
+        // Note: add-part chart creates a skeleton chart part without a chart type;
+        // the part is intentionally incomplete until further configuration via set/raw-set.
     }
 
     // ==================== validate ====================
@@ -644,11 +650,75 @@ public sealed class PptCliCommandE2ETests : PptTestBase
         RunCliOk("add", path, "/", "--type", "slide", "--prop", "title=Titled");
 
         var result = RunCliOk("view", path, "issues");
-        // A properly titled slide should have fewer issues
-        result.Stdout.Should().Contain("issue");
+        // A properly titled slide should report 0 issues
+        result.Stdout.Should().Contain("0 issue");
     }
 
     // ==================== Error cases ====================
+
+    [Fact]
+    public void Error_SetInvalidProperty()
+    {
+        var path = CreatePresentation();
+        RunCliOk("add", path, "/", "--type", "slide");
+        RunCliOk("add", path, "/slide[1]", "--type", "shape",
+            "--prop", "preset=rect", "--prop", "text=Test");
+        var result = RunCli("set", path, "/slide[1]/shape[1]", "--prop", "nonexistent=123");
+        result.ExitCode.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void Error_AddPictureWithoutSrc()
+    {
+        var path = CreatePresentation();
+        RunCliOk("add", path, "/", "--type", "slide");
+        var result = RunCli("add", path, "/slide[1]", "--type", "picture");
+        result.ExitCode.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void Error_RawSetInvalidXPath()
+    {
+        var path = CreatePresentation();
+        var result = RunCli("raw-set", path, "/presentation",
+            "--xpath", "///bad[",
+            "--action", "setattr",
+            "--xml", "foo=bar");
+        result.ExitCode.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void Error_AddPartUnsupportedType()
+    {
+        var path = CreatePresentation();
+        RunCliOk("add", path, "/", "--type", "slide");
+        var result = RunCli("add-part", path, "/slide[1]", "--type", "bogus");
+        result.ExitCode.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void Error_AddPictureInvalidMediaSource()
+    {
+        var path = CreatePresentation();
+        RunCliOk("add", path, "/", "--type", "slide");
+        var result = RunCli("add", path, "/slide[1]", "--type", "picture",
+            "--prop", "src=/nonexistent/file.png");
+        result.ExitCode.Should().NotBe(0);
+    }
+
+    [Fact]
+    public void Error_DuplicateAddConflict()
+    {
+        var path = CreatePresentation();
+        // Append a second sldSz element — only one is allowed per presentation.
+        // raw-set append may succeed but the resulting file is invalid.
+        RunCli("raw-set", path, "/presentation",
+            "--xpath", "/p:presentation",
+            "--action", "append",
+            "--xml", "<p:sldSz cx=\"9144000\" cy=\"5143500\" type=\"custom\"/>");
+        var validate = RunCli("validate", path);
+        validate.ExitCode.Should().NotBe(0);
+    }
 
     [Fact]
     public void Error_OpenMissingFile()
@@ -716,7 +786,7 @@ public sealed class PptCliCommandE2ETests : PptTestBase
     }
 
     [Fact]
-    public void Error_QueryWithNoResults()
+    public void Query_NoResults_ReportsWarning()
     {
         var path = CreatePresentation();
         // Querying for shape when there are none should produce output but no matches
@@ -794,6 +864,33 @@ public sealed class PptCliCommandE2ETests : PptTestBase
         // Close without open should succeed (no resident)
         var result = RunCliOk("close", path);
         result.Stdout.Should().Contain("already saved");
+    }
+
+    [Fact]
+    public void ResidentFlow_OpenMutateSaveClose_VerifyDiskReadback()
+    {
+        // 1. Create a blank pptx, open it, add a slide with text, save, verify on disk
+        var path = CreatePresentation();
+        RunCliOk("open", path);
+        RunCliOk("add", path, "/", "--type", "slide", "--prop", "title=SlideOne");
+        RunCliOk("save", path);
+
+        // Verify saved file contains SlideOne (via separate open + view text)
+        var afterSavePath = NewTempPath(".pptx");
+        File.Copy(path, afterSavePath);
+        var view1 = RunCliOk("view", afterSavePath, "text");
+        view1.Stdout.Should().Contain("SlideOne");
+
+        // 2. Reopen, add another slide, close, verify on disk
+        RunCliOk("add", path, "/", "--type", "slide", "--prop", "title=SlideTwo");
+        RunCliOk("close", path);
+
+        // Verify closed file contains both slides
+        var afterClosePath = NewTempPath(".pptx");
+        File.Copy(path, afterClosePath);
+        var view2 = RunCliOk("view", afterClosePath, "text");
+        view2.Stdout.Should().Contain("SlideOne");
+        view2.Stdout.Should().Contain("SlideTwo");
     }
 
     // ==================== view edge cases ====================
