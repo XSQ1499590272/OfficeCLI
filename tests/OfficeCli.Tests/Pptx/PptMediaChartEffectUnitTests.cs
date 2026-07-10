@@ -85,6 +85,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         var node = handler.Get("/slide[1]/picture[1]");
         // Crop values should be read back (may differ slightly due to rounding)
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("crop");
     }
 
     [Fact]
@@ -103,6 +104,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("crop");
     }
 
     [Theory]
@@ -122,6 +124,8 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        if (fillMode == "tile")
+            node.Format.Should().ContainKey("fillMode");
     }
 
     [Fact]
@@ -138,6 +142,8 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("brightness");
+        node.Format.Should().ContainKey("contrast");
     }
 
     [Fact]
@@ -153,6 +159,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("shadow");
     }
 
     [Fact]
@@ -168,6 +175,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("glow");
     }
 
     [Fact]
@@ -183,6 +191,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("rotation");
     }
 
     [Fact]
@@ -234,6 +243,7 @@ public sealed class PptMediaChartEffectUnitTests : PptTestBase
         });
         var node = handler.Get("/slide[1]/picture[1]");
         node.Type.Should().Be("picture");
+        node.Format.Should().ContainKey("width");
     }
 
     [Fact]
