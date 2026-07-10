@@ -166,7 +166,7 @@
 
 ## Fix Report Round 2 (2026-07-09)
 
-**Commit:** (pending)
+**Commit:** `e5709c6c` — fix(pptx): strengthen assertions in Task 3 spec-coverage tests
 
 ### What Was Fixed
 

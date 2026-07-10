@@ -5,8 +5,11 @@ using FluentAssertions;
 using OfficeCli.Core;
 using OfficeCli.Handlers;
 
-namespace OfficeCli.Tests.Pptx;
+using OfficeCli.Tests.Pptx;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class PptContentHandlerTests : PptTestBase
 {
     private string CreatePresentationWithSlide()

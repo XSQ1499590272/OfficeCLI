@@ -10,8 +10,11 @@ using OfficeCli.Core;
 using OfficeCli.Handlers;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace OfficeCli.Tests.Pptx;
+using OfficeCli.Tests.Pptx;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class PptPathSelectorRawUnitTests : PptTestBase
 {
     private string CreatePresentationWithSlide()

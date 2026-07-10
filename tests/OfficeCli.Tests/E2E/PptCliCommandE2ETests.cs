@@ -4,8 +4,11 @@
 using System.Diagnostics;
 using FluentAssertions;
 
-namespace OfficeCli.Tests.Pptx;
+using OfficeCli.Tests.Pptx;
 
+namespace OfficeCli.Tests.E2E;
+
+[Trait("Speed", "E2E")]
 public sealed class PptCliCommandE2ETests : PptTestBase
 {
     // ==================== Core lifecycle ====================
