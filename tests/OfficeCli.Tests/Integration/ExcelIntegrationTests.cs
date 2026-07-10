@@ -5,8 +5,11 @@ using FluentAssertions;
 using OfficeCli;
 using OfficeCli.Handlers;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Integration;
+
+[Trait("Speed", "Integration")]
 public sealed class ExcelIntegrationTests : ExcelTestBase
 {
     [Fact]

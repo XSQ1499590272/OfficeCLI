@@ -8,8 +8,11 @@ using FluentAssertions;
 using OfficeCli.Core;
 using OfficeCli.Handlers;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class ExcelFormulaUnitTests
 {
     public static IEnumerable<object?[]> FormulaDispatchCases()

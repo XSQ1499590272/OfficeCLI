@@ -4,8 +4,11 @@
 using FluentAssertions;
 using OfficeCli.Core;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class ExcelCellsAndFormulasTests : ExcelTestBase
 {
     [Fact]

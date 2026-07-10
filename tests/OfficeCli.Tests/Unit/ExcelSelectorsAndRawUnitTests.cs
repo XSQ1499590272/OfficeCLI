@@ -12,8 +12,11 @@ using OfficeCli.Core;
 using OfficeCli.Handlers;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class ExcelSelectorsAndRawUnitTests
 {
     private static readonly XNamespace SpreadsheetNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";

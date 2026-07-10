@@ -11,8 +11,11 @@ using CX = DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using A = DocumentFormat.OpenXml.Drawing;
 using C = DocumentFormat.OpenXml.Drawing.Charts;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Unit;
+
+[Trait("Speed", "Unit")]
 public sealed class ExcelChartUnitTests
 {
     [Fact]

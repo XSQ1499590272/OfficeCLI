@@ -6,8 +6,11 @@ using OfficeCli;
 using OfficeCli.Core;
 using OfficeCli.Handlers;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Integration;
+
+[Trait("Speed", "Integration")]
 public sealed class ExcelChartsDrawingsIntegrationTests : ExcelTestBase
 {
     // ── Standard charts ────────────────────────────────────────────────

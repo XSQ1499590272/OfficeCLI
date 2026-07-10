@@ -4,8 +4,11 @@
 using System.Diagnostics;
 using FluentAssertions;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.E2E;
+
+[Trait("Speed", "E2E")]
 public sealed class ExcelCliCommandE2ETests : ExcelTestBase
 {
     // ==================== Core lifecycle ====================

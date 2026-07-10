@@ -3,8 +3,11 @@
 
 using FluentAssertions;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.Integration;
+
+[Trait("Speed", "Integration")]
 public sealed class ExcelDumpBatchRenderTests : ExcelTestBase
 {
     [Fact]

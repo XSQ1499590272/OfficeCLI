@@ -4,8 +4,11 @@
 using System.Diagnostics;
 using FluentAssertions;
 
-namespace OfficeCli.Tests.Excel;
+using OfficeCli.Tests.Excel;
 
+namespace OfficeCli.Tests.E2E;
+
+[Trait("Speed", "E2E")]
 public sealed class ExcelRenderE2ETests : ExcelTestBase
 {
     // ==================== view html --out: cells and values ====================
