@@ -249,4 +249,37 @@ public class WordDumpBatchRoundTripTests : OfficeCli.Tests.Unit.WordTestBase
             Assert.Empty(target.Validate());
         }
     }
+
+    [Fact]
+    public void FullDumpReplayIntoFreshDocumentsProducesIdenticalSecondDumps()
+    {
+        var sourcePath = CreateBlankDocx();
+        var firstTargetPath = CreateBlankDocx();
+        var secondTargetPath = CreateBlankDocx();
+
+        List<BatchItem> dump;
+        using (var source = new WordHandler(sourcePath, editable: true))
+        {
+            source.Add("/body", "paragraph", null, new() { ["text"] = "replay paragraph" });
+            source.Add("/body", "table", null, new() { ["data"] = "A,B;C,D" });
+            dump = WordBatchEmitter.EmitWord(source);
+        }
+
+        var dumpJson = JsonSerializer.Serialize(dump);
+        using (var first = new WordHandler(firstTargetPath, editable: true))
+        using (var second = new WordHandler(secondTargetPath, editable: true))
+        {
+            Assert.Contains("0 failed", BatchExecutor.ExecuteBatch(first, dumpJson, json: false));
+            Assert.Contains("0 failed", BatchExecutor.ExecuteBatch(second, dumpJson, json: false));
+            Assert.Empty(first.Validate());
+            Assert.Empty(second.Validate());
+        }
+
+        using var firstReadOnly = new WordHandler(firstTargetPath, editable: false);
+        using var secondReadOnly = new WordHandler(secondTargetPath, editable: false);
+        var firstDump = JsonSerializer.Serialize(WordBatchEmitter.EmitWord(firstReadOnly));
+        var secondDump = JsonSerializer.Serialize(WordBatchEmitter.EmitWord(secondReadOnly));
+
+        Assert.Equal(firstDump, secondDump);
+    }
 }

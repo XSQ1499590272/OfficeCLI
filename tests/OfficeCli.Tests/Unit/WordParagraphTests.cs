@@ -77,4 +77,34 @@ public class WordParagraphTests : WordTestBase
         Assert.Equal("bullet", Fmt(node)["listStyle"]);
         Assert.Empty(handler.Validate());
     }
+
+    [Fact]
+    public void AddParagraph_ReadsBackPaginationDirectionAndPatternShading()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new()
+        {
+            ["text"] = "advanced paragraph",
+            ["keepNext"] = "true",
+            ["keepLines"] = "true",
+            ["pageBreakBefore"] = "true",
+            ["widowControl"] = "false",
+            ["bidi"] = "rtl",
+            ["shading"] = "pct20;FFFF00;0000FF"
+        });
+
+        var format = Fmt(handler.Get(paragraphPath));
+
+        Assert.Equal(true, format["keepNext"]);
+        Assert.Equal(true, format["keepLines"]);
+        Assert.Equal(true, format["pageBreakBefore"]);
+        Assert.Equal(false, format["widowControl"]);
+        Assert.Equal("rtl", format["direction"]);
+        Assert.Equal("pct20", format["shading.val"]);
+        Assert.Equal("#FFFF00", format["shading.fill"]);
+        Assert.Equal("#0000FF", format["shading.color"]);
+        Assert.Empty(handler.Validate());
+    }
 }

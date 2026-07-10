@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using OfficeCli.Core;
+using OfficeCli.Handlers;
 
 namespace OfficeCli.Tests.Unit;
 
@@ -32,5 +34,51 @@ public class WordResourceLimitTests
         Assert.Equal("max_depth_exceeded", exception.Code);
         Assert.Contains("maximum supported depth", exception.Message);
         Assert.NotNull(exception.Suggestion);
+    }
+
+    [Fact]
+    public void Open_RejectsZeroByteDocxWithCorruptFileCode()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"officecli_zero_{Guid.NewGuid():N}.docx");
+        File.WriteAllBytes(path, []);
+
+        try
+        {
+            var exception = Assert.Throws<CliException>(() =>
+                DocumentHandlerFactory.Open(path));
+
+            Assert.Equal("corrupt_file", exception.Code);
+            Assert.Contains("0 bytes", exception.Message);
+        }
+        finally
+        {
+            try { File.Delete(path); } catch { }
+        }
+    }
+
+    [Fact]
+    public void Open_RejectsPackageWithTooManyEntriesBeforeSdkOpen()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"officecli_entries_{Guid.NewGuid():N}.docx");
+
+        try
+        {
+            using (var archive = ZipFile.Open(path, ZipArchiveMode.Create))
+            {
+                for (var i = 0; i <= DocumentLimits.MaxZipEntries; i++)
+                    archive.CreateEntry($"parts/{i:D6}.xml", CompressionLevel.NoCompression);
+            }
+
+            var exception = Assert.Throws<CliException>(() =>
+                DocumentHandlerFactory.Open(path));
+
+            Assert.Equal("decompression_bomb", exception.Code);
+            Assert.Contains("entries", exception.Message);
+            Assert.Contains("potential decompression bomb", exception.Message);
+        }
+        finally
+        {
+            try { File.Delete(path); } catch { }
+        }
     }
 }

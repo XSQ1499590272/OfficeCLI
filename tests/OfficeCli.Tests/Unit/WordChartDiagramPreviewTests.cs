@@ -126,6 +126,20 @@ public class WordChartDiagramPreviewTests : WordTestBase
     }
 
     [Fact]
+    public void Chart_MissingDataThrowsBeforeCreatingChartPart()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var ex = Assert.Throws<ArgumentException>(() =>
+            handler.Add("/body", "chart", null, new() { ["chartType"] = "column" }));
+
+        Assert.Contains("Chart requires data", ex.Message);
+        Assert.Empty(handler.Query("chart"));
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
     public void ChartHelper_ParsesChartTypeSeriesRangesAndColors_CurrentBehavior()
     {
         const BindingFlags Flags = BindingFlags.Static | BindingFlags.NonPublic;

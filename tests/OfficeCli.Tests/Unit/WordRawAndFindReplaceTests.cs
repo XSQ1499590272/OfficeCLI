@@ -84,6 +84,28 @@ public class WordRawAndFindReplaceTests : WordTestBase
     }
 
     [Fact]
+    public void SetFindReplace_AllowsEmptyReplacementAndPreservesUnmatchedText()
+    {
+        var path = CreateBlankDocx();
+
+        using var handler = new WordHandler(path, editable: true);
+        var paragraphPath = handler.Add("/body", "paragraph", null, new()
+        {
+            ["text"] = "before {{token}} after {{token}}"
+        });
+
+        handler.Set(paragraphPath, new()
+        {
+            ["find"] = "{{token}}",
+            ["replace"] = string.Empty
+        });
+
+        Assert.Equal("before  after ", handler.Get(paragraphPath).Text);
+        Assert.Equal(2, handler.LastFindMatchCount);
+        Assert.Empty(handler.Validate());
+    }
+
+    [Fact]
     public void RawAndRawSet_ReadWriteAndFailedXPathDoesNotMutateDocument()
     {
         var path = CreateBlankDocx();
