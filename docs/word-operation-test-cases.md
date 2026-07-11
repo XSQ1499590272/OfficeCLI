@@ -37,7 +37,7 @@
 
 补齐原则：handler 层已有覆盖的，不重复堆相同 happy path；优先补“源码里有独立命令面或 schema 声明，但当前测试只覆盖了内部 handler”的行为。下面新增的用例先进入清单并标明状态，后续实现测试时按这些 ID 逐项落地。
 
-本轮整理后的规模统计：操作/场景条目共 364 条，其中已有单元覆盖 102 条、已有自动覆盖 97 条、部分自动覆盖 148 条、示例待改造 14 条、建议人工核验 2 条、CI smoke 1 条，新增待补 0 条；另有 154 条 `WORD-FREEZE-*` 冻结基线映射。这里的条目数不是 xUnit 方法数，也不是展开后的 test case 数，后续实现时一个条目可以对应一个或多个测试方法/数据行。这里的“部分自动覆盖”不等于矩阵已完成，表内仍明确列出未覆盖的 OS、后端、输入形状和错误边界。
+本轮整理后的规模统计：操作/场景条目共 366 条，其中已有单元覆盖 102 条、已有自动覆盖 97 条、部分自动覆盖 150 条、示例待改造 14 条、建议人工核验 2 条、CI smoke 1 条，新增待补 0 条；另有 154 条 `WORD-FREEZE-*` 冻结基线映射。这里的条目数不是 xUnit 方法数，也不是展开后的 test case 数，后续实现时一个条目可以对应一个或多个测试方法/数据行。这里的“部分自动覆盖”不等于矩阵已完成，表内仍明确列出未覆盖的 OS、后端、输入形状和错误边界。
 
 ### 本轮复审后仍不全面的优先缺口
 
@@ -459,7 +459,7 @@
 
 | ID | 层级 | 优先级 | 依据 | 操作 / 场景 | 建议断言 | 状态 |
 |---|---|---:|---|---|---|---|
-| WORD-CMD-049 | e2e | P0 | `CommandBuilder.Add.cs`, `schemas/help/docx/*.json` | `add --type` 类型路由矩阵 | paragraph/run/table/picture/sdt/field/hyperlink/bookmark/header/footer 的真实 CLI 路由、query 和 validate 已固定；row/cell/section/formfield/note/comment/OLE/chart/equation/diagram/shape/textbox/watermark/permission 等类型的全量 CLI 矩阵仍待补；见 `tests/OfficeCli.Tests/E2E/WordViewSmokeTests.cs` | 部分自动覆盖 |
+| WORD-CMD-049 | e2e | P0 | `CommandBuilder.Add.cs`, `schemas/help/docx/*.json` | `add --type` 类型路由矩阵 | 常用类型和本轮新增的 block/table/note、inline/control、media/drawing、definition、alias/rejection CLI 路由已固定；各类型属性组合、header/footer 多 section 绑定、复杂 carrier 和全部 schema aliases 仍待补；见 `tests/OfficeCli.Tests/E2E/WordViewSmokeTests.cs`、`tests/OfficeCli.Tests/Integration/WordAddTypeCommandIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-CMD-050 | e2e | P0 | `CommandBuilder.Add.cs`, `InsertPosition` | add 位置与互斥参数矩阵 | 已固定默认 append、`--index`、`--before`、`--after` 的 body 顺序，以及多个位置参数同时出现时非零退出和文档 XML 不变；stable-id anchor、负/越界 index、完整 exit/code/message 矩阵仍待补；见 `tests/OfficeCli.Tests/Integration/WordMutationCommandIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-CMD-051 | e2e | P0 | `CommandBuilder.Set.cs`, `CommandBuilder.Add.cs` | set/add 属性输入矩阵 | 已固定大小写不敏感 key、重复 key 后值覆盖、supported 与 unsupported key 同批时 supported 仍生效、缺少 prop、空 key、`--from` 与 `--prop` 冲突；legacy alias、只读 key、warning/envelope 全量仍待补；见 `tests/OfficeCli.Tests/Integration/WordMutationCommandIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-CMD-052 | e2e | P0 | `CommandBuilder.GetQuery.cs` | get/query path 与输出模式矩阵 | 已固定 indexed `get --json`、`query --find --json` 的结构化 results，以及文本节点使用 `--save` 时失败且不创建输出文件；root/body/stable-id/depth 上限、binary payload 和完整裸输出矩阵仍待补；见 `tests/OfficeCli.Tests/Integration/WordMutationCommandIntegrationTests.cs` | 部分自动覆盖 |
@@ -500,7 +500,7 @@
 | WORD-NEG-019 | integration | P0 | all mutation commands | mutation 全量原子性 | 已固定 add/set/raw-set/batch/move/copy/remove 的主要失败不落语义节点、body XML/查询/validate 保持可用，并覆盖 CLI raw-set 非法 XPath；add-part、swap、merge、complex media 和 package bytes 全量矩阵仍待补；见 `tests/OfficeCli.Tests/Integration/WordMutationAtomicityTests.cs`、`WordRawCommandIntegrationTests.cs`、`tests/OfficeCli.Tests/Unit/WordErrorBoundaryTests.cs` | 部分自动覆盖 |
 | WORD-NEG-020 | integration | P0 | relationship cleanup helpers | relationship 冲突与删除安全 | 已固定 picture/OLE/chart/hyperlink/header/footer/notes 删除后的主要清理、header/footer host relId 隔离和同 host image relId 唯一；相同 part 多引用、最后/非最后引用、跨 host copy/remove、duplicate relId 和失败回滚仍待补；见 `tests/OfficeCli.Tests/Integration/WordComplexRelationshipCleanupTests.cs`、`tests/OfficeCli.Tests/Unit/WordRelationshipHostTests.cs`、`WordDumpBatchRoundTripTests.cs` | 部分自动覆盖 |
 | WORD-NEG-021 | integration | P1 | document protection and permission ranges | protection 与 allowed range | 已固定 permission marker 的 add/remove/非法 id 和部分 allowed range contract；protected doc 默认拒绝/force、batch/resident、standalone remove/raw-set 的交叉差异仍待补；见 `tests/OfficeCli.Tests/Functional/WordPermissionContractTests.cs`、`tests/OfficeCli.Tests/Unit/WordBreakTabPermissionTests.cs` | 部分自动覆盖 |
-| WORD-NEG-022 | e2e | P0 | `ResidentClient`, `ResidentServer` | busy/crash/stale marker 矩阵 | 已固定 resident 不存在时 `TryConnect` 为 false、`TrySend` 返回 null 且非幂等 add 不落文档；已连接读失败的 at-most-once 也已固定；main pipe busy、ping pipe、异常退出、锁/marker 清理、pipe 重用和恢复建议仍待补；见 `tests/OfficeCli.Tests/Unit/WordResidentWireTests.cs`、`WordResidentConcurrencyTests.cs` | 部分自动覆盖 |
+| WORD-NEG-022 | e2e | P0 | `ResidentClient`, `ResidentServer` | busy/crash/stale marker 矩阵 | 已固定 resident 不存在、主 pipe busy、ping 返回其他文件路径、连接后半响应/EOF、resident 进程退出后的 pipe 不可达和 `create --force` 恢复；非幂等 add 不因连接后失败而重复发送；真实 Windows pipe/锁文件差异和更多恢复建议仍待补；见 `tests/OfficeCli.Tests/Unit/WordResidentWireTests.cs`、`tests/OfficeCli.Tests/Integration/WordResidentFailureIntegrationTests.cs`、`tests/OfficeCli.Tests/Integration/WordResidentConcurrencyTests.cs`、`tests/OfficeCli.Tests/E2E/WordViewSmokeTests.cs` | 部分自动覆盖 |
 | WORD-NEG-023 | e2e | P0 | `OutputFormatter`, all Word commands | JSON stdout purity | 已固定 get/query/set/add/move/swap/remove/validate/save/close 的成功 JSON stdout 可独立 parse，unsupported-property 失败也返回 JSON error 且不污染 stderr；raw/view/batch/watch/plugin/update 日志和全量裸文本矩阵仍待补；见 `tests/OfficeCli.Tests/Integration/WordMutationCommandIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-NEG-024 | integration | P1 | `ResidentClient.MaxMessageLength`, render/dump | 大输入和边界资源 | 已固定 128KiB Word text 经 CLI 完整 round-trip、超大 `get --depth` 被安全截断且成功、512 条 batch item 执行后全部持久化并可 validate；512MB pipe、超大 binary、超多 HTML lines 和真正上限拒绝仍待补；见 `tests/OfficeCli.Tests/Integration/WordResourceBoundaryIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-NEG-025 | e2e | P1 | `CommandBuilder` file handling | 文件系统安全边界 | 已固定 `create --type docx` 对空格/CJK 路径的扩展名推断、已有文件拒绝、`--force` 覆盖，以及 `dump --out` 父目录不存在时非零退出且不创建部分输出；相对/RTL/`.`/`..`/符号链接/只读目录/同文件输入输出仍待补；见 `tests/OfficeCli.Tests/Integration/WordFilesystemBoundaryIntegrationTests.cs` | 部分自动覆盖 |
@@ -550,6 +550,7 @@
 | WORD-CMD-069 | e2e | P1 | `CommandBuilder.cs` | create 已存在目标与 force 矩阵 | 已有文件、已有 resident、扩展名/type 不一致、`--force`、同一输入输出路径的 exit/code/文件 bytes/锁清理固定 | 部分自动覆盖 |
 | WORD-CMD-070 | e2e | P1 | `CommandBuilder.View.cs`, rendering registry | view renderer 选择与输出冲突 | html/svg/screenshot/pdf 的 backend capability、`--render`、`--out`/stdout、已有输出、page filter/grid 和未知 renderer 的 JSON/裸文本错误边界固定 | 部分自动覆盖 |
 | WORD-CMD-071 | e2e | P1 | `CommandBuilder.Refresh.cs`, `WordHtmlRefresh.cs` | refresh CLI page/filter/backend 矩阵 | `--fields`、`--pages`、`--timeout`、native/fallback/no-backend、输出文件和 JSON envelope 的组合固定；失败不覆盖原文件 | 部分自动覆盖 |
+| WORD-CMD-072 | e2e | P0 | `WordHandler.Add.cs`, `schemas/help/docx/*.json` | `add --type` 完整 Word CLI 路由矩阵 | 已按 parent 固定 paragraph/run/table/row/col/cell/section/header/footer/style/num/abstractNum/lvl/tab/ptab/field/toc/sdt/formfield/hyperlink/bookmark/comment/footnote/endnote/permission/picture/OLE/chart/equation/diagram/shape/textbox/watermark 的代表性真实 CLI 路由、返回路径、query 或逻辑路径和 validate，并覆盖 `p/r/tbl/img` aliases、required props 和 revision/altChunk 拒绝；属性级全量 aliases、header/footer 多 section、复杂 carrier 和每类错误矩阵仍待补；见 `tests/OfficeCli.Tests/Integration/WordAddTypeCommandIntegrationTests.cs` | 部分自动覆盖 |
 
 ### 文档对象与跨层 round-trip 补充
 
@@ -570,7 +571,8 @@
 | WORD-NEG-028 | e2e | P1 | `WatchNotifier.cs`, `CommandBuilder.Mark.cs` | mark no-watch 与 rejected 请求区分 | no watch 返回“start watch”类错误；watch 存在但 path/color/regex 被拒绝返回真实 reject；空 id、空 error、超时不会伪装成成功 | 部分自动覆盖 |
 | WORD-NEG-029 | e2e | P1 | `CommandBuilder.*`, file handling | 输出路径、临时文件和同路径边界 | 已固定 dump 输出父目录不存在时不创建目标文件；`--out` 已存在、输入输出相同、只读目录、符号链接、`.`/`..`、进程中断后的临时文件清理和源文件不变仍待补；见 `tests/OfficeCli.Tests/Integration/WordFilesystemBoundaryIntegrationTests.cs` | 部分自动覆盖 |
 | WORD-NEG-030 | integration | P0 | relationship helpers, raw/add-part | relationship 冲突与回滚矩阵 | duplicate relId、相同 part 多引用、删除最后/非最后引用、坏 content type、raw-set/add-part/mutation 失败回滚时不能误删或留下 dangling rel | 部分自动覆盖 |
-| WORD-NEG-031 | integration | P0 | `ResidentClient.cs`, `ResidentServer.cs`, `ResidentFlushPolicy.cs` | timeout、半响应与 at-most-once | server 中途断开、响应为空/延迟、client retry、save/close 超时、非幂等 mutation 的发送次数和最终文档顺序固定 | 部分自动覆盖 |
+| WORD-NEG-031 | integration | P0 | `ResidentClient.cs`, `ResidentServer.cs`, `ResidentFlushPolicy.cs` | timeout、半响应与 at-most-once | 已固定连接后半截 JSON/EOF 不重试、请求只发送一次；server 延迟响应、save/close 超时、batch 非幂等重试和更大响应边界仍待补；见 `tests/OfficeCli.Tests/Integration/WordResidentFailureIntegrationTests.cs`、`tests/OfficeCli.Tests/Unit/WordResidentWireTests.cs` | 部分自动覆盖 |
+| WORD-NEG-032 | integration/e2e | P0 | `ResidentClient.cs`, `ResidentServer.cs`, `WordViewSmokeTests.cs` | resident busy/crash/stale/half-response 与恢复 | 已固定主 pipe 被占用时 connect 重试不落文档、ping 返回其他文件路径识别为 stale resident、写入后 EOF/半截 JSON 不重新发送非幂等 mutation、resident 进程退出后 pipe 不可达且 `create --force` 恢复；Windows pipe/锁文件差异和完整 CLI 恢复建议仍待补；见 `tests/OfficeCli.Tests/Integration/WordResidentFailureIntegrationTests.cs`、`tests/OfficeCli.Tests/E2E/WordViewSmokeTests.cs` | 部分自动覆盖 |
 
 ## 首批冻结基线用例
 
