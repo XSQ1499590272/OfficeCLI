@@ -66,6 +66,7 @@ public class WordPublishedBinarySmokeTests
         var document = Path.Combine(workingRoot, "published-smoke.docx");
         var environment = new Dictionary<string, string>
         {
+            ["OFFICECLI_NO_AUTO_INSTALL"] = "1",
             ["OFFICECLI_NO_AUTO_RESIDENT"] = "1",
             ["OFFICECLI_SKIP_UPDATE"] = "1",
         };

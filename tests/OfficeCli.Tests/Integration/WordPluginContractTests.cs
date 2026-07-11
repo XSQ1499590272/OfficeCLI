@@ -89,6 +89,43 @@ public sealed class WordPluginContractTests : IDisposable
         }
     }
 
+    [Fact]
+    public void PluginManifest_InvalidKindTargetAndTimeoutExposeWarningsAndSafeFallback()
+    {
+        var manifest = new PluginManifest
+        {
+            Name = "invalid-word-plugin",
+            Version = "0.0.1",
+            Protocol = 1,
+            Kinds = ["dump-reader", "unknown-kind"],
+            Extensions = [".doc"],
+            Target = "pdf",
+            IdleTimeoutSeconds = new PluginIdleTimeout { Default = 0 }
+        };
+
+        var warnings = manifest.Warnings();
+
+        Assert.Contains(warnings, warning => warning.Contains("unknown kind", StringComparison.Ordinal));
+        Assert.Contains(warnings, warning => warning.Contains("target", StringComparison.Ordinal));
+        Assert.Contains(warnings, warning => warning.Contains("idle_timeout_seconds.default", StringComparison.Ordinal));
+        Assert.Equal(60, manifest.ResolveIdleTimeout("dump"));
+    }
+
+    [Fact]
+    public void WordCommand_WithInstallAndUpdateGuardsKeepsProtocolStreamsClean()
+    {
+        var documentPath = CreateTemp("officecli_guarded_word", ".docx");
+        OfficeCli.BlankDocCreator.Create(documentPath);
+
+        var result = RunOfficeCli("validate", documentPath, "--json");
+
+        Assert.Equal(0, result.ExitCode);
+        using var json = JsonDocument.Parse(result.Stdout);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean(), result.Stdout);
+        Assert.DoesNotContain("install", result.Stdout + result.Stderr, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("update", result.Stdout + result.Stderr, StringComparison.OrdinalIgnoreCase);
+    }
+
     private string CreateTemp(string prefix, string extension)
     {
         var path = Path.Combine(Path.GetTempPath(), $"{prefix}_{Guid.NewGuid():N}{extension}");
@@ -121,6 +158,7 @@ public sealed class WordPluginContractTests : IDisposable
         foreach (var arg in args) psi.ArgumentList.Add(arg);
         psi.Environment["OFFICECLI_NO_AUTO_RESIDENT"] = "1";
         psi.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
+        psi.Environment["OFFICECLI_NO_AUTO_INSTALL"] = "1";
 
         using var process = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start officecli");
         var stdout = process.StandardOutput.ReadToEnd();

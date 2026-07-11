@@ -51,6 +51,32 @@ public sealed class WordHtmlRefreshTests : WordTestBase
     }
 
     [Fact]
+    public void ApplyPageNumbers_LeavesUnknownPagerefAndNonPagerefFieldsUnchanged()
+    {
+        var path = CreateBlankDocx();
+
+        using var document = WordprocessingDocument.Open(path, true);
+        var body = document.MainDocumentPart!.Document!.Body!;
+        var known = FieldParagraph(" PAGEREF _Known \\h ", "1");
+        var unknown = FieldParagraph(" PAGEREF _Missing \\h ", "2");
+        var page = FieldParagraph(" PAGE ", "3");
+        body.InsertBefore(known, body.GetFirstChild<SectionProperties>());
+        body.InsertBefore(unknown, body.GetFirstChild<SectionProperties>());
+        body.InsertBefore(page, body.GetFirstChild<SectionProperties>());
+
+        var method = typeof(WordHtmlRefresh).GetMethod(
+            "ApplyPageNumbers",
+            BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        method!.Invoke(null, [document, new Dictionary<string, int> { ["_Known"] = 9 }]);
+
+        Assert.Equal("9", known.Descendants<Text>().Last().Text);
+        Assert.Equal("2", unknown.Descendants<Text>().Last().Text);
+        Assert.Equal("3", page.Descendants<Text>().Last().Text);
+        document.MainDocumentPart.Document.Save();
+    }
+
+    [Fact]
     public void RefreshViaHtml_MissingDocumentReturnsFalse()
     {
         var path = Path.Combine(Path.GetTempPath(), $"officecli_missing_{Guid.NewGuid():N}.docx");
@@ -76,4 +102,12 @@ public sealed class WordHtmlRefreshTests : WordTestBase
             try { File.Delete(path); } catch { }
         }
     }
+
+    private static Paragraph FieldParagraph(string instruction, string cachedResult)
+        => new(
+            new Run(new FieldChar { FieldCharType = FieldCharValues.Begin }),
+            new Run(new FieldCode { Text = instruction }),
+            new Run(new FieldChar { FieldCharType = FieldCharValues.Separate }),
+            new Run(new Text(cachedResult)),
+            new Run(new FieldChar { FieldCharType = FieldCharValues.End }));
 }

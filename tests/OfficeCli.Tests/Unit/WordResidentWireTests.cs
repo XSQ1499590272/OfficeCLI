@@ -83,4 +83,27 @@ public sealed class WordResidentWireTests : WordTestBase
 
         Assert.Null(response);
     }
+
+    [Fact]
+    public void TrySend_WhenResidentIsMissingReturnsNullWithoutChangingTheFile()
+    {
+        var path = CreateBlankDocx();
+        var before = File.ReadAllBytes(path);
+
+        Assert.False(ResidentClient.TryConnect(path, out _));
+        var response = ResidentClient.TrySend(
+            path,
+            new ResidentRequest
+            {
+                Command = "add",
+                Args = new() { ["parent"] = "/body", ["type"] = "paragraph" },
+                Props = new() { ["text"] = "must not be applied" },
+                Json = true
+            },
+            maxRetries: 1,
+            connectTimeoutMs: 50);
+
+        Assert.Null(response);
+        Assert.Equal(before, File.ReadAllBytes(path));
+    }
 }
