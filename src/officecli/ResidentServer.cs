@@ -1931,6 +1931,12 @@ public class ResidentServer : IDisposable
         var textFilter = req.GetArgOrNull("find");
         if (!string.IsNullOrEmpty(textFilter))
             results = results.Where(n => n.Text != null && AttributeFilter.MatchesTextFilter(n.Text, textFilter)).ToList();
+        if (req.GetArgOrNull("compact") == "true")
+        {
+            foreach (var w in warnings) Console.Error.WriteLine(w.Message);
+            Console.WriteLine(CommandBuilder.FormatNodesCompact(_handler, results, req.GetArgOrNull("fields")));
+            return;
+        }
         // CONSISTENCY(query-json-children): hydrate Children from Get(path, depth=1)
         // for JSON output so consumers see the same shape as `get --json`. Mirrors
         // the post-processing in CommandBuilder.GetQuery.cs.

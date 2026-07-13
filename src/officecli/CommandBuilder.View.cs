@@ -23,6 +23,7 @@ static partial class CommandBuilder
         var pageOpt = new Option<string?>("--page") { Description = "页面过滤器（例如 1、2-5、1,3,5）。html mode 默认 all；screenshot mode 默认 1（使用 --page 1-N 捕获更多页面，或使用 --grid N 生成整份文档的缩略图 contact sheet）。" };
         var browserOpt = new Option<bool>("--browser") { Description = "在 browser 中打开输出（html / svg mode）" };
         var outOpt = new Option<string?>("--out", "-o") { Description = "输出文件路径（html、screenshot mode；html 默认 stdout，screenshot 默认临时文件）" };
+        var clipOpt = new Option<string?>("--range") { Description = "将输出限制到指定区域。Screenshot：xlsx 单元格范围或元素 data-path；text（仅 xlsx）：单元格范围或单个单元格。它不是 set 的字符偏移 range 参数。" };
         var screenshotWidthOpt = new Option<int>("--screenshot-width") { Description = "Screenshot viewport 宽度（默认 1600）", DefaultValueFactory = _ => 1600 };
         var screenshotHeightOpt = new Option<int>("--screenshot-height") { Description = "Screenshot viewport 高度（默认 1200）", DefaultValueFactory = _ => 1200 };
         var gridOpt = new Option<string?>("--grid")
@@ -45,6 +46,7 @@ static partial class CommandBuilder
         viewCommand.Add(pageOpt);
         viewCommand.Add(browserOpt);
         viewCommand.Add(outOpt);
+        viewCommand.Add(clipOpt);
         viewCommand.Add(screenshotWidthOpt);
         viewCommand.Add(screenshotHeightOpt);
         viewCommand.Add(gridOpt);
@@ -65,6 +67,7 @@ static partial class CommandBuilder
             var pageFilter = result.GetValue(pageOpt);
             var browser = result.GetValue(browserOpt);
             var outArg = result.GetValue(outOpt);
+            var clipArg = result.GetValue(clipOpt);
             var screenshotWidth = result.GetValue(screenshotWidthOpt);
             var screenshotHeight = result.GetValue(screenshotHeightOpt);
             // --grid has three states: absent → off (0), present with no value
@@ -93,6 +96,7 @@ static partial class CommandBuilder
                 if (pageFilter != null) req.Args["page"] = pageFilter;
                 if (browser) req.Args["browser"] = "true";
                 if (outArg != null) req.Args["out"] = outArg;
+                if (clipArg != null) req.Args["range"] = clipArg;
                 req.Args["screenshot-width"] = screenshotWidth.ToString();
                 req.Args["screenshot-height"] = screenshotHeight.ToString();
                 if (gridCols != 0) req.Args["grid"] = gridCols.ToString(); // -1 = auto
@@ -185,9 +189,16 @@ static partial class CommandBuilder
                 // `.sheet-content { display:none }` + `.active` on sheet 0.
                 string? html = null;
                 byte[]? directPng = null;
+                // --range crops a data-path-addressed region from the HTML preview;
+                // whole-page native/direct-PNG backends cannot provide that crop.
+                if (clipArg != null)
+                    renderMode = "html";
                 if (handler is OfficeCli.Handlers.PowerPointHandler pptHandler)
                 {
                     var effectiveFilter = pageFilter;
+                    if (clipArg != null && string.IsNullOrEmpty(effectiveFilter)
+                        && System.Text.RegularExpressions.Regex.Match(clipArg, @"^/slide\[(\d+)\]") is { Success: true } slideM)
+                        effectiveFilter = slideM.Groups[1].Value;
                     if (string.IsNullOrEmpty(effectiveFilter) && start is null && end is null && gridCols == 0)
                         effectiveFilter = "1";
                     var (pStart, pEnd) = ParsePptHtmlPage(effectiveFilter, start, end, pptHandler);
@@ -324,7 +335,11 @@ static partial class CommandBuilder
                 }
                 else if (handler is OfficeCli.Handlers.WordHandler wordHandler)
                 {
-                    var effectiveFilter = string.IsNullOrEmpty(pageFilter) ? "1" : pageFilter;
+                    // With --range, render all pages unless the caller explicitly
+                    // narrowed with --page so the target can be anywhere.
+                    var effectiveFilter = clipArg != null
+                        ? pageFilter
+                        : (string.IsNullOrEmpty(pageFilter) ? "1" : pageFilter);
                     if (renderMode != "html" && OperatingSystem.IsWindows())
                     {
                         try { directPng = OfficeCli.Core.WordPdfBackend.Render(file.FullName, effectiveFilter); }
@@ -399,8 +414,20 @@ static partial class CommandBuilder
                     // SECURITY: random token in temp filename — same rationale as the html/--browser path.
                     var tmpHtml = Path.Combine(Path.GetTempPath(), $"officecli_preview_{Path.GetFileNameWithoutExtension(file.Name)}_{DateTime.Now:HHmmss}_{Guid.NewGuid():N}.html");
                     File.WriteAllText(tmpHtml, html!);
-                    var r = OfficeCli.Core.HtmlScreenshot.Capture(tmpHtml, pngPath, screenshotWidth, screenshotHeight);
+                    var r = clipArg != null
+                        ? OfficeCli.Core.HtmlScreenshot.CaptureClipped(tmpHtml, pngPath,
+                            OfficeCli.Core.HtmlScreenshot.ResolveClipDataPaths(clipArg))
+                        : OfficeCli.Core.HtmlScreenshot.Capture(tmpHtml, pngPath, screenshotWidth, screenshotHeight);
                     try { File.Delete(tmpHtml); } catch { /* ignore */ }
+                    if (!r.Ok && r.Error == "clip_target_not_found")
+                    {
+                        throw new OfficeCli.Core.CliException(
+                            $"--range target '{clipArg}' 未匹配到任何已渲染元素。")
+                        {
+                            Code = "range_target_not_found",
+                            Suggestion = "请使用 HTML preview 产生的 data-path；xlsx 可用 Sheet1!A1:C3，pptx/docx 可用 query 返回的元素路径。",
+                        };
+                    }
                     if (!r.Ok)
                     {
                         throw new OfficeCli.Core.CliException(
@@ -532,7 +559,7 @@ static partial class CommandBuilder
                 else if (modeKey is "outline" or "o")
                     Console.WriteLine(OutputFormatter.WrapEnvelope(handler.ViewAsOutlineJson().ToJsonString(OutputFormatter.PublicJsonOptions)));
                 else if (modeKey is "text" or "t")
-                    Console.WriteLine(OutputFormatter.WrapEnvelope(handler.ViewAsTextJson(start, end, maxLines, cols).ToJsonString(OutputFormatter.PublicJsonOptions)));
+                    Console.WriteLine(OutputFormatter.WrapEnvelope(handler.ViewAsTextJson(start, end, maxLines, cols, clipArg).ToJsonString(OutputFormatter.PublicJsonOptions)));
                 else if (modeKey is "annotated" or "a")
                     Console.WriteLine(OutputFormatter.WrapEnvelope(
                         OutputFormatter.FormatView(mode, handler.ViewAsAnnotated(start, end, maxLines, cols), OutputFormat.Json)));
@@ -561,7 +588,7 @@ static partial class CommandBuilder
             {
                 var output = mode.ToLowerInvariant() switch
                 {
-                    "text" or "t" => handler.ViewAsText(start, end, maxLines, cols),
+                    "text" or "t" => handler.ViewAsText(start, end, maxLines, cols, clipArg),
                     "annotated" or "a" => handler.ViewAsAnnotated(start, end, maxLines, cols),
                     "outline" or "o" => handler.ViewAsOutline(),
                     "stats" or "s" => withPagesValue.HasValue

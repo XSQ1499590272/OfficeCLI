@@ -102,4 +102,6 @@ if (args.Length == 0)
     return 0;
 }
 
-return rootCommand.Parse(args).Invoke();
+var parseResult = rootCommand.Parse(args,
+    new System.CommandLine.ParserConfiguration { ResponseFileTokenReplacer = null });
+return parseResult.Invoke();

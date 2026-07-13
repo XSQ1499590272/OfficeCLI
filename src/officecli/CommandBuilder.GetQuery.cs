@@ -171,18 +171,26 @@ static partial class CommandBuilder
         var selectorArg = new Argument<string>("selector") { Description = "CSS 风格 selector（例如 paragraph[style=Normal] > run[font!=Arial]）" };
 
         var queryFindOpt = new Option<string?>("--find") { Description = "将结果过滤为包含此文本的元素（不区分大小写的子串）" };
+        var queryCompactOpt = new Option<bool>("--compact") { Description = "每个元素输出一行：path、标签、文本；末行输出 total。仅支持 pptx/docx，xlsx 请使用 view text --range。可用 --fields 追加 Format 字段。" };
+        var queryFieldsOpt = new Option<string?>("--fields") { Description = "在 --compact 输出中追加的 Format 字段，逗号分隔（例如 x,y,width）" };
 
         var queryCommand = new Command("query", "使用 CSS 风格 selector 查询文档元素");
         queryCommand.Add(queryFileArg);
         queryCommand.Add(selectorArg);
         queryCommand.Add(jsonOption);
         queryCommand.Add(queryFindOpt);
+        queryCommand.Add(queryCompactOpt);
+        queryCommand.Add(queryFieldsOpt);
 
         queryCommand.SetAction(result => { var json = result.GetValue(jsonOption); return SafeRun(() =>
         {
             var file = result.GetValue(queryFileArg)!;
             var selector = MsysPathHint.Restore(result.GetValue(selectorArg)!)!;
             var textFilter = result.GetValue(queryFindOpt);
+            var compact = result.GetValue(queryCompactOpt);
+            var fields = result.GetValue(queryFieldsOpt);
+            if (compact && json)
+                throw new OfficeCli.Core.CliException("--compact 是纯文本逐行格式，不能与 --json 同时使用。") { Code = "invalid_value" };
 
             if (TryResident(file.FullName, req =>
             {
@@ -190,6 +198,8 @@ static partial class CommandBuilder
                 req.Json = json;
                 req.Args["selector"] = selector;
                 if (textFilter != null) req.Args["find"] = textFilter;
+                if (compact) req.Args["compact"] = "true";
+                if (fields != null) req.Args["fields"] = fields;
             }, json) is {} rc) return rc;
 
             var format = json ? OutputFormat.Json : OutputFormat.Text;
@@ -209,6 +219,12 @@ static partial class CommandBuilder
             var (results, warnings) = OfficeCli.Core.AttributeFilter.FilterSelector(selector, handler.Query, keyResolver);
             if (!string.IsNullOrEmpty(textFilter))
                 results = results.Where(n => n.Text != null && OfficeCli.Core.AttributeFilter.MatchesTextFilter(n.Text, textFilter)).ToList();
+            if (compact)
+            {
+                foreach (var w in warnings) Console.Error.WriteLine(w.Message);
+                Console.WriteLine(FormatNodesCompact(handler, results, fields));
+                return 0;
+            }
             if (json)
             {
                 // CONSISTENCY(query-json-children): Query returns nodes with empty
@@ -260,5 +276,93 @@ static partial class CommandBuilder
         }, json); });
 
         return queryCommand;
+    }
+
+    /// <summary>
+    /// `query --compact` 的稳定逐行格式。已有列的顺序和含义保持不变，
+    /// 只允许在末尾追加新列。
+    /// </summary>
+    internal static string FormatNodesCompact(IDocumentHandler handler, List<DocumentNode> results, string? fields)
+    {
+        if (handler is ExcelHandler)
+            throw new OfficeCli.Core.CliException(
+                "--compact 不支持 xlsx：请使用 view text，或使用 view text --range Sheet1!A1:C10。")
+            { Code = "invalid_value" };
+
+        var fieldList = string.IsNullOrWhiteSpace(fields)
+            ? null
+            : fields.Split(',').Select(f => f.Trim()).Where(f => f.Length > 0).ToList();
+
+        if (handler is PowerPointHandler)
+        {
+            results = results
+                .Select((n, i) => (n, i))
+                .OrderBy(t => System.Text.RegularExpressions.Regex.Match(t.n.Path, @"^/slide\[(\d+)\]") is { Success: true } m
+                    ? int.Parse(m.Groups[1].Value) : int.MaxValue)
+                .ThenBy(t => t.n.Format.TryGetValue("zorder", out var z) && int.TryParse(z?.ToString(), out var zi)
+                    ? zi : int.MaxValue)
+                .ThenBy(t => t.i)
+                .Select(t => t.n)
+                .ToList();
+        }
+
+        var sb = new System.Text.StringBuilder();
+        foreach (var n in results)
+        {
+            sb.Append(n.Path);
+            if (n.Type == "table" && n.Format.TryGetValue("rows", out var r) && n.Format.TryGetValue("cols", out var c))
+            {
+                sb.Append('\t').Append($"[table {r}x{c}]");
+            }
+            else
+            {
+                var label = !string.IsNullOrEmpty(n.Style) ? n.Style : n.Type;
+                sb.Append('\t').Append('[').Append(label).Append(']');
+                sb.Append('\t').Append(CompactText(n.Text));
+            }
+            if (fieldList != null)
+                foreach (var f in fieldList)
+                    sb.Append('\t').Append(f).Append('=')
+                      .Append(n.Format.TryGetValue(f, out var v) && v != null ? v.ToString() : "");
+            sb.Append('\n');
+        }
+
+        var (total, containerSuffix) = CountCompactDenominator(handler);
+        sb.Append($"total: {results.Count} of {total} elements{containerSuffix}");
+        return sb.ToString();
+    }
+
+    private static string CompactText(string? text)
+    {
+        if (string.IsNullOrEmpty(text)) return "(empty)";
+        var t = text.Replace("\\", "\\\\").Replace("\t", "\\t")
+                    .Replace("\r", "").Replace("\n", "\\n").Replace("\"", "\\\"");
+        if (t.Length > 60) t = t[..60] + "…";
+        return "\"" + t + "\"";
+    }
+
+    private static (int Total, string ContainerSuffix) CountCompactDenominator(IDocumentHandler handler)
+    {
+        if (handler is PowerPointHandler)
+        {
+            int slides = handler.Query("slide").Count;
+            var paths = new HashSet<string>();
+            foreach (var sel in new[] { "shape", "picture", "table", "chart", "connector", "group" })
+            {
+                try { foreach (var n in handler.Query(sel)) paths.Add(n.Path); }
+                catch { /* selector unsupported on this document — skip */ }
+            }
+            return (paths.Count, $" / {slides} slides");
+        }
+
+        try
+        {
+            var body = handler.Get("/body", depth: 1);
+            return (body.Children.Count(c => c.Type != "section"), "");
+        }
+        catch
+        {
+            return (0, "");
+        }
     }
 }
