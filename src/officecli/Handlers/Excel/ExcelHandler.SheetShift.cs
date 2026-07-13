@@ -34,6 +34,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using C = DocumentFormat.OpenXml.Drawing.Charts;
+using CX = DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 using Xm = DocumentFormat.OpenXml.Office.Excel;
 using ThreadedCmt = DocumentFormat.OpenXml.Office2019.Excel.ThreadedComments;
@@ -65,7 +66,8 @@ public partial class ExcelHandler
         Func<string, string?> refMapper,
         Func<string, string>? formulaTextMapper,
         Func<int, int>? rowMarkerShift = null,
-        Func<int, int>? colMarkerShift = null)
+        Func<int, int>? colMarkerShift = null,
+        Func<string, string, string>? crossSheetFormulaMapper = null)
     {
         var ws = GetSheet(worksheet);
 
@@ -95,12 +97,20 @@ public partial class ExcelHandler
             if (formulaTextMapper != null)
                 foreach (var rule in cf.Elements<ConditionalFormattingRule>())
                 {
+                    // A CF rule's <formula> is RELATIVE to the top-left of its
+                    // sqref. Deleting a row/col that a self-relative reference
+                    // lands on must re-relativize (Excel keeps "B2>3"), NOT
+                    // rewrite it to a literal "#REF!" — that silently disables
+                    // the rule. The generic shifter (correct for cell formulas
+                    // referencing a truly-gone cell) produces #REF! here; when
+                    // it introduces a NEW #REF! into a CF formula, keep the
+                    // original relative text instead.
                     foreach (var f in rule.Elements<Formula>())
-                        if (!string.IsNullOrEmpty(f.Text)) f.Text = formulaTextMapper(f.Text);
+                        if (!string.IsNullOrEmpty(f.Text)) f.Text = ShiftCfFormula(f.Text, formulaTextMapper);
                     foreach (var cfvo in rule.Descendants<ConditionalFormatValueObject>())
                         if (cfvo.Type?.Value == ConditionalFormatValueObjectValues.Formula
                             && !string.IsNullOrEmpty(cfvo.Val?.Value))
-                            cfvo.Val = formulaTextMapper(cfvo.Val!.Value!);
+                            cfvo.Val = ShiftCfFormula(cfvo.Val!.Value!, formulaTextMapper);
                 }
             if (cf.SequenceOfReferences?.HasValue != true) continue;
             var newRefs = cf.SequenceOfReferences.Items
@@ -165,9 +175,18 @@ public partial class ExcelHandler
             var tbl = tablePart.Table;
             if (tbl == null) continue;
             bool tblDirty = false;
+            // A ListObject is never header-only: Excel itself always keeps at
+            // least one (blank) data row — deleting every data row in the UI
+            // leaves ref A1:B2. Without this floor, a predicate remove that
+            // matched every data row shrank ref to the header row alone, a
+            // shape Excel never writes.
+            int tblHeaderRows = (int)(tbl.HeaderRowCount?.Value ?? 1);
+            int tblTotalsRows = (int)(tbl.TotalsRowCount?.Value ?? 0);
             if (tbl.Reference?.Value != null)
             {
                 var shifted = refMapper(tbl.Reference.Value);
+                if (shifted != null)
+                    shifted = EnsureTableRefRowFloor(shifted, tblHeaderRows + 1 + tblTotalsRows);
                 if (shifted != null && !string.Equals(shifted, tbl.Reference.Value, StringComparison.Ordinal))
                 {
                     tbl.Reference = shifted;
@@ -177,6 +196,8 @@ public partial class ExcelHandler
             if (tbl.AutoFilter?.Reference?.Value != null)
             {
                 var shifted = refMapper(tbl.AutoFilter.Reference.Value);
+                if (shifted != null)
+                    shifted = EnsureTableRefRowFloor(shifted, tblHeaderRows + 1);   // autoFilter spans header+data, no totals
                 if (shifted != null && !string.Equals(shifted, tbl.AutoFilter.Reference.Value, StringComparison.Ordinal))
                 {
                     tbl.AutoFilter.Reference = shifted;
@@ -242,24 +263,47 @@ public partial class ExcelHandler
             }
         }
 
-        // 6c. chart series references (<c:f> in each ChartPart under DrawingsPart),
-        // e.g. Sheet1!$B$1:$B$5. Route through formulaTextMapper so refs targeting
-        // this sheet follow the displacement and refs to other sheets are left
-        // alone (the shifter's sheet-scope guard handles that).
-        if (formulaTextMapper != null && worksheet.DrawingsPart != null)
+        // 6c. chart series references (<c:f> in each ChartPart), e.g.
+        // Sheet1!$B$1:$B$5. A chart on ANY sheet can reference the edited sheet
+        // (a dashboard chart sourced from a data sheet is the common case), so
+        // walk every worksheet's DrawingsPart — not just the edited sheet's.
+        // The mapper's sheet-scope guard leaves refs to other sheets untouched,
+        // so this only shifts the refs that actually target the edited sheet.
+        if (formulaTextMapper != null)
         {
-            foreach (var chartPart in worksheet.DrawingsPart.ChartParts)
+            foreach (var (_, wsPart) in GetWorksheets())
             {
-                var cs = chartPart.ChartSpace;
-                if (cs == null) continue;
-                bool chDirty = false;
-                foreach (var f in cs.Descendants<C.Formula>())
+                if (wsPart.DrawingsPart == null) continue;
+                foreach (var chartPart in wsPart.DrawingsPart.ChartParts)
                 {
-                    if (string.IsNullOrEmpty(f.Text)) continue;
-                    var nf = formulaTextMapper(f.Text);
-                    if (!string.Equals(nf, f.Text, StringComparison.Ordinal)) { f.Text = nf; chDirty = true; }
+                    var cs = chartPart.ChartSpace;
+                    if (cs == null) continue;
+                    bool chDirty = false;
+                    foreach (var f in cs.Descendants<C.Formula>())
+                    {
+                        if (string.IsNullOrEmpty(f.Text)) continue;
+                        var nf = formulaTextMapper(f.Text);
+                        if (!string.Equals(nf, f.Text, StringComparison.Ordinal)) { f.Text = nf; chDirty = true; }
+                    }
+                    if (chDirty) cs.Save();
                 }
-                if (chDirty) cs.Save();
+                // Extended (cx) charts — funnel/pareto/treemap/sunburst/
+                // boxWhisker/histogram — carry their series/category refs in
+                // <cx:f> and were never displaced, so a row/col insert left
+                // them stale (same class as the regular-chart gap above).
+                foreach (var extPart in wsPart.DrawingsPart.ExtendedChartParts)
+                {
+                    var cxs = extPart.ChartSpace;
+                    if (cxs == null) continue;
+                    bool cxDirty = false;
+                    foreach (var f in cxs.Descendants<CX.Formula>())
+                    {
+                        if (string.IsNullOrEmpty(f.Text)) continue;
+                        var nf = formulaTextMapper(f.Text);
+                        if (!string.Equals(nf, f.Text, StringComparison.Ordinal)) { f.Text = nf; cxDirty = true; }
+                    }
+                    if (cxDirty) cxs.Save();
+                }
             }
         }
 
@@ -333,6 +377,17 @@ public partial class ExcelHandler
         {
             foreach (var sv in sheetViews.Elements<SheetView>())
             {
+                // The frozen/split pane's top-left cell is an A1 anchor with the
+                // same displacement semantics as the selection's active cell; it
+                // was left un-shifted, so a row/col insert drifted the freeze
+                // point (freeze=B3 stayed B3 after inserting a row above).
+                var pane = sv.GetFirstChild<Pane>();
+                if (pane?.TopLeftCell?.Value is { } tlc)
+                {
+                    var newTlc = refMapper(tlc);
+                    if (newTlc != null && !string.Equals(newTlc, tlc, StringComparison.Ordinal))
+                        pane.TopLeftCell = newTlc;
+                }
                 foreach (var sel in sv.Elements<Selection>())
                 {
                     if (sel.ActiveCell?.Value != null)
@@ -441,7 +496,12 @@ public partial class ExcelHandler
                 {
                     if (cell.CellFormula == null) continue;
                     if (formulaTextMapper != null && !string.IsNullOrEmpty(cell.CellFormula.Text))
-                        cell.CellFormula.Text = formulaTextMapper(cell.CellFormula.Text);
+                    {
+                        var oldText = cell.CellFormula.Text;
+                        var newText = formulaTextMapper(oldText);
+                        cell.CellFormula.Text = newText;
+                        InvalidateCacheIfShiftBrokeFormula(cell, oldText, newText);
+                    }
                     if (cell.CellFormula.Reference?.Value != null)
                     {
                         var shifted = refMapper(cell.CellFormula.Reference.Value);
@@ -449,6 +509,33 @@ public partial class ExcelHandler
                         else cell.CellFormula.Remove();
                     }
                 }
+            }
+        }
+
+        // 7b. cell formulas in OTHER sheets that reference THIS sheet
+        // (`Summary!A1 = Sheet1!B4`). A row/col insert or delete in one sheet
+        // displaces its cells for every formula everywhere, not just formulas on
+        // the same sheet — otherwise a cross-sheet reference silently points at
+        // the wrong (or now-empty) cell. The per-sheet mapper uses the OTHER
+        // sheet as its "current sheet" so that sheet's UNqualified refs are left
+        // alone; only a ref explicitly qualified with this sheet is shifted.
+        if (crossSheetFormulaMapper != null)
+        {
+            foreach (var (otherName, otherPart) in GetWorksheets())
+            {
+                if (otherPart == worksheet) continue;
+                var otherData = GetSheet(otherPart).GetFirstChild<SheetData>();
+                if (otherData == null) continue;
+                foreach (var row in otherData.Elements<Row>())
+                    foreach (var cell in row.Elements<Cell>())
+                        if (cell.CellFormula != null && !string.IsNullOrEmpty(cell.CellFormula.Text))
+                        {
+                            var oldText = cell.CellFormula.Text;
+                            var newText = crossSheetFormulaMapper(otherName, oldText);
+                            cell.CellFormula.Text = newText;
+                            InvalidateCacheIfShiftBrokeFormula(cell, oldText, newText);
+                        }
+                otherPart.Worksheet.Save();
             }
         }
 
@@ -475,5 +562,48 @@ public partial class ExcelHandler
                 if (changed) GetWorkbook().Save();
             }
         }
+    }
+
+    // A structural shift that rewrites a formula to contain #REF! (its target
+    // row/col was deleted) must not leave the pre-delete cached value behind:
+    // `get` would keep reporting the old number with evaluated=true and
+    // `view text` would present it as truth, while Excel shows #REF!. Persist
+    // what Excel itself would after recalc — an error-typed cell with #REF! as
+    // the cached value — so display shows #REF! and `view issues` classifies it
+    // as a formula error (not a stale number).
+    // Grow a shifted table ref back to its minimum legal row span (header +
+    // one data row + totals). Column span and anchor are untouched; a
+    // single-cell ref passes through unchanged.
+    private static string EnsureTableRefRowFloor(string refStr, int minRowSpan)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(
+            refStr, @"^([A-Z]+)(\d+):([A-Z]+)(\d+)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        if (!m.Success) return refStr;
+        int r1 = int.Parse(m.Groups[2].Value), r2 = int.Parse(m.Groups[4].Value);
+        if (r2 - r1 + 1 >= minRowSpan) return refStr;
+        return $"{m.Groups[1].Value}{r1}:{m.Groups[3].Value}{r1 + minRowSpan - 1}";
+    }
+
+    private static void InvalidateCacheIfShiftBrokeFormula(Cell cell, string oldText, string newText)
+    {
+        if (newText == oldText || !newText.Contains("#REF!", StringComparison.Ordinal)) return;
+        cell.DataType = CellValues.Error;
+        cell.CellValue = new CellValue("#REF!");
+    }
+
+    // Shift a conditional-formatting rule's formula. Unlike a cell formula, a
+    // CF <formula> is relative to the top-left of its applied range, so a row/
+    // col deleted within that range re-relativizes it rather than invalidating
+    // it. The generic shifter can't tell the two apart and emits "#REF!"; when
+    // it introduces a NEW #REF! into a CF formula, keep the original relative
+    // text (Excel's behaviour). Formulas already broken pre-shift are left as-is.
+    private static string ShiftCfFormula(string text, Func<string, string?> mapper)
+    {
+        var mapped = mapper(text);
+        if (mapped == null) return text;
+        if (mapped.Contains("#REF!", StringComparison.Ordinal)
+            && !text.Contains("#REF!", StringComparison.Ordinal))
+            return text;
+        return mapped;
     }
 }

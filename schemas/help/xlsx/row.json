@@ -22,6 +22,14 @@
         "officecli query book.xlsx \"row[Region=West and Sales>1000]\"",
         "officecli query book.xlsx \"row[Status=open or Priority=high]\""
       ]
+    },
+    {
+      "title": "Write a table column's cell on a row; disambiguate a column that shadows a row property",
+      "commands": [
+        "officecli set book.xlsx \"/Sheet1/row[2]\" --prop Salary=9000",
+        "officecli set book.xlsx \"/Sheet1/row[2]\" --prop col.Height=180",
+        "officecli set book.xlsx \"/Sheet1/row[2]\" --prop @height=25"
+      ]
     }
   ],
   "properties": {
@@ -82,7 +90,7 @@
       "description": "折叠 row group。当前仅支持 Set。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop collapsed=true"],
-      "readback": "not surfaced by Get",
+      "readback": "true when the row group is collapsed",
       "enforcement": "report"
     },
     "customHeight": { "type":"bool", "add":false, "set":false, "get":true, "description":"row 带有显式 height 时为 true（Row @customHeight）。仅 Get flag。", "readback":"true when row has a custom height", "enforcement":"report" }

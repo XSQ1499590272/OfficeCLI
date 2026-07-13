@@ -68,6 +68,7 @@
       "type": "bool",
       "description": "是否显示 total row。别名：showTotals。",
       "aliases": [
+        "totalsRow",
         "showTotals"
       ],
       "add": true,

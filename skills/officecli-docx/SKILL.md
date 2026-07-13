@@ -248,6 +248,11 @@ officecli add "$FILE" / --type footer --prop type=default --prop align=center --
 任何有 3+ 个 heading 的 document：
 
 ```bash
+# Built-in Heading styles are TOC sources.
+officecli add "$FILE" /body --type paragraph --prop text="Introduction" --prop style=Heading1
+# Custom paragraph styles need an outline level (0 = Heading 1).
+officecli add "$FILE" /styles --type style --prop id=ThesisH1 --prop type=paragraph --prop outlineLvl=0
+# Add the TOC only after its sources exist.
 officecli add "$FILE" /body --type toc --prop levels="1-3" --prop title="Table of Contents" --prop hyperlinks=true --index 0
 ```
 
@@ -311,8 +316,8 @@ officecli set "$FILE" / --prop columns=2 --prop columnSpace=720
 有两种机制，但**任一机制单独使用都不能在所有 viewer 中可靠生效**。不同 viewer 或前置内容可能忽略 `<w:pageBreakBefore/>`，也可能把 `<w:br w:type="page"/>` 渲染为 soft break。对需要另起页的每个 H1、TOC heading 和 cover 末尾 paragraph，同时应用两者：
 
 ```bash
-officecli add "$FILE" /body --type pagebreak --index <N>          # 1. pagebreak element BEFORE the heading
-officecli set "$FILE" "/body/p[<N+1>]" --prop pageBreakBefore=true # 2. on the heading itself
+# Default: apply the break directly to the heading.
+officecli add "$FILE" /body --type paragraph --prop text="Introduction" --prop style=Heading1 --prop pageBreakBefore=true
 ```
 
 `--prop break=newPage` 是 `pageBreakBefore=true` 的简写 alias（接受 `newPage|page|nextPage|pageBreak`）。两者生成相同 XML，仍应遵循上述双重保障规则。使用 `view html` 预览并核对页数。
@@ -330,8 +335,7 @@ officecli add "$FILE" /body --type paragraph --prop text="FY26 Outlook and Scena
 officecli add "$FILE" /body --type paragraph --prop text='Prepared for: Acme Corp. Leadership Team' --prop align=center --prop size=11pt
 officecli add "$FILE" /body --type paragraph --prop text='Engagement: 2026-04 — 2026-06' --prop align=center --prop size=11pt --prop spaceAfter=36pt
 officecli add "$FILE" /body --type paragraph --prop text="Key themes: 1) margin resilience, 2) EMEA expansion, 3) capital allocation." --prop align=center --prop italic=true --prop size=10pt
-officecli add "$FILE" /body --type pagebreak
-officecli set "$FILE" "/body/p[last()]" --prop pageBreakBefore=true
+officecli add "$FILE" /body --type paragraph --prop text="Executive Summary" --prop style=Heading1 --prop pageBreakBefore=true
 ```
 
 **(b) Page X of Y footer：组合 PAGE + NUMPAGES。** 先创建 footer paragraph，再通过三个 child operation 构成 live `Page <X> of <Y>`。这是 `help docx footer` 的官方 recipe。
@@ -451,9 +455,10 @@ officecli close "$FILE" 2>/dev/null
 officecli validate "$FILE" | grep -q "no errors found" || { echo "REJECT Gate 1: validate failed"; exit 1; }
 echo "Gate 1 OK"
 
-# Gate 2 — token leak (shell-escape / template tokens / TOC placeholder / literal \$ \t \n). grep -c never false-PASSes.
-LEAK=$(officecli view "$FILE" text | grep -cE '(\$[A-Za-z_]+\$|\{\{[^}]+\}\}|<TODO>|xxxx|lorem|Update field to see|\\[\$tn])')
-[ "$LEAK" -eq 0 ] && echo "Gate 2 OK" || { echo "REJECT Gate 2: $LEAK leak line(s)"; officecli view "$FILE" text | grep -nE '(\$[A-Za-z_]+\$|\{\{[^}]+\}\}|<TODO>|xxxx|lorem|Update field to see|\\[\$tn])'; exit 1; }
+# Gate 2 — token leak (shell-escape / template tokens / literal \$ \t \n). grep -c never false-PASSes.
+LEAK=$(officecli view "$FILE" text | grep -cE '(\$[A-Za-z_]+\$|\{\{[^}]+\}\}|<TODO>|xxxx|lorem|\\[\$tn])')
+[ "$LEAK" -eq 0 ] && echo "Gate 2 OK" || { echo "REJECT Gate 2: $LEAK leak line(s)"; officecli view "$FILE" text | grep -nE '(\$[A-Za-z_]+\$|\{\{[^}]+\}\}|<TODO>|xxxx|lorem|\\[\$tn])'; exit 1; }
+# A TOC placeholder is valid before a Word-compatible field engine updates it; confirm the TOC field and updateFields setting structurally instead.
 
 # Gate 3 — live PAGE field exists when a footer is expected.
 FLD=$(officecli query "$FILE" 'field[fieldType=page]' --json | jq '.data.results | length')

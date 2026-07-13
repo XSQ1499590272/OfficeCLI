@@ -268,6 +268,15 @@ public partial class WordHandler
 
     private void RenderParagraphHtml(StringBuilder sb, Paragraph para)
     {
+        // VML horizontal rule (w:pict > v:rect[o:hr="t"]). The body loop
+        // checks this before dispatching, but paragraphs routed through this
+        // shared renderer (headers/footers, text boxes) skipped w:pict in the
+        // run walk, so the rule silently vanished outside the body.
+        if (IsVmlHorizontalRule(para))
+        {
+            RenderVmlHorizontalRule(sb, para);
+            return;
+        }
         // Use <div> instead of <p> when paragraph contains block-level elements (text boxes, charts, shapes)
         var tag = HasBlockLevelDrawing(para) ? "div" : "p";
         sb.Append(BuildParagraphOpenTag(para, tag));
@@ -296,6 +305,15 @@ public partial class WordHandler
         var classes = new List<string>();
         if (IsTocParagraphStyle(styleId, GetStyleName(para)))
             classes.Add("toc");
+        // A paragraph that is purely an m:oMathPara wrapper is a display-math
+        // block. The body renderer wraps it in <div class="equation"> itself,
+        // but paragraphs routed through this generic tag builder (text boxes,
+        // headers/footers, SDT content) kept the default left alignment, so
+        // the same formula rendered centered in the body and left-aligned in
+        // a text box. Reuse the .equation class (text-align:center) on the
+        // <p> itself — the inner katex span already carries data-display.
+        if (IsOMathParaWrapperParagraph(para))
+            classes.Add("equation");
         // CONSISTENCY(run-special-content): paragraphs containing w:ptab
         // (header/footer left/center/right alignment) need a flex container
         // for the .ptab-spacer / .*-leader children to actually push their
@@ -342,6 +360,20 @@ public partial class WordHandler
                 return true;
         }
         return false;
+    }
+
+    // Container-level <w:bookmarkStart> (a direct child of the cell / header /
+    // txbxContent, the shape Word writes when a bookmark spans multiple
+    // paragraphs) must surface as a navigable <a id> anchor, exactly like the
+    // body loop's emit. Returns true when the child was such a bookmark (the
+    // caller skips it; bookmarkEnd needs no output either way).
+    private static bool TryEmitContainerBookmarkAnchor(StringBuilder sb, OpenXmlElement child)
+    {
+        if (child is not BookmarkStart bm) return false;
+        var name = bm.Name?.Value;
+        if (!string.IsNullOrEmpty(name) && !name.StartsWith("_GoBack"))
+            sb.Append($"<a id=\"{HtmlEncodeAttr(name)}\"></a>");
+        return true;
     }
 
     private void RenderParagraphContentHtml(StringBuilder sb, Paragraph para)
@@ -588,6 +620,17 @@ public partial class WordHandler
             {
                 var latex = FormulaParser.ToLatex(child);
                 sb.Append($"<span class=\"katex-formula\" data-formula=\"{HtmlEncodeAttr(latex)}\"></span>");
+            }
+            else if (child.LocalName == "oMathPara" || child is M.Paragraph)
+            {
+                // Display math (m:oMathPara). The body and table-cell renderers
+                // matched this wrapper, but paragraphs routed through here
+                // (text boxes, SDT content, …) only matched inline oMath, so a
+                // display equation inside a text box was silently dropped from
+                // the HTML preview (issue #183). Emit the same katex span the
+                // body path uses, flagged display so KaTeX centers it.
+                var latex = FormulaParser.ToLatex(child);
+                sb.Append($"<span class=\"katex-formula\" data-formula=\"{HtmlEncodeAttr(latex)}\" data-display=\"true\"></span>");
             }
             else if (child.LocalName is "sdt" or "smartTag" or "customXml" or "fldSimple")
             {
@@ -1509,20 +1552,41 @@ public partial class WordHandler
     private void RenderFootnoteChildren(StringBuilder sb, OpenXmlElement note)
     {
         bool first = true;
+        // List items in a footnote/endnote previously rendered as bare <br>-
+        // separated text — every bullet/number marker was silently dropped
+        // while the body, table-cell and header/footer paths rendered them.
+        // Reuse the cell path's per-container list state: same container-
+        // matrix defect class as the header/footer list gap.
+        string? fnListTag = null;
+        var fnOlState = new OrderedListNumberingState();
+        void CloseFnList()
+        {
+            if (fnListTag != null) { sb.Append($"</{fnListTag}>"); fnListTag = null; }
+        }
         foreach (var child in note.ChildElements)
         {
             if (child is Paragraph p)
             {
+                var fnListStyle = GetParagraphListStyle(p);
+                if (fnListStyle != null)
+                {
+                    RenderCellListItem(sb, p, fnListStyle, ref fnListTag, fnOlState);
+                    first = false;
+                    continue;
+                }
+                CloseFnList();
                 if (!first) sb.Append("<br>");
                 RenderParagraphContentHtml(sb, p);
                 first = false;
             }
             else if (child is Table tbl)
             {
+                CloseFnList();
                 RenderTableHtml(sb, tbl);
                 first = false;
             }
         }
+        CloseFnList();
     }
 
     private void RenderEndnotesHtml(StringBuilder sb)

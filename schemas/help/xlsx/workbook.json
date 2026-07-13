@@ -302,8 +302,9 @@
     },
     "workbook.date1904": {
       "type": "bool",
+      "aliases": ["date1904"],
       "add": false,
-      "set": false,
+      "set": true,
       "get": true,
       "description": "WorkbookProperties 的 Date1904 标记：为 true 时日期使用 1904 epoch（旧版 Mac 兼容）。",
       "readback": "true|false",

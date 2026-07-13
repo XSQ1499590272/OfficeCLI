@@ -224,10 +224,35 @@ internal static partial class ChartHelper
             switch (lower)
             {
                 case "title":
+                case "axistitle":
+                case "vtitle":
                     // Map role → existing axis-title keys already handled by SetChartProperties.
-                    // category/series → cattitle; value/value2 → axistitle.
+                    // category/series → cattitle; value → axistitle (primary value axis).
+                    // The common alias `axisTitle` (and `vtitle`) must route here
+                    // too — otherwise it falls through to the default and always
+                    // targets the PRIMARY value axis, clobbering it for role=value2.
                     if (normalizedRole is "category" or "series")
                         translated["cattitle"] = value;
+                    // CONSISTENCY(chart/axis-role-write): the legacy `axistitle`
+                    // key always targets the PRIMARY value axis. For role=value2
+                    // that would overwrite the primary axis's title and leave the
+                    // secondary untouched — write directly to the resolved
+                    // secondary axis instead (mirrors min/max/crosses below).
+                    else if (normalizedRole == "value2" && targetAxis is OpenXmlCompositeElement titleAx2)
+                    {
+                        titleAx2.RemoveAllChildren<C.Title>();
+                        if (!value.Equals("none", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ParseHelpers.ValidateXmlText(value, "axisTitle");
+                            var insertAfter = (OpenXmlElement?)titleAx2.GetFirstChild<C.MinorGridlines>()
+                                ?? (OpenXmlElement?)titleAx2.GetFirstChild<C.MajorGridlines>()
+                                ?? titleAx2.GetFirstChild<C.AxisPosition>();
+                            var newTitle = BuildChartTitle(value);
+                            if (insertAfter != null) titleAx2.InsertAfter(newTitle, insertAfter);
+                            else titleAx2.AppendChild(newTitle);
+                        }
+                        directlyHandled.Add(key);
+                    }
                     else
                         translated["axistitle"] = value;
                     break;
@@ -246,10 +271,16 @@ internal static partial class ChartHelper
                         var scaling = minAx2.GetFirstChild<C.Scaling>();
                         if (scaling != null)
                         {
+                            var minV = ParseHelpers.SafeParseDouble(value, "min");
+                            // A log-scaled axis cannot have min <= 0 (Excel
+                            // refuses the file, 0x800A03EC).
+                            if (minV <= 0 && scaling.GetFirstChild<C.LogBase>() != null)
+                                throw new ArgumentException(
+                                    $"min={value} is invalid on a log-scaled axis: a logarithmic axis minimum must be greater than 0.");
                             scaling.RemoveAllChildren<C.MinAxisValue>();
                             // CT_Scaling order: logBase, orientation, max, min —
                             // min is last, so append is always valid.
-                            scaling.AppendChild(new C.MinAxisValue { Val = ParseHelpers.SafeParseDouble(value, "min") });
+                            scaling.AppendChild(new C.MinAxisValue { Val = minV });
                         }
                         directlyHandled.Add(key);
                     }
@@ -286,7 +317,7 @@ internal static partial class ChartHelper
                     {
                         // Same-type only — see ChartHelper.Setter.cs case "crosses"
                         // for the mutual-remove bug rationale.
-                        crsAx2.RemoveAllChildren<C.Crosses>();
+                        // Validate BEFORE mutating (atomicity).
                         var crossVal = value.ToLowerInvariant() switch
                         {
                             "max" => C.CrossesValues.Maximum,
@@ -294,6 +325,7 @@ internal static partial class ChartHelper
                             "autozero" => C.CrossesValues.AutoZero,
                             _ => throw new ArgumentException($"Invalid 'crosses' value: '{value}'. Valid: autoZero, max, min.")
                         };
+                        crsAx2.RemoveAllChildren<C.Crosses>();
                         var newCrosses = new C.Crosses { Val = crossVal };
                         var crsAnchor = crsAx2.GetFirstChild<C.CrossesAt>() as OpenXmlElement
                             ?? crsAx2.GetFirstChild<C.CrossBetween>() as OpenXmlElement;
@@ -311,8 +343,9 @@ internal static partial class ChartHelper
                     if (normalizedRole == "value2" && targetAxis is OpenXmlCompositeElement crsAtAx2)
                     {
                         // Same-type only.
+                        var crossesAtVal2 = ParseHelpers.SafeParseDouble(value, "crossesAt");
                         crsAtAx2.RemoveAllChildren<C.CrossesAt>();
-                        var newCrossesAt = new C.CrossesAt { Val = ParseHelpers.SafeParseDouble(value, "crossesAt") };
+                        var newCrossesAt = new C.CrossesAt { Val = crossesAtVal2 };
                         var cbBefore2 = crsAtAx2.GetFirstChild<C.CrossBetween>();
                         if (cbBefore2 != null) crsAtAx2.InsertBefore(newCrossesAt, cbBefore2);
                         else crsAtAx2.AppendChild(newCrossesAt);
@@ -428,7 +461,9 @@ internal static partial class ChartHelper
                         var scaling = axLb.GetFirstChild<C.Scaling>();
                         if (scaling != null)
                         {
-                            scaling.RemoveAllChildren<C.LogBase>();
+                            // Resolve+validate BEFORE mutating so a bad numeric
+                            // base doesn't wipe the prior valid log scale.
+                            double? newLogBase;
                             if (value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
                                 value.Equals("yes", StringComparison.OrdinalIgnoreCase) ||
                                 value.Equals("log", StringComparison.OrdinalIgnoreCase))
@@ -436,12 +471,16 @@ internal static partial class ChartHelper
                                 // "1" was historically truthy shorthand here too;
                                 // routed through SafeParseDouble + range-check below
                                 // so logBase=1 surfaces as ArgumentException.
-                                scaling.PrependChild(new C.LogBase { Val = 10d });
+                                newLogBase = 10d;
                             }
-                            else if (!value.Equals("none", StringComparison.OrdinalIgnoreCase) &&
-                                     !value.Equals("linear", StringComparison.OrdinalIgnoreCase) &&
-                                     !value.Equals("false", StringComparison.OrdinalIgnoreCase) &&
-                                     !value.Equals("no", StringComparison.OrdinalIgnoreCase))
+                            else if (value.Equals("none", StringComparison.OrdinalIgnoreCase) ||
+                                     value.Equals("linear", StringComparison.OrdinalIgnoreCase) ||
+                                     value.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                                     value.Equals("no", StringComparison.OrdinalIgnoreCase))
+                            {
+                                newLogBase = null; // remove log scale (linear)
+                            }
+                            else
                             // "0" dropped as a falsy synonym for the same
                             // reason as the Setter.cs site — falls into the
                             // range check below and throws.
@@ -452,8 +491,17 @@ internal static partial class ChartHelper
                                 // ghost-rewrite the chart back to linear.
                                 if (logVal < 2.0 || logVal > 1000.0)
                                     throw new ArgumentException($"Invalid logBase '{value}': must be in the OOXML range [2, 1000] (ST_LogBase).");
-                                scaling.PrependChild(new C.LogBase { Val = logVal });
+                                newLogBase = logVal;
                             }
+                            // A log scale requires axis min > 0 (Excel refuses
+                            // the file, 0x800A03EC).
+                            if (newLogBase != null
+                                && scaling.GetFirstChild<C.MinAxisValue>()?.Val?.Value is { } curMin && curMin <= 0)
+                                throw new ArgumentException(
+                                    $"logBase cannot be enabled while the axis minimum ({curMin}) is <= 0: a logarithmic axis minimum must be greater than 0.");
+                            scaling.RemoveAllChildren<C.LogBase>();
+                            if (newLogBase != null)
+                                scaling.PrependChild(new C.LogBase { Val = newLogBase.Value });
                         }
                     }
                     directlyHandled.Add(key);

@@ -22,7 +22,7 @@
       "type": "enum",
       "values": ["ins", "del", "moveTo", "moveFrom", "format"],
       "add": false, "set": false, "get": true,
-      "examples": ["query /revision[@type=ins]"],
+      "examples": ["query revision[@type=ins]"],
       "readback": "revision type (read-only on the revision node; create with --prop revision.type=… on the host element)",
       "enforcement": "report"
     },
@@ -39,7 +39,7 @@
       "description": "修订作者。会在 query revision 节点，以及带有 ins/del/*PrChange 祖先节点的宿主元素（run/paragraph 等）上返回。创建时在宿主元素传入 --prop revision.author=… 。Run 宿主要求更严格：单独使用 set <run> --prop revision.author=X 会被拒绝，因为没有可归属的操作时，旧的兜底实现会写入未记录任何变化的空快照 rPrChange。请将 revision.author 与实际格式属性配对（--prop bold=true），或传入 --prop revision.type=ins|del|moveFrom|moveTo，使包裹操作本身成为记录的变化。Run 上单独使用 revision.type=format 也受同样限制。非 Run 宿主（paragraph/table/row/cell/section）仍接受单独指定作者，并写入空快照 *PrChange；这对 table 级 marker 的 dump→batch round-trip 是必要的，因为其修改前基线无法重建。也可与 find（以及 replace / format / paragraph props）配合；find dispatch 会用相应 marker 包裹每个匹配项，并将作者设为此值。",
       "add": false, "set": false, "get": true,
       "examples": [
-        "query /revision[@author=Alice]",
+        "query revision[@author=Alice]",
         "set /body --prop find=fox --prop replace=cat --prop revision.author=Alice",
         "set /body --prop find=red --prop bold=true --prop revision.author=Bob",
         "set /body --prop find=BAD --prop replace= --prop revision.author=Carol",

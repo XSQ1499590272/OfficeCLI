@@ -60,9 +60,11 @@
       "description": "旋转角度（正值为顺时针）。OOXML 内部将其以 1/60000 度写入 Transform2D @rot。",
       "add": true,
       "set": true,
+      "get": true,
       "examples": [
         "--prop rotation=45"
       ],
+      "readback": "rotation in degrees (rounded)",
       "enforcement": "report"
     },
     "flip": {
@@ -70,10 +72,12 @@
       "description": "简写 flip token：'h' / 'v' / 'both' / 'hv' / 'vh' / 'horizontal' / 'vertical'。",
       "add": true,
       "set": true,
+      "get": true,
       "examples": [
         "--prop flip=h",
         "--prop flip=both"
       ],
+      "readback": "h / v / both",
       "enforcement": "report"
     },
     "flipH": {

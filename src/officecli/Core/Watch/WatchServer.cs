@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // CONSISTENCY(watch-isolation): this file does not reference OfficeCli.Handlers, does not open files,
-// does not write to disk. See CLAUDE.md "Watch Server Rules". To relax this red line,
+// does not write to disk. See the project conventions "Watch Server Rules". To relax this red line,
 // grep "CONSISTENCY(watch-isolation)" and review every file in the watch subsystem project-wide.
 
 using System.Net;
@@ -52,7 +52,7 @@ internal class WatchServer : IDisposable
     // CONSISTENCY(path-stability): selection and mark share the same naive positional addressing
     // contract — no fingerprinting, no drift detection. To upgrade to stable IDs,
     // grep "CONSISTENCY(path-stability)" and update every deferred site project-wide in one pass.
-    // See CLAUDE.md "Design Principles".
+    // See the project conventions "Design Principles".
     private List<string> _currentSelection = new();
     private readonly object _selectionLock = new();
 
@@ -63,7 +63,7 @@ internal class WatchServer : IDisposable
     // CONSISTENCY(path-stability): element-deletion / position-drift handling deliberately matches
     // selection — naive positional addressing, no fingerprint, no drift detection. `stale` is only
     // set when the client reports a path-resolution failure or a `find` miss.
-    // See CLAUDE.md "Design Principles" + "Watch Server Rules".
+    // See the project conventions "Design Principles" + "Watch Server Rules".
     // To migrate to stable-ID paths, grep "CONSISTENCY(path-stability)" and update every deferred
     // site (selection / mark / any future path consumer) project-wide — never patch mark alone.
     private readonly List<WatchMark> _currentMarks = new();
@@ -870,7 +870,7 @@ internal class WatchServer : IDisposable
     // the mark is flipped to Stale=true with MatchedText=[]. Same
     // limitations as selection. grep "CONSISTENCY(path-stability)" for
     // all deferred sites that should move together if we ever switch
-    // to stable IDs. See CLAUDE.md "Watch Server Rules".
+    // to stable IDs. See the project conventions "Watch Server Rules".
     //
     // watch-isolation: this code runs pure-regex string-scraping on
     // the html snapshot already cached in _currentHtml. It does not
@@ -2333,8 +2333,13 @@ internal class WatchServer : IDisposable
             using var proc = System.Diagnostics.Process.Start(psi);
             if (proc != null)
             {
+                // Drain stderr concurrently: it is redirected (so it MUST be
+                // read) but never surfaced — a child that fills the ~64KB pipe
+                // buffer with warnings would otherwise deadlock this request.
+                var drainErr = proc.StandardError.ReadToEndAsync(token);
                 output = await proc.StandardOutput.ReadToEndAsync(token);
                 await proc.WaitForExitAsync(token);
+                _ = await drainErr;
                 // command auto-notifies watch via named pipe → SSE refresh
             }
             await WriteCommEnvelopeAsync(stream, true, output.TrimEnd('\n', '\r'), token);
@@ -2402,8 +2407,13 @@ internal class WatchServer : IDisposable
             using var proc = System.Diagnostics.Process.Start(psi);
             if (proc != null)
             {
+                // Drain stderr concurrently: it is redirected (so it MUST be
+                // read) but never surfaced — a child that fills the ~64KB pipe
+                // buffer with warnings would otherwise deadlock this request.
+                var drainErr = proc.StandardError.ReadToEndAsync(token);
                 output = await proc.StandardOutput.ReadToEndAsync(token);
                 await proc.WaitForExitAsync(token);
+                _ = await drainErr;
                 // batch auto-notifies watch via named pipe → SSE refresh
             }
             await WriteCommEnvelopeAsync(stream, true, output.TrimEnd('\n', '\r'), token);

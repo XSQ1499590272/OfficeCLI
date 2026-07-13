@@ -1401,6 +1401,7 @@ public partial class WordHandler
     {
         foreach (var child in container.ChildElements)
         {
+            if (TryEmitContainerBookmarkAnchor(sb, child)) continue;
             if (child is Paragraph para)
             {
                 // List item → reuse the cell list renderer (opens <ul>/<ol>,

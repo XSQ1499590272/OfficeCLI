@@ -229,8 +229,13 @@ public partial class WordHandler
                     .Where(f => !string.IsNullOrEmpty(f))
                     .Select(f => $"family={f.Replace(' ', '+')}:ital,wght@0,400;0,700;1,400;1,700"));
                 // media=print + onload swap → load asynchronously without blocking first paint
-                // (Google Fonts is unreachable in many networks and would otherwise stall render until TCP timeout).
-                sb.AppendLine($"<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?{families}&display=swap\" media=\"print\" onload=\"this.media='all'\" onerror=\"this.remove()\">");
+                // (web fonts are unreachable in many networks and would otherwise stall render until TCP timeout).
+                // CONSISTENCY(katex-mirror): officecli's caching proxy first (d.officecli.ai/fonts/css2
+                // forwards to Google Fonts, rewrites the font URLs to the /gstatic hop, and CF-edge-caches
+                // both), Google direct as the onerror fallback, removal as the last resort — the local
+                // metric-override @font-face block above keeps layout stable without any web font.
+                var gfQuery = $"{families}&display=swap";
+                sb.AppendLine($"<link rel=\"stylesheet\" href=\"https://d.officecli.ai/fonts/css2?{gfQuery}\" media=\"print\" onload=\"this.media='all'\" onerror=\"if(!this.dataset.f){{this.dataset.f=1;this.href='https://fonts.googleapis.com/css2?{gfQuery}'}}else{{this.remove()}}\">");
             }
         }
         // KaTeX for math rendering — only include when the document actually has formulas.
@@ -238,8 +243,9 @@ public partial class WordHandler
         bool hasMathFormulas = body.Descendants<M.OfficeMath>().Any();
         if (hasMathFormulas)
         {
-            sb.AppendLine("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\" media=\"print\" onload=\"this.media='all'\" onerror=\"this.remove()\">");
-            sb.AppendLine("<script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\" onerror=\"document.querySelectorAll('.katex-formula').forEach(function(el){el.textContent=el.dataset.formula;el.style.fontFamily='monospace';el.style.color='#666'})\"></script>");
+            // CONSISTENCY(katex-mirror): mirror-first with CDN fallback chain — see Core/KatexAssets.
+            sb.AppendLine($"<link rel=\"stylesheet\" href=\"{Core.KatexAssets.CssUrl}\" media=\"print\" onload=\"this.media='all'\" onerror=\"{Core.KatexAssets.CssOnErrorJs}\">");
+            sb.AppendLine($"<script defer src=\"{Core.KatexAssets.JsUrl}\" onerror=\"{Core.KatexAssets.JsOnErrorJs("document.querySelectorAll('.katex-formula').forEach(function(el){el.textContent=el.dataset.formula;el.style.fontFamily='monospace';el.style.color='#666'})")}\"></script>");
         }
         sb.AppendLine("</head>");
         sb.AppendLine("<body>");
@@ -1241,10 +1247,12 @@ public partial class WordHandler
     // re-invoke the caller so the new formula renders.
     if(window._katexLoading){window._katexCallbacks=window._katexCallbacks||[];window._katexCallbacks.push(cb);return;}
     window._katexLoading=true;window._katexCallbacks=[cb];
-    var link=document.createElement('link');link.rel='stylesheet';link.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';link.onerror=function(){this.remove();};document.head.appendChild(link);
-    var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js';
-    s.onload=function(){(window._katexCallbacks||[]).forEach(function(f){try{f();}catch(e){}});window._katexCallbacks=[];};
-    s.onerror=function(){document.querySelectorAll('.katex-formula:not(.katex-rendered)').forEach(function(el){el.textContent=el.dataset.formula;el.style.fontFamily='monospace';el.style.color='#666';el.classList.add('katex-rendered');});};
+    // CONSISTENCY(katex-mirror): mirror-first, CDN retry, then plain-text fallback.
+    var link=document.createElement('link');link.rel='stylesheet';link.href='{{KATEX_CSS}}';link.onerror=function(){if(!this.dataset.f){this.dataset.f=1;this.href='{{KATEX_CSS_CDN}}';}else{this.remove();}};document.head.appendChild(link);
+    var _kOk=function(){(window._katexCallbacks||[]).forEach(function(f){try{f();}catch(e){}});window._katexCallbacks=[];};
+    var _kFail=function(){document.querySelectorAll('.katex-formula:not(.katex-rendered)').forEach(function(el){el.textContent=el.dataset.formula;el.style.fontFamily='monospace';el.style.color='#666';el.classList.add('katex-rendered');});};
+    var s=document.createElement('script');s.src='{{KATEX_JS}}';s.onload=_kOk;
+    s.onerror=function(){var s2=document.createElement('script');s2.src='{{KATEX_JS_CDN}}';s2.onload=_kOk;s2.onerror=_kFail;document.head.appendChild(s2);};
     document.head.appendChild(s);
   }
   function renderNewContent(){
@@ -1277,7 +1285,13 @@ public partial class WordHandler
     });
   }
   window._wordPaginate=function(){renderNewContent();setTimeout(paginate,0);};
-");
+"
+            // CONSISTENCY(katex-mirror): the verbatim block above can't interpolate;
+            // substitute the KaTeX asset URLs (mirror + CDN fallback) afterwards.
+            .Replace("{{KATEX_CSS}}", Core.KatexAssets.CssUrl)
+            .Replace("{{KATEX_CSS_CDN}}", Core.KatexAssets.CdnCssUrl)
+            .Replace("{{KATEX_JS}}", Core.KatexAssets.JsUrl)
+            .Replace("{{KATEX_JS_CDN}}", Core.KatexAssets.CdnJsUrl));
         // Responsive scaling: shrink pages to fit viewport (like PPT's scaleSlides)
         sb.AppendLine(@"  function scalePages(animate){
     var bs=getComputedStyle(document.body);
@@ -2131,8 +2145,20 @@ public partial class WordHandler
     /// tables and image-only paragraphs.</summary>
     private void RenderHeaderFooterBody(StringBuilder sb, OpenXmlElement hf, StringBuilder? watermarkSb = null)
     {
+        // List items in a header/footer previously rendered as bare paragraphs
+        // (RenderParagraphHtml carries no list machinery) — every bullet/number
+        // marker was silently dropped while the body and table-cell paths
+        // rendered them. Reuse the cell path's per-container list state: same
+        // container-matrix defect class as the text-box display-math gap.
+        string? hfListTag = null;
+        var hfOlState = new OrderedListNumberingState();
+        void CloseHfList()
+        {
+            if (hfListTag != null) { sb.Append($"</{hfListTag}>"); hfListTag = null; }
+        }
         foreach (var child in hf.ChildElements)
         {
+            if (TryEmitContainerBookmarkAnchor(sb, child)) continue;
             // Watermark paragraphs are nested inside <w:sdt><w:sdtContent>;
             // recurse so they render the same as direct paragraph children.
             if (child is SdtBlock sdt && sdt.SdtContentBlock is { } content)
@@ -2184,14 +2210,28 @@ public partial class WordHandler
                     // watermark is its only content, to avoid emitting a blank
                     // <p> in the header band (prior behaviour: bare `continue`).
                     if (ParagraphHasNonWatermarkContent(para))
+                    {
+                        CloseHfList();
                         RenderParagraphHtml(sb, para);
+                    }
                     continue;
                 }
+                var hfListStyle = GetParagraphListStyle(para);
+                if (hfListStyle != null)
+                {
+                    RenderCellListItem(sb, para, hfListStyle, ref hfListTag, hfOlState);
+                    continue;
+                }
+                CloseHfList();
                 RenderParagraphHtml(sb, para);
             }
             else if (child is Table tbl)
+            {
+                CloseHfList();
                 RenderTableHtmlPaged(sb, tbl);
+            }
         }
+        CloseHfList();
     }
 
     /// <summary>

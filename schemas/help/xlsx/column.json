@@ -54,7 +54,7 @@
       "description": "折叠 column group。当前仅支持 Set。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop collapsed=true"],
-      "readback": "not surfaced by Get",
+      "readback": "true when the column group is collapsed",
       "enforcement": "report"
     },
     "numberformat": {

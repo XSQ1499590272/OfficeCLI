@@ -508,6 +508,22 @@ internal static class ParseHelpers
     }
 
     /// <summary>
+    /// Convert a linear-gradient angle in whole degrees to OOXML
+    /// ST_PositiveFixedAngle units (60000ths of a degree). The raw
+    /// `degrees * 60000` multiply overflows Int32 for |degrees| ≳ 35792
+    /// (e.g. 99999° wraps to a garbage 1.7e9 angle that real Excel refuses
+    /// with 0x800A03EC). Reducing modulo 360 first keeps the value in the
+    /// spec range [0, 21600000) — geometrically identical, overflow-proof,
+    /// and always producing a file Excel accepts. Shared by the shape and
+    /// chart gradient builders so their angle handling stays consistent.
+    /// </summary>
+    public static int GradientAngleToOoxmlUnits(int degrees)
+    {
+        var normalized = ((degrees % 360) + 360) % 360;
+        return normalized * 60000;
+    }
+
+    /// <summary>
     /// Safely parse a string as uint, throwing ArgumentException with a clear message on failure.
     /// </summary>
     public static uint SafeParseUint(string value, string propertyName)
@@ -653,7 +669,7 @@ internal static class ParseHelpers
             // dk/lt collapse to canonical dark/light (no separate user-facing
             // form). tx/bg map to text/background — the SDK distinguishes
             // SchemeColorValues.Text1 / Background1 from Dark1 / Light1, and
-            // CLAUDE.md ("scheme colors pass through unchanged") demands the
+            // the project conventions ("scheme colors pass through unchanged") demands the
             // user-supplied form survives Get; collapsing tx1→dark1 would
             // break that contract for text1/text2/background1/background2 set
             // by the user.

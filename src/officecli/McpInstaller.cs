@@ -224,9 +224,19 @@ public static class McpInstaller
             foreach (var a in args) psi.ArgumentList.Add(a);
             using var p = Process.Start(psi);
             if (p == null) return false;
-            stdout = p.StandardOutput.ReadToEnd();
-            stderr = p.StandardError.ReadToEnd();
-            p.WaitForExit();
+            // Async-drain both streams and bound the wait: the serial
+            // ReadToEnd pair deadlocked when the child CLI interleaved large
+            // stderr output with stdout, and the unbounded WaitForExit hung
+            // officecli for as long as the child lived.
+            var outTask = p.StandardOutput.ReadToEndAsync();
+            var errTask = p.StandardError.ReadToEndAsync();
+            if (!p.WaitForExit(30_000))
+            {
+                try { p.Kill(true); } catch { }
+                return false;
+            }
+            stdout = outTask.Result;
+            stderr = errTask.Result;
             exitCode = p.ExitCode;
             return true;
         }

@@ -566,8 +566,26 @@ public partial class WordHandler
                 // only Paragraph/Table lost every nested run.
                 void RenderCellChild(OpenXmlElement child)
                 {
+                    if (TryEmitContainerBookmarkAnchor(sb, child)) return;
+                    // OOXML allows w:altChunk directly under w:tc; the body
+                    // loop already renders it, the cell walk dropped it.
+                    if (child is AltChunk cellAltChunk)
+                    {
+                        CloseCellList();
+                        RenderAltChunkHtml(sb, cellAltChunk);
+                        return;
+                    }
                     if (child is Paragraph cellPara)
                     {
+                        // VML horizontal rule inside a cell — same pre-dispatch
+                        // check as the body loop; the generic run walk skips
+                        // w:pict, so without this the rule disappeared.
+                        if (IsVmlHorizontalRule(cellPara))
+                        {
+                            CloseCellList();
+                            RenderVmlHorizontalRule(sb, cellPara);
+                            return;
+                        }
                         // Display equation inside a cell: a <w:p> whose content is
                         // an <m:oMathPara>/<m:oMath> wrapper. Body paragraphs route
                         // these to a katex-formula span (HtmlPreview.cs ~line 2362);
@@ -717,6 +735,11 @@ public partial class WordHandler
     /// — the first style in the chain that declares a tblCellMar wins.</summary>
     private TableCellMarginDefault? ResolveTableStyleCellMargin(string styleId)
     {
+        // Word merges w:tblCellMar PER SIDE across the basedOn chain (verified
+        // against real Word — unlike w:tblBorders, which replaces wholesale):
+        // a child style declaring only w:top keeps the parent's left/right/
+        // bottom margins. Walk derived→base, most-derived side wins.
+        TableCellMarginDefault? merged = null;
         var visited = new HashSet<string>();
         var currentId = styleId;
         while (currentId != null && visited.Add(currentId))
@@ -724,10 +747,18 @@ public partial class WordHandler
             var style = FindStyleById(currentId);
             if (style == null) break;
             var cm = style.StyleTableProperties?.TableCellMarginDefault;
-            if (cm != null) return cm;
+            if (cm != null)
+            {
+                if (merged == null)
+                    merged = (TableCellMarginDefault)cm.CloneNode(true);
+                else
+                    foreach (var side in cm.ChildElements)
+                        if (!merged.ChildElements.Any(c => c.LocalName == side.LocalName))
+                            merged.AppendChild(side.CloneNode(true));
+            }
             currentId = style.BasedOn?.Val?.Value;
         }
-        return null;
+        return merged;
     }
 
     /// <summary>Resolve the base cell shading (&lt;w:style&gt;&lt;w:tcPr&gt;&lt;w:shd&gt;)
@@ -1064,8 +1095,26 @@ public partial class WordHandler
             paraStyle = string.IsNullOrEmpty(paraStyle) ? hangCss : paraStyle + ";" + hangCss;
         }
 
+        // Deeper levels: the <ol>/<ul> element carries only the FIRST item's
+        // indent (set when the list was opened), so a level-1+ item rendered
+        // flat at the same x as its parent — the cell/textbox/header/footnote
+        // "multi-level collapses to one level" gap. Indent each item by its
+        // level's indent delta over the same list's level-0 indent (stateless:
+        // no per-container base tracking needed; level 0 gets delta 0).
+        double levelDeltaPt = 0;
+        if (ilvl > 0)
+        {
+            var (baseLeft, _) = GetListLevelIndentFull(numId, 0);
+            var basePt = baseLeft / 20.0;
+            if (basePt < 18) basePt = 18;
+            if (indentPt > basePt) levelDeltaPt = indentPt - basePt;
+        }
         sb.Append("<li");
         sb.Append($" class=\"marker-{numId}-{ilvl}\"");
+        if (levelDeltaPt > 0)
+            paraStyle = string.IsNullOrEmpty(paraStyle)
+                ? $"margin-left:{levelDeltaPt:0.#}pt"
+                : paraStyle + $";margin-left:{levelDeltaPt:0.#}pt";
         if (!string.IsNullOrEmpty(paraStyle))
             sb.Append($" style=\"{paraStyle}\"");
         sb.Append(">");

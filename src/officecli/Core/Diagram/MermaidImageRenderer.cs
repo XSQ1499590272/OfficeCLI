@@ -158,8 +158,11 @@ public static class MermaidImageRenderer
 
             using var p = Process.Start(psi)
                 ?? throw new InvalidOperationException("failed to start mmdc.");
-            var err = p.StandardError.ReadToEnd();
-            var outp = p.StandardOutput.ReadToEnd();
+            // Async-drain both streams: the serial stderr-then-stdout reads
+            // interlocked when mmdc filled the stdout pipe first (bounded by
+            // the 120s kill below, but a wasted two minutes per diagram).
+            var errTask = p.StandardError.ReadToEndAsync();
+            var outTask = p.StandardOutput.ReadToEndAsync();
             if (!p.WaitForExit(120_000))
             {
                 try { p.Kill(true); } catch { /* best effort */ }
@@ -167,7 +170,7 @@ public static class MermaidImageRenderer
             }
             if (p.ExitCode != 0 || !File.Exists(outPath))
             {
-                var msg = $"{err}{outp}".Trim();
+                var msg = $"{errTask.Result}{outTask.Result}".Trim();
                 // A parse/unknown-type failure is bad input, not a broken mmdc; class
                 // it as syntax so the Add path surfaces it (and does not fall back).
                 if (LooksLikeSyntaxError(msg))
