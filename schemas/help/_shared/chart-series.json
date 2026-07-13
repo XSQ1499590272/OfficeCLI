@@ -5,7 +5,7 @@
   "properties": {
     "categories": {
       "type": "string",
-      "description": "per-series category override; range reference only.",
+      "description": "逐 series 的 category 覆盖；仅接受 range reference。",
       "add": true,
       "set": true,
       "get": true,
@@ -20,13 +20,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "A1 cell range backing the category labels.",
+      "description": "为 category labels 提供数据的 A1 cell range。",
       "readback": "A1 range string",
       "enforcement": "report"
     },
     "color": {
       "type": "color",
-      "description": "series fill color.",
+      "description": "series 填充颜色。",
       "add": true,
       "set": true,
       "get": true,
@@ -42,7 +42,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "per-series data label number format readback.",
+      "description": "逐 series data label 数字格式的读取结果。",
       "readback": "format code",
       "enforcement": "report"
     },
@@ -51,7 +51,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "per-series data label separator string readback.",
+      "description": "逐 series data label 分隔符字符串的读取结果。",
       "readback": "separator string",
       "enforcement": "report"
     },
@@ -60,7 +60,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "error bar value type (fixed, percent, stddev, stderr); accepted aliases: fixedValue, percentage/pct, standardDeviation, standardError. Pass 'none' to clear. Silently ignored on series types that don't support error bars.",
+      "description": "error bar 值类型（fixed、percent、stddev、stderr）；接受别名 fixedValue、percentage/pct、standardDeviation、standardError。传入 'none' 可清除。不支持 error bar 的 series type 会静默忽略。",
       "readback": "OOXML errValType token",
       "enforcement": "lenient"
     },
@@ -69,7 +69,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "invert color for negative values. Bar/column/area/pie series only; line/scatter silently ignore.",
+      "description": "反转负值的颜色。仅 bar/column/area/pie series 支持；line/scatter 会静默忽略。",
       "readback": "true | false",
       "enforcement": "lenient"
     },
@@ -93,7 +93,7 @@
       "aliases": [
         "dash"
       ],
-      "description": "series line dash style. Set accepts user-friendly aliases (dash/dot/dashDot/longDash); Get returns OOXML token (sysDash/sysDot/sysDashDot/lgDash). 'dashDotDot' has no native enum member and is accepted as an alias for sysDashDotDot — Get readback will return sysDashDotDot. 'solid' is the only round-trip-stable value.",
+      "description": "series line dash style。Set 接受易用别名（dash/dot/dashDot/longDash）；Get 返回 OOXML token（sysDash/sysDot/sysDashDot/lgDash）。'dashDotDot' 没有原生 enum member，作为 sysDashDotDot 的别名接受；Get 读取结果会返回 sysDashDotDot。只有 'solid' 可稳定往返。",
       "examples": [
         "--prop lineDash=dash",
         "--prop lineDash=solid"
@@ -105,7 +105,7 @@
       "type": "number",
       "set": true,
       "get": true,
-      "description": "series line width in points (e.g. 1.5).",
+      "description": "series 线宽，单位为 points（例如 1.5）。",
       "examples": [
         "--prop lineWidth=1.5"
       ],
@@ -116,7 +116,7 @@
       "type": "string",
       "set": true,
       "get": true,
-      "description": "per-series marker symbol. Values: circle, dash, diamond, dot, plus, square, star, triangle, x, none, auto. Supports 'symbol:size:COLOR' compound form (e.g. 'circle:8:FF0000'). Applies to line/scatter/radar series. (picture markers are not implemented.)",
+      "description": "逐 series marker symbol。可选值：circle、dash、diamond、dot、plus、square、star、triangle、x、none、auto。支持复合形式 'symbol:size:COLOR'（例如 'circle:8:FF0000'）。适用于 line/scatter/radar series。（picture marker 尚未实现。）",
       "examples": [
         "--prop marker=circle",
         "--prop marker=\"circle:8:FF0000\""
@@ -128,7 +128,7 @@
       "type": "number",
       "set": true,
       "get": true,
-      "description": "marker size in points (2–72). Applies when marker is not 'none'.",
+      "description": "marker 大小，单位为 points（2–72）。仅当 marker 不为 'none' 时生效。",
       "examples": [
         "--prop markerSize=8"
       ],
@@ -142,7 +142,7 @@
       ],
       "set": true,
       "get": true,
-      "description": "per-series marker fill color (line/scatter/radar). Preserves existing symbol and size — pair with marker=/markerSize= to set the triplet independently. Round-trips via Reader's spPr/solidFill probe.",
+      "description": "逐 series marker 填充颜色（line/scatter/radar）。会保留现有 symbol 和 size；可与 marker=/markerSize= 配合，分别设置这三个值。通过 Reader 的 spPr/solidFill 探测实现往返。",
       "examples": [
         "--prop markerColor=FF0000"
       ],
@@ -151,7 +151,7 @@
     },
     "name": {
       "type": "string",
-      "description": "series name shown in legend and data labels.",
+      "description": "显示在 legend 和 data labels 中的 series 名称。",
       "aliases": [
         "title"
       ],
@@ -174,7 +174,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "A1 cell reference backing the series name.",
+      "description": "为 series 名称提供数据的 A1 cell reference。",
       "readback": "A1 cell reference",
       "enforcement": "report"
     },
@@ -183,7 +183,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "scatter sub-style (line/lineMarker/marker/smooth/smoothMarker/none).",
+      "description": "scatter 子样式（line/lineMarker/marker/smooth/smoothMarker/none）。",
       "readback": "OOXML scatterStyle token",
       "enforcement": "report"
     },
@@ -192,13 +192,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true when the chart has more than one value axis (this series uses the secondary).",
+      "description": "当 chart 有多个 value axis 且此 series 使用 secondary axis 时为 true。",
       "readback": "true | false",
       "enforcement": "report"
     },
     "smooth": {
       "type": "string",
-      "description": "smooth line interpolation for line/scatter series (true|false).",
+      "description": "line/scatter series 的平滑线插值（true|false）。",
       "appliesWhen": {
         "parent.chartType": [
           "line",
@@ -215,7 +215,7 @@
     },
     "values": {
       "type": "string",
-      "description": "comma-separated numbers, OR a cell range reference (Sheet1!B2:B13)",
+      "description": "以逗号分隔的数字，或 cell range reference（Sheet1!B2:B13）。",
       "add": true,
       "set": true,
       "get": true,
@@ -228,7 +228,7 @@
     },
     "bubbleSize": {
       "type": "string",
-      "description": "bubble chart per-point sizes; comma-separated numbers OR a cell range reference. Defaults to the y-values when omitted.",
+      "description": "bubble chart 每个 point 的大小；接受以逗号分隔的数字或 cell range reference。省略时默认使用 y-values。",
       "appliesWhen": {
         "parent.chartType": [
           "bubble"
@@ -246,7 +246,7 @@
     },
     "bubbleSizeRef": {
       "type": "string",
-      "description": "A1 cell range backing bubble per-point sizes. Coexists with bubbleSize (the literal becomes the numCache).",
+      "description": "为 bubble 每个 point 的大小提供数据的 A1 cell range。可与 bubbleSize 共存（字面量会成为 numCache）。",
       "appliesWhen": {
         "parent.chartType": [
           "bubble"

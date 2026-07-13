@@ -4,7 +4,7 @@
   "properties": {
     "subscript": {
       "type": "bool",
-      "description": "vertical alignment = subscript. Mutually exclusive with superscript.",
+      "description": "垂直对齐方式为 subscript。与 superscript 互斥。",
       "add": true,
       "set": true,
       "get": true,
@@ -16,7 +16,7 @@
     },
     "superscript": {
       "type": "bool",
-      "description": "vertical alignment = superscript. Mutually exclusive with subscript.",
+      "description": "垂直对齐方式为 superscript。与 subscript 互斥。",
       "add": true,
       "set": true,
       "get": true,

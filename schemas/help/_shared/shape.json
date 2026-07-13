@@ -5,7 +5,7 @@
   "properties": {
     "align": {
       "type": "string",
-      "description": "Paragraph alignment: 'left' / 'center' (c/ctr) / 'right' (r) / 'justify'.",
+      "description": "段落对齐方式：'left' / 'center'（c/ctr）/ 'right'（r）/ 'justify'。",
       "add": true,
       "set": true,
       "get": true,
@@ -16,7 +16,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "Bold runs. Bare alias of font.bold.",
+      "description": "将 run 设为粗体。font.bold 的简写别名。",
       "add": true,
       "set": true,
       "examples": [
@@ -31,7 +31,7 @@
     },
     "color": {
       "type": "color",
-      "description": "Text color. Bare alias of font.color.",
+      "description": "文本颜色。font.color 的简写别名。",
       "add": true,
       "set": true,
       "examples": [
@@ -47,7 +47,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "Solid fill color, or 'none' for no fill (text-only shapes route effects to text-level rPr). Accepts color-transform modifiers appended with '+': '+lumMod<N>' / '+lumOff<N>' (luminance, percent), '+tint<N>' / '+shade<N>', '+alpha<N>' (e.g. 'accent1+lumMod75', 'FF0000+lumMod50', 'accent2+shade60+alpha80'). Modifiers apply to both scheme and srgb base colors and round-trip in Get.",
+      "description": "纯色填充；传入 'none' 表示无填充（纯文本 shape 会将效果写入文本层 rPr）。支持以 '+' 追加颜色变换修饰符：'+lumMod<N>' / '+lumOff<N>'（亮度百分比）、'+tint<N>' / '+shade<N>'、'+alpha<N>'，例如 'accent1+lumMod75'、'FF0000+lumMod50'、'accent2+shade60+alpha80'。修饰符同时适用于 scheme 和 srgb 基色，并可在 Get 中往返保留。",
       "add": true,
       "set": true,
       "get": true,
@@ -70,7 +70,7 @@
       "aliases": [
         "flipHorizontal"
       ],
-      "description": "Flip horizontally (Office-API alias of flip=h).",
+      "description": "水平翻转（Office-API 中 flip=h 的别名）。",
       "add": true,
       "set": true,
       "examples": [
@@ -83,7 +83,7 @@
       "aliases": [
         "flipVertical"
       ],
-      "description": "Flip vertically (Office-API alias of flip=v).",
+      "description": "垂直翻转（Office-API 中 flip=v 的别名）。",
       "add": true,
       "set": true,
       "examples": [
@@ -93,7 +93,7 @@
     },
     "font": {
       "type": "string",
-      "description": "default font family for shape text. Bare 'font' targets Latin + EastAsian; for per-script control (Japanese / Korean / Arabic) use font.latin, font.ea, or font.cs.",
+      "description": "shape 文本的默认字体族。不带子字段的 'font' 会同时作用于 Latin 和 EastAsian；如需按脚本控制（Japanese / Korean / Arabic），请使用 font.latin、font.ea 或 font.cs。",
       "aliases": [
         "font.name"
       ],
@@ -108,7 +108,7 @@
     },
     "glow": {
       "type": "string",
-      "description": "glow effect. Pass a color (e.g. '4472C4') or 'true' (defaults to accent blue).",
+      "description": "发光效果。传入颜色（例如 '4472C4'）或 'true'（默认使用强调蓝色）。",
       "add": true,
       "set": true,
       "get": true,
@@ -122,7 +122,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "Italic runs. Bare alias of font.italic.",
+      "description": "将 run 设为斜体。font.italic 的简写别名。",
       "add": true,
       "set": true,
       "examples": [
@@ -137,7 +137,7 @@
     },
     "line": {
       "type": "string",
-      "description": "Outline color (or 'none'). Form: 'color[:width[:style]]', e.g. 'FF0000:1.5:dash'. width in points; style: solid|dash|dot|dashdot|longdash.",
+      "description": "轮廓颜色（或 'none'）。格式为 'color[:width[:style]]'，例如 'FF0000:1.5:dash'。width 的单位为 points；style 可为 solid|dash|dot|dashdot|longdash。",
       "aliases": [
         "border",
         "linecolor",
@@ -157,7 +157,7 @@
     },
     "margin": {
       "type": "length",
-      "description": "uniform internal padding (text inset) for shape body.",
+      "description": "shape 正文的统一内边距（文字边距）。",
       "add": true,
       "set": true,
       "get": true,
@@ -170,7 +170,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Override the auto-generated 'Shape {id}' label on cNvPr @name.",
+      "description": "覆盖 cNvPr @name 中自动生成的 'Shape {id}' 标签。",
       "add": true,
       "set": true,
       "examples": [
@@ -183,7 +183,7 @@
     },
     "reflection": {
       "type": "string",
-      "description": "reflection effect. Accepts 'true' to enable a default reflection.",
+      "description": "倒影效果。传入 'true' 可启用默认倒影。",
       "add": true,
       "set": true,
       "get": false,
@@ -195,7 +195,7 @@
     },
     "rotation": {
       "type": "string",
-      "description": "Rotation in degrees (positive = clockwise). Stored OOXML-internal as 60000ths of a degree on Transform2D @rot.",
+      "description": "旋转角度（正值表示顺时针）。在 OOXML 内部以 1/60000 度存储于 Transform2D @rot。",
       "aliases": [
         "rot",
         "rotate"
@@ -211,7 +211,7 @@
     },
     "shadow": {
       "type": "string",
-      "description": "outer shadow effect. Pass a color (e.g. '000000') or 'true' (defaults to black). Routed to text-level rPr for text-only shapes.",
+      "description": "外阴影效果。传入颜色（例如 '000000'）或 'true'（默认黑色）。纯文本 shape 会将其写入文本层 rPr。",
       "add": true,
       "set": true,
       "get": true,
@@ -226,7 +226,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size",
+      "description": "字体大小。",
       "aliases": [
         "fontSize",
         "fontsize",
@@ -248,7 +248,7 @@
       "aliases": [
         "softedge"
       ],
-      "description": "Soft edge radius, or 'none' to clear.",
+      "description": "柔化边缘半径；传入 'none' 可清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -273,7 +273,7 @@
     },
     "underline": {
       "type": "string",
-      "description": "Underline style: 'true'/'single'/'sng', 'double'/'dbl', 'none'/'false'. Bare alias of font.underline.",
+      "description": "下划线样式：'true'/'single'/'sng'、'double'/'dbl'、'none'/'false'。font.underline 的简写别名。",
       "add": true,
       "set": true,
       "examples": [
@@ -288,7 +288,7 @@
     },
     "valign": {
       "type": "string",
-      "description": "Vertical anchor: 'top' (t) / 'center' (ctr/middle/c/m) / 'bottom' (b).",
+      "description": "垂直锚点：'top'（t）/ 'center'（ctr/middle/c/m）/ 'bottom'（b）。",
       "add": true,
       "set": true,
       "get": true,

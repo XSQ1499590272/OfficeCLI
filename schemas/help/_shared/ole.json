@@ -5,7 +5,7 @@
   "properties": {
     "preview": {
       "type": "string",
-      "description": "preview thumbnail image source. Add-time only — Set ignores this key.",
+      "description": "预览缩略图来源。仅 add 时使用；Set 会忽略此 key。",
       "add": true,
       "set": false,
       "get": false,
@@ -17,7 +17,7 @@
     },
     "progId": {
       "type": "string",
-      "description": "OLE ProgID (e.g. 'Excel.Sheet.12'). Usually inferred from src extension.",
+      "description": "OLE ProgID（例如 'Excel.Sheet.12'）。通常根据 src 扩展名推断。",
       "aliases": [
         "progid"
       ],
@@ -33,7 +33,7 @@
     },
     "src": {
       "type": "string",
-      "description": "embedded object source — file path, URL, or data-URI; accepted on add/set only. Get does NOT surface this key; the embedded relationship id is exposed under a separate Format[\"relId\"] key.",
+      "description": "嵌入对象来源——文件路径、URL 或 data-URI；仅 add/set 接受。Get 不会返回此 key；嵌入对象的 relationship id 会以独立的 Format[\"relId\"] key 返回。",
       "aliases": [
         "path"
       ],
@@ -49,7 +49,7 @@
     },
     "oleKind": {
       "type": "enum",
-      "description": "dump→batch round-trip carrier: whether the embedded payload is an Office package ('package' → EmbeddedPackagePart) or a generic object ('object' → EmbeddedObjectPart). Emitted by dump alongside a data-URI src; lets add rebuild the exact part class. Add-time only.",
+      "description": "dump→batch 往返载体：说明嵌入 payload 是 Office package（'package' → EmbeddedPackagePart）还是通用 object（'object' → EmbeddedObjectPart）。dump 会与 data-URI src 一并输出，以便 add 重建完全相同的 part class。仅 add 时使用。",
       "values": ["package", "object"],
       "aliases": ["olekind"],
       "add": true,
@@ -61,7 +61,7 @@
     },
     "contentType": {
       "type": "string",
-      "description": "dump→batch round-trip carrier: MIME content type of the embedded payload part (e.g. 'application/vnd.ms-excel'). Paired with a data-URI src + oleKind so add restores the exact part content type. Add-time only.",
+      "description": "dump→batch 往返载体：嵌入 payload part 的 MIME content type（例如 'application/vnd.ms-excel'）。与 data-URI src 和 oleKind 配合，使 add 恢复完全相同的 part content type。仅 add 时使用。",
       "aliases": ["contenttype"],
       "add": true,
       "set": false,
@@ -72,7 +72,7 @@
     },
     "embedExt": {
       "type": "string",
-      "description": "dump→batch round-trip carrier: target file extension for the embedded package part (e.g. 'xls'). Add-time only.",
+      "description": "dump→batch 往返载体：嵌入 package part 的目标文件扩展名（例如 'xls'）。仅 add 时使用。",
       "aliases": ["embedext"],
       "add": true,
       "set": false,

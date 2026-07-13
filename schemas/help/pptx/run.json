@@ -16,7 +16,7 @@
       "/slide[N]/shape[M]/p[K]/r[L]"
     ]
   },
-  "note": "Appends a:r inside a:p. Font properties live on a:rPr. Colors get #-prefixed on readback via ParseHelpers.FormatHexColor. effective.* keys behave as documented in pptx/shape.json (no effective.direction on runs). Run-level formatting can also be applied by character offset without addressing individual runs: `set <shape-or-paragraph-path> --prop range=START:END --prop bold=true` splits the run(s) covering each span and applies the format props to just that slice — the offset-based sibling of `find` (which locates the span by text). Several disjoint spans as `range=6:11,20:25`. Offsets are relative to the concatenated run text of the path scope: a shape path spans all its paragraphs, a /paragraph[P] path is that paragraph only. Mind the two bases: the path `[N]` positions are 1-based (XPath-style, `/shape[2]` = 2nd shape); range START:END are 0-based half-open (`range=0:1` = first character). `find` and `range` are mutually exclusive on one call; `range` currently applies formatting only (no text= yet).",
+  "note": "向 a:p 中追加 a:r。Font properties 位于 a:rPr。颜色通过 ParseHelpers.FormatHexColor 读回时会加 # 前缀。effective.* 行为参见 pptx/shape.json（run 没有 effective.direction）。也可以按 character offset 对 run-level formatting 执行 set，而无需定位单个 run；range=START:END 会拆分覆盖范围的 run，并只格式化对应片段。offset 相对于 path scope 中拼接后的 run text：shape path 覆盖其全部 paragraph，/paragraph[P] 只覆盖该 paragraph；path [N] 为 1-based，range 为 0-based 半开区间。find 与 range 不能同时使用，range 当前只支持 formatting。",
   "extends": [
     "_shared/run",
     "_shared/run.docx-pptx"
@@ -24,7 +24,7 @@
   "properties": {
     "font": {
       "type": "string",
-      "description": "bare font family — write-only convenience that sets the latin/ea/cs script slots to the same value. Get normalizes the readback to per-script canonical keys (font.latin / font.ea / font.cs) so a get→set round-trip preserves divergent slot values.",
+      "description": "裸 font family：仅写入的便捷属性，会将 latin/ea/cs script slot 设为相同值。Get 会将读取结果规范化为各脚本的 canonical key（font.latin / font.ea / font.cs），使 get→set round-trip 保留不同 slot 的值。",
       "aliases": [
         "fontname",
         "fontFamily",
@@ -43,7 +43,7 @@
     },
     "baseline": {
       "type": "string",
-      "description": "vertical alignment in % of font height. Accepts 'super' (≡ +30), 'sub' (≡ -25), 'none'/'false'/'0', or a signed number. Get readback is the %-suffixed percentage.",
+      "description": "相对 font height 的垂直对齐百分比。支持 'super'（≡ +30）、'sub'（≡ -25）、'none'/'false'/'0' 或带符号数字。Get 返回带 % 后缀的百分比。",
       "add": true,
       "set": true,
       "get": true,
@@ -57,7 +57,7 @@
     },
     "highlight": {
       "type": "color",
-      "description": "text highlight color behind the glyphs (a:highlight). Unlike Word's fixed named-color list, accepts any color (hex, named, rgb(), scheme names like accent1). 'none'/'false' removes the highlight on set.",
+      "description": "glyph 背后的文本高亮颜色（a:highlight）。不同于 Word 的固定命名颜色列表，支持任意颜色（hex、named、rgb()、如 accent1 的 scheme name）。Set 时 'none'/'false' 会移除 highlight。",
       "add": true,
       "set": true,
       "get": true,
@@ -71,7 +71,7 @@
     },
     "kern": {
       "type": "int",
-      "description": "minimum font size (in hundredths of a point) at which character kerning is applied. ECMA-376 §21.1.2.3.9 a:rPr/@kern. 0 disables; 1 enables for all sizes; e.g. 1200 = kern from 12pt up.",
+      "description": "应用 character kerning 的最小 font size，单位为 1/100 pt。ECMA-376 §21.1.2.3.9 a:rPr/@kern。0 禁用；1 对所有尺寸启用；如 1200 表示从 12pt 开始 kern。",
       "add": true,
       "set": true,
       "get": true,
@@ -84,7 +84,7 @@
     },
     "spacing": {
       "type": "number",
-      "description": "character spacing in points. Stored as 1/100 pt in OOXML (a:rPr/@spc); readback is the point value. Negative values tighten.",
+      "description": "character spacing，单位为 pt。OOXML 中以 1/100 pt 存储（a:rPr/@spc）；读取返回 pt 值。负值会收紧间距。",
       "aliases": [
         "charspacing",
         "letterspacing",
@@ -103,7 +103,7 @@
     },
     "lang": {
       "type": "string",
-      "description": "BCP-47 language tag for the run (ECMA-376 §21.1.2.3.9 a:rPr/@lang). DrawingML exposes a single primary-language slot — there is no per-script (latin/ea/cs) split like Word; 'lang.latin' is accepted as an alias on input, 'lang.ea'/'lang.cs' are rejected. Validated against a BCP-47 shape, max 35 chars.",
+      "description": "run 的 BCP-47 language tag（ECMA-376 §21.1.2.3.9 a:rPr/@lang）。DrawingML 仅提供单一 primary-language slot，不像 Word 那样分为 latin/ea/cs；输入接受 'lang.latin' 作为别名，拒绝 'lang.ea'/'lang.cs'。会按 BCP-47 格式校验，最长 35 个字符。",
       "aliases": [
         "lang.latin"
       ],
@@ -120,7 +120,7 @@
     },
     "textOutline": {
       "type": "string",
-      "description": "text outline / glyph stroke (a:rPr/a:ln). Compound form 'width:color' (mirrors connector 'line='); split forms 'textOutline.width' and 'textOutline.color' allow additive Set. Pass 'none' or 'false' to clear.",
+      "description": "text outline / glyph stroke（a:rPr/a:ln）。组合形式为 'width:color'（与 connector 的 'line=' 一致）；可通过 'textOutline.width' 和 'textOutline.color' 分别增量 Set。传入 'none' 或 'false' 清除。",
       "aliases": [
         "textoutline"
       ],
@@ -137,7 +137,7 @@
     },
     "textOutline.color": {
       "type": "string",
-      "description": "text outline colour (a:rPr/a:ln/a:solidFill). Accepts #RRGGBB, named colors, rgb(...), or scheme tokens.",
+      "description": "text outline 颜色（a:rPr/a:ln/a:solidFill）。支持 #RRGGBB、named color、rgb(...) 或 scheme token。",
       "aliases": [
         "textoutline.color"
       ],
@@ -152,7 +152,7 @@
     },
     "textOutline.width": {
       "type": "string",
-      "description": "text outline stroke width (a:rPr/a:ln/@w). Accepts pt/cm/in/emu units.",
+      "description": "text outline stroke 宽度（a:rPr/a:ln/@w）。支持 pt/cm/in/emu 单位。",
       "aliases": [
         "textoutline.width"
       ],
@@ -190,7 +190,7 @@
     },
     "effective.font": {
       "type": "string",
-      "description": "resolved font name inherited from placeholder→layout→master→presentation defaults. Suppressed when 'font' is set directly on the run.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 font name。run 直接设置 'font' 时不会返回。",
       "add": false,
       "set": false,
       "get": true,
@@ -199,7 +199,7 @@
     },
     "subscript": {
       "type": "bool",
-      "description": "vertical alignment = subscript (sugar for baseline=sub). Mutually exclusive with superscript. Get readback uses canonical 'baseline' (not surfaced as 'subscript').",
+      "description": "垂直对齐为 subscript（baseline=sub 的简写）。与 superscript 互斥。Get 使用规范的 'baseline' 返回，不会返回 'subscript'。",
       "add": true,
       "set": true,
       "get": false,
@@ -210,7 +210,7 @@
     },
     "superscript": {
       "type": "bool",
-      "description": "vertical alignment = superscript (sugar for baseline=super). Mutually exclusive with subscript. Get readback uses canonical 'baseline' (not surfaced as 'superscript').",
+      "description": "垂直对齐为 superscript（baseline=super 的简写）。与 subscript 互斥。Get 使用规范的 'baseline' 返回，不会返回 'superscript'。",
       "add": true,
       "set": true,
       "get": false,

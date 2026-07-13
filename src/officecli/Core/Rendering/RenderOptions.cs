@@ -7,7 +7,7 @@ namespace OfficeCli.Core.Rendering;
 /// A render request. Unifies the per-handler entry points that exist today
 /// (WordHandler.ViewAsHtml(pageFilter, gridCols, gridCellWpx),
 /// PowerPointHandler.ViewAsHtml(start, end, gridCols, viewportPx),
-/// ExcelHandler.ViewAsHtml(), FormatHandlerProxy.ViewAsHtml(page)) into a single
+/// ExcelHandler.ViewAsHtml()) into a single
 /// options object so dispatch no longer branches on the concrete handler type.
 /// <para>
 /// Unset fields mean "renderer default". A renderer ignores options it does not

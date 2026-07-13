@@ -14,7 +14,7 @@
   "paths": {
     "positional": ["/body/p[@paraId=X]/r[N]", "/header[N]/p[M]/r[K]", "/footer[N]/p[M]/r[K]"]
   },
-  "note": "Inline w:br element wrapped in a run. Aliases: columnbreak, break. type=column → column break; type=page (default) → page break; type=line/textWrapping → soft line break. Surfaced by Get as type=break (when the run carries no <w:t> alongside the <w:br>).",
+  "note": "Inline w:br element 会包装在 run 中。Aliases：columnbreak、break。type=column 表示 column break；type=page（默认）表示 page break；type=line/textWrapping 表示 soft line break。当 run 除 <w:br> 外不带 <w:t> 时，Get 会以 type=break 返回。",
   "properties": {
     "type": {
       "type": "enum",
@@ -24,7 +24,7 @@
       "examples": ["--prop type=page", "--prop type=column"],
       "readback": "n/a (use 'breakType' on Get / Set)",
       "enforcement": "report",
-      "description": "Add-only alias; Get surfaces this as 'breakType', and Set requires 'breakType'."
+      "description": "仅用于 Add 的 alias；Get 会以 'breakType' 返回，Set 必须使用 'breakType'。"
     },
     "breakType": {
       "type": "enum",
@@ -34,7 +34,7 @@
       "examples": ["--prop breakType=column"],
       "readback": "br type attribute",
       "enforcement": "report",
-      "description": "Canonical key on Get/Set. Add accepts 'type' as a parallel synonym for symmetry with the historical alias."
+      "description": "Get/Set 使用的 canonical key。为兼容历史 alias，Add 同时接受 'type' 作为 synonym。"
     }
   }
 }

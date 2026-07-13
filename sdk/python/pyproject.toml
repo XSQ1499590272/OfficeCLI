@@ -26,9 +26,8 @@ classifiers = [
 Homepage = "https://officecli.ai"
 Repository = "https://github.com/iOfficeAI/OfficeCLI"
 
-# IMPORTANT: this package is only the SDK. It shells out to the `officecli`
-# CLI binary, which must be installed separately and on PATH (Homebrew, etc.).
-# pip cannot install that binary for you — see README.
+# IMPORTANT: this package is only the SDK. It shells out to an `officecli`
+# CLI binary that must already be available on PATH or passed explicitly.
 
 [tool.setuptools]
 py-modules = ["officecli"]  # single-file module: officecli.py

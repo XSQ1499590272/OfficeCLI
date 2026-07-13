@@ -18,8 +18,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Build outputs
-build/
+# Build outputs (release gate sources live in build/)
+build/*
+!build/officecli.entitlements
+!build/verify-macos-portability.sh
+!build/verify-windows-portability.ps1
 dist/
 temp/
 

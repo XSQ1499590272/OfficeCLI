@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/field[N]"]
   },
-  "note": "Complex field (fldChar: begin/instr/separate/result/end), addressed as a whole at /field[N]; /body/p[N]/r[M] returns the inner fieldChar run, not the field. Per-type required props: mergefield/ref → name (aka fieldName/bookmarkName); seq → identifier; styleref → styleName; docproperty → propertyName; if → expression (+ optional trueText/falseText); date/time accept optional format.",
+  "note": "Complex field（fldChar：begin/instr/separate/result/end）作为整体通过 /field[N] 定位；/body/p[N]/r[M] 返回其中的 fieldChar run，而不是整个 field。不同 field type 的必需 props：mergefield/ref → name（也可用 fieldName/bookmarkName）；seq → identifier；styleref → styleName；docproperty → propertyName；if → expression（可选 trueText/falseText）；date/time 可选 format。",
   "properties": {
     "evaluated": {
       "type": "bool",
-      "description": "cross-handler protocol flag — true when the field has a cached result run that the opening application can display, false when the field was written without a cached value (view text substitutes #OCLI_NOTEVAL!{instr}; view issues emits subtype field_not_evaluated). For dirty cached fields the cache is still trusted by evaluated; staleness surfaces separately via subtype field_cache_stale. Read this via get --json instead of pattern-matching the sentinel, since multiple fields per paragraph and literal user content may collide.",
+      "description": "cross-handler protocol 标记：field 有可供打开应用显示的 cached result run 时为 true；写入 field 时未提供 cached value 则为 false（view text 会替换为 #OCLI_NOTEVAL!{instr}；view issues 会返回 subtype field_not_evaluated）。对 dirty cached field，evaluated 仍信任 cache；是否过期由 subtype field_cache_stale 单独返回。请通过 get --json 读取，不要匹配 sentinel 文本，因为同一段可能有多个 field，且可能与用户字面内容冲突。",
       "add": false, "set": false, "get": true,
       "readback": "true|false (true ⇒ cached result run present)",
       "enforcement": "report"
@@ -33,7 +33,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Per-type identifier: mergefield → field name (e.g. CustomerName); ref/pageref/noteref → target bookmark name; styleref → style name; docproperty → property name. Aliases preserve historical naming differences (e.g. ref docs called this 'bookmarkName').",
+      "description": "各 field type 的标识符：mergefield → field name（如 CustomerName）；ref/pageref/noteref → target bookmark name；styleref → style name；docproperty → property name。aliases 保留历史命名差异（如 ref 文档曾称其为 'bookmarkName'）。",
       "aliases": ["fieldName", "fieldname", "bookmarkName", "bookmarkname", "bookmark", "styleName", "stylename", "propertyName", "propertyname"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=CustomerName", "--prop bookmarkName=Section1", "--prop styleName=\"Heading 1\""],
@@ -42,7 +42,7 @@
     },
     "id": {
       "type": "string",
-      "description": "SEQ field's identifier (sequence label). Defaults to 'name' when 'id' is not supplied. Alias: identifier.",
+      "description": "SEQ field 的标识符（sequence label）。未提供 'id' 时默认使用 'name'。别名：identifier。",
       "aliases": ["identifier"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop id=Figure", "--prop identifier=Figure"],
@@ -51,7 +51,7 @@
     },
     "expression": {
       "type": "string",
-      "description": "IF field's logical expression (e.g. 'MERGEFIELD Gender = \"Male\"'). Add/Set only — surfaces back inside the `instruction` readback, not as its own Format key.",
+      "description": "IF field 的逻辑表达式（如 'MERGEFIELD Gender = \"Male\"'）。仅 Add/Set；会在 instruction 的读取结果中返回，而不是作为独立 Format key。",
       "aliases": ["condition"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop expression='{ MERGEFIELD Gender } = \"Male\"'"],
@@ -60,7 +60,7 @@
     },
     "trueText": {
       "type": "string",
-      "description": "IF field's text shown when expression evaluates true. Add/Set only — surfaces back inside the `instruction` readback.",
+      "description": "IF field 的 expression 求值为 true 时显示的文本。仅 Add/Set；会在 instruction 的读取结果中返回。",
       "aliases": ["truetext"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop trueText=\"Mr.\""],
@@ -69,7 +69,7 @@
     },
     "falseText": {
       "type": "string",
-      "description": "IF field's text shown when expression evaluates false. Add/Set only — surfaces back inside the `instruction` readback.",
+      "description": "IF field 的 expression 求值为 false 时显示的文本。仅 Add/Set；会在 instruction 的读取结果中返回。",
       "aliases": ["falsetext"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop falseText=\"Ms.\""],
@@ -78,7 +78,7 @@
     },
     "hyperlink": {
       "type": "bool",
-      "description": "REF field: append \\h switch so the inserted reference becomes a clickable hyperlink to the bookmark target. Add/Set only — surfaces back as a switch inside the `instruction` readback.",
+      "description": "REF field：附加 \\h switch，使插入的引用成为指向 bookmark target 的可点击 hyperlink。仅 Add/Set；会作为 switch 出现在 instruction 的读取结果中。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop hyperlink=true"],
       "readback": "n/a (embedded in instruction)",
@@ -86,7 +86,7 @@
     },
     "format": {
       "type": "string",
-      "description": "field format — bare picture string (e.g. 'yyyy-MM-dd' for DATE, '0.00%' for numeric). The handler wraps it into the OOXML '\\@ \"...\"' switch automatically; do NOT pass the '\\@' prefix yourself.",
+      "description": "field format：裸 picture string（如 DATE 用 'yyyy-MM-dd'，numeric 用 '0.00%'）。handler 会自动包装为 OOXML '\\@ \"...\"' switch；请勿自行传入 '\\@' 前缀。",
       "add": true, "set": true, "get": true,
       "examples": [
         "--prop format=\"yyyy-MM-dd\"",
@@ -97,7 +97,7 @@
     },
     "instruction": {
       "type": "string",
-      "description": "Raw field instruction text. Bypasses fieldType-specific helpers — useful for arbitrary fields not covered by the typed shortcuts.",
+      "description": "原始 field instruction text。会绕过 fieldType-specific helper，适用于 typed shortcut 未覆盖的任意 field。",
       "aliases": ["instr", "code"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop instruction=' DATE \\@ \"yyyy年MM月\" '"],
@@ -107,7 +107,7 @@
     "vertAlign": {
       "type": "enum",
       "values": ["superscript", "subscript", "baseline"],
-      "description": "field-wide vertical alignment applied uniformly to every run of the field (begin/instrText/separate/result/end). Common case: a superscript cross-reference citation mark ([1],[2]…). Accepts the boolean aliases superscript=true / subscript=true. Like the other run-format props the field add accepts (font/size/bold/color), this rides on the whole field rather than a single run.",
+      "description": "应用到 field 每个 run（begin/instrText/separate/result/end）的 field-wide vertical alignment。常见用途为 superscript 的 cross-reference citation mark（[1]、[2] 等）。接受 boolean aliases：superscript=true / subscript=true。与 field add 接受的其他 run-format props（font/size/bold/color）一样，作用于整个 field 而非单个 run。",
       "aliases": ["vertalign", "superscript", "subscript"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop vertAlign=superscript", "--prop superscript=true"],
@@ -116,7 +116,7 @@
     },
     "fldLock": {
       "type": "bool",
-      "description": "field lock (w:fldChar/w:fldSimple @w:fldLock) — when true, Word does NOT update the field on F9 / Update Field / recalc; the cached result stays put. Universal across field types (rides on the begin fldChar). On a dump→batch round-trip a fldSimple lock is preserved through the conversion to a complex field.",
+      "description": "field lock（w:fldChar/w:fldSimple @w:fldLock）：为 true 时，Word 不会在 F9 / Update Field / recalc 时更新 field，cached result 保持不变。适用于所有 field type（写在 begin fldChar 上）。dump→batch round-trip 时，fldSimple lock 会在转换为 complex field 后保留。",
       "aliases": ["fldlock"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop fldLock=true"],

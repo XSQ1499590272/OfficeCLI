@@ -16,12 +16,12 @@
       "/slide[N]/table[M]/tr[R]/tc[C]"
     ]
   },
-  "note": "Appending a cell to a row is unusual — normally cells are seeded at row-Add time. This op exists for completeness; pptx tables are strictly rectangular, so a standalone Add cell only succeeds when the row currently has fewer cells than the table grid (an OOXML-illegal state).",
+  "note": "向 row 追加 cell 并不常见，通常 cell 在 row-Add 时预填。此操作为完整性保留；pptx table 必须严格保持矩形，因此 standalone Add cell 只有在 row 当前 cell 数少于 table grid 时才成功（这本身是 OOXML-illegal 状态）。",
   "extends": "_shared/table-cell",
   "properties": {
     "text": {
       "type": "string",
-      "description": "single-run text content. pptx-only override: prefer set tc[C] for cell text in pptx; standalone Add cell rarely has room to land within a rectangular table grid. Set + Get unchanged.",
+      "description": "单个 run 的文本内容。pptx 中设置单元格文本时应优先使用 set tc[C]；独立 add cell 很难在矩形 table grid 中找到可插入位置。set/get 语义不变。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop text=\"Hello\""],
       "readback": "string concatenated from all <a:r>/<a:t> in the cell paragraphs",
@@ -29,7 +29,7 @@
     },
     "colspan": {
       "type": "number",
-      "description": "horizontal cell span (a:tc @gridSpan) — number of grid columns this cell spans (>=2 means merged across). Setting colspan=N also stamps hMerge=true on the next (N-1) cells in the same row, matching the convenience prop merge.right. Surfaces on Get only when the cell spans more than one column. Canonical name matches docx; alias: gridspan.",
+      "description": "单元格横向跨列数（a:tc @gridSpan）；>=2 表示横向合并。设置 colspan=N 时，同一行后续 N-1 个单元格也会写入 hMerge=true，与便捷属性 merge.right 一致。仅在跨越多列时通过 Get 返回。规范名称与 docx 相同；别名：gridspan。",
       "add": false, "set": true, "get": true,
       "aliases": ["gridspan"],
       "readback": "integer ≥ 2",
@@ -38,7 +38,7 @@
     },
     "rowspan": {
       "type": "number",
-      "description": "vertical cell span (a:tc @rowSpan). Settable: rowspan=N writes rowSpan=N on this anchor cell and vMerge=true on the (N-1) continuation cells directly below. Surfaces on Get only when the cell spans more than one row.",
+      "description": "单元格纵向跨行数（a:tc @rowSpan）。设置 rowspan=N 时，当前锚点单元格写入 rowSpan=N，正下方后续 N-1 个单元格写入 vMerge=true。仅在跨越多行时通过 Get 返回。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop rowspan=2"],
       "readback": "integer ≥ 2",
@@ -46,28 +46,28 @@
     },
     "padding.left": {
       "type": "string",
-      "description": "left cell padding (a:tcPr @marL). Read-only readback; emitted as a unit-qualified length (cm/in/pt).",
+      "description": "单元格左内边距（a:tcPr @marL）。只读，返回带单位的长度（cm/in/pt）。",
       "add": false, "set": false, "get": true,
       "readback": "unit-qualified length, e.g. '0.25cm'",
       "enforcement": "report"
     },
     "padding.right": {
       "type": "string",
-      "description": "right cell padding (a:tcPr @marR). Read-only readback; emitted as a unit-qualified length.",
+      "description": "单元格右内边距（a:tcPr @marR）。只读，返回带单位的长度。",
       "add": false, "set": false, "get": true,
       "readback": "unit-qualified length, e.g. '0.25cm'",
       "enforcement": "report"
     },
     "padding.top": {
       "type": "string",
-      "description": "top cell padding (a:tcPr @marT). Read-only readback; emitted as a unit-qualified length.",
+      "description": "单元格上内边距（a:tcPr @marT）。只读，返回带单位的长度。",
       "add": false, "set": false, "get": true,
       "readback": "unit-qualified length, e.g. '0.13cm'",
       "enforcement": "report"
     },
     "padding.bottom": {
       "type": "string",
-      "description": "bottom cell padding (a:tcPr @marB). Read-only readback; emitted as a unit-qualified length.",
+      "description": "单元格下内边距（a:tcPr @marB）。只读，返回带单位的长度。",
       "add": false, "set": true, "get": true,
       "aliases": ["margin.bottom"],
       "examples": ["--prop padding.bottom=0.25cm"],
@@ -76,7 +76,7 @@
     },
     "padding": {
       "type": "string",
-      "description": "shorthand to set all four cell paddings at once (a:tcPr @marL/@marR/@marT/@marB). Accepts a unit-qualified length applied to every edge.",
+      "description": "一次设置四个方向的单元格内边距（a:tcPr @marL/@marR/@marT/@marB）。传入带单位的长度，会应用到每一边。",
       "aliases": ["margin"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop padding=0.2cm"],
@@ -84,7 +84,7 @@
     },
     "valign": {
       "type": "string",
-      "description": "vertical text anchor (a:tcPr @anchor). top|center|bottom.",
+      "description": "文本垂直锚点（a:tcPr @anchor）。可选 top|center|bottom。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop valign=center"],
       "readback": "top|center|bottom",
@@ -92,7 +92,7 @@
     },
     "wrap": {
       "type": "bool",
-      "description": "cell text wrap (a:txBody/a:bodyPr @wrap). true=square (wrap), false=none (clip to cell). Set on the cell's body properties.",
+      "description": "单元格文本换行（a:txBody/a:bodyPr @wrap）。true=square（换行），false=none（裁剪到单元格内）；写入单元格 body properties。",
       "aliases": ["wordwrap"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop wrap=false"],
@@ -101,7 +101,7 @@
     },
     "textdirection": {
       "type": "string",
-      "description": "cell text rotation (a:tcPr @vert). horizontal|vertical90|vertical270|stacked. Round-trips through the same canonical vocabulary.",
+      "description": "单元格文本旋转方向（a:tcPr @vert）。可选 horizontal|vertical90|vertical270|stacked；写入和读取使用相同的规范值。",
       "aliases": ["textdir", "vert"],
       "add": false, "set": true, "get": true,
       "examples": [
@@ -113,7 +113,7 @@
     },
     "direction": {
       "type": "string",
-      "description": "first-paragraph reading direction (a:pPr @rtl). ltr|rtl. Fans out to every paragraph in the cell's text body; readback reflects the first paragraph only.",
+      "description": "首段的阅读方向（a:pPr @rtl），可选 ltr|rtl。设置时会应用到单元格 text body 中的所有段落；读取仅反映首段。",
       "aliases": ["dir", "rtl"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop direction=rtl"],
@@ -122,21 +122,21 @@
     },
     "merge.right": {
       "type": "number",
-      "description": "convenience for horizontal merge — merges N neighbor cells to the right into this one, so the total span becomes N+1 (writes gridSpan=N+1 on this cell and hMerge=true on the next N cells in the same row).",
+      "description": "横向合并的便捷属性：将右侧 N 个相邻单元格合并到当前单元格，总跨列数为 N+1（当前单元格写入 gridSpan=N+1，同一行后续 N 个单元格写入 hMerge=true）。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop merge.right=2"],
       "enforcement": "report"
     },
     "merge.down": {
       "type": "number",
-      "description": "convenience for vertical merge — stamps rowSpan=N on this cell and vMerge=true on the same column in the next N-1 rows.",
+      "description": "纵向合并的便捷属性：当前单元格写入 rowSpan=N，后续 N-1 行的同列单元格写入 vMerge=true。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop merge.down=2"],
       "enforcement": "report"
     },
     "bevel": {
       "type": "string",
-      "description": "3-D cell bevel (a:tcPr/a:cell3D). 'none' to clear, or a preset name (circle, slope, cross, angle, softRound, convex, coolSlant, divot, riblet, hardEdge, artDeco, …). Optional 'NAME;Wpt;Hpt' to set width/height.",
+      "description": "3-D 单元格 bevel（a:tcPr/a:cell3D）。使用 'none' 清除，或传入预设名称（circle、slope、cross、angle、softRound、convex、coolSlant、divot、riblet、hardEdge、artDeco 等）。可选格式 'NAME;Wpt;Hpt' 用于指定宽度/高度。",
       "aliases": ["cell3d"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop bevel=circle", "--prop bevel=\"circle;6pt;6pt\""],
@@ -144,7 +144,7 @@
     },
     "opacity": {
       "type": "number",
-      "description": "fill alpha as a 0–1 fraction or 0–100 percent (post-applied to the cell's solid/gradient fill).",
+      "description": "填充透明度，可传入 0–1 小数或 0–100 百分比；会在单元格 solid/gradient fill 设置后应用。",
       "aliases": ["fill.opacity", "alpha", "fill.alpha"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop opacity=0.5", "--prop opacity=50%"],
@@ -152,7 +152,7 @@
     },
     "image": {
       "type": "string",
-      "description": "embed an image file as the cell's blip fill (a:tcPr/a:blipFill). Path to a local image; relationship is added to the slide. Replaces any prior fill.",
+      "description": "将本地图片嵌入为单元格 blip fill（a:tcPr/a:blipFill）。传入本地图片路径，会向 slide 添加 relationship，并替换已有 fill。",
       "aliases": ["imagefill"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop image=logo.png"],
@@ -160,7 +160,7 @@
     },
     "linespacing": {
       "type": "string",
-      "description": "line spacing applied to every paragraph in the cell. Accepts multiplier ('1.5x', '150%') or fixed points ('18pt').",
+      "description": "应用到单元格内所有段落的行距。支持倍数（'1.5x'、'150%'）或固定值（'18pt'）。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop linespacing=1.5x", "--prop linespacing=18pt"],
       "readback": "multiplier (e.g. '1.5x') or unit-qualified length (e.g. '18pt')",
@@ -168,7 +168,7 @@
     },
     "spacebefore": {
       "type": "string",
-      "description": "space before every paragraph in the cell. Unit-qualified length ('12pt', '0.5cm').",
+      "description": "单元格内每个段落的段前间距。使用带单位的长度（'12pt'、'0.5cm'）。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop spacebefore=6pt"],
       "readback": "unit-qualified length",
@@ -176,7 +176,7 @@
     },
     "spaceafter": {
       "type": "string",
-      "description": "space after every paragraph in the cell. Unit-qualified length ('12pt', '0.5cm').",
+      "description": "单元格内每个段落的段后间距。使用带单位的长度（'12pt'、'0.5cm'）。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop spaceafter=6pt"],
       "readback": "unit-qualified length",
@@ -184,7 +184,7 @@
     },
     "align": {
       "type": "string",
-      "description": "first-paragraph horizontal alignment applied to every paragraph in the cell (a:pPr @algn). left|center|right|justify. Readback reflects the first paragraph only.",
+      "description": "应用到单元格内所有段落的首段水平对齐方式（a:pPr @algn）。可选 left|center|right|justify；读取仅反映首段。",
       "aliases": ["alignment", "halign"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop align=center"],
@@ -193,7 +193,7 @@
     },
     "font": {
       "type": "string",
-      "description": "Latin (and East Asian fallback) font typeface for every run in the cell. Fans out to a:rPr/a:latin + a:ea on every existing run.",
+      "description": "单元格内每个 run 的 Latin 字体（及 East Asian 后备字体）。设置时会写入所有已有 run 的 a:rPr/a:latin 和 a:ea。",
       "aliases": ["font.name", "font.latin"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop font=Calibri"],
@@ -202,7 +202,7 @@
     },
     "size": {
       "type": "string",
-      "description": "font size for every run in the cell (a:rPr @sz). Unit-qualified ('14pt') or bare number (points).",
+      "description": "单元格内每个 run 的字体大小（a:rPr @sz）。可使用带单位的值（'14pt'）或裸数字（按 pt 处理）。",
       "aliases": ["font.size", "fontsize"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop size=14pt", "--prop size=10.5"],
@@ -211,7 +211,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "bold for every run in the cell (a:rPr @b).",
+      "description": "单元格内每个 run 的 bold 设置（a:rPr @b）。",
       "aliases": ["font.bold"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop bold=true"],
@@ -220,7 +220,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "italic for every run in the cell (a:rPr @i).",
+      "description": "单元格内每个 run 的 italic 设置（a:rPr @i）。",
       "aliases": ["font.italic"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop italic=true"],
@@ -229,7 +229,7 @@
     },
     "underline": {
       "type": "string",
-      "description": "underline style for every run in the cell (a:rPr @u). single|double|none or any OOXML underline value.",
+      "description": "单元格内每个 run 的 underline 样式（a:rPr @u）。可选 single|double|none，或其他 OOXML underline 值。",
       "aliases": ["font.underline"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop underline=single", "--prop underline=double"],
@@ -238,7 +238,7 @@
     },
     "strike": {
       "type": "string",
-      "description": "strikethrough for every run in the cell (a:rPr @strike). single|double|none.",
+      "description": "单元格内每个 run 的 strikethrough 设置（a:rPr @strike）。可选 single|double|none。",
       "aliases": ["strikethrough", "font.strike", "font.strikethrough"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop strike=single"],
@@ -247,7 +247,7 @@
     },
     "color": {
       "type": "color",
-      "description": "font color for every run in the cell (a:rPr/a:solidFill).",
+      "description": "单元格内每个 run 的字体颜色（a:rPr/a:solidFill）。",
       "aliases": ["font.color"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop color=FF0000", "--prop color=red"],
@@ -256,7 +256,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "cell background fill. Accepts a solid color (hex, named, rgb(...)), scheme color name (accent1–accent6, dk1, dk2, lt1, lt2, hyperlink), 'none' for explicit no-fill, or a gradient string 'COLOR1-COLOR2[-ANGLE]' (e.g. 'FF0000-0000FF-90'). Stored as a:solidFill/a:noFill/a:gradFill on a:tcPr.",
+      "description": "单元格背景 fill。支持纯色（hex、命名色、rgb(...)）、scheme color 名称（accent1–accent6、dk1、dk2、lt1、lt2、hyperlink）、表示显式无填充的 'none'，或渐变字符串 'COLOR1-COLOR2[-ANGLE]'（如 'FF0000-0000FF-90'）。会以 a:solidFill/a:noFill/a:gradFill 写入 a:tcPr。",
       "aliases": [
         "background",
         "shd",
@@ -281,7 +281,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "first run baseline offset for the cell text (percent units; positive=raised).",
+      "description": "单元格文本中首个 run 的 baseline 偏移（百分比单位；正值为上移）。",
       "readback": "percent (e.g. 30)",
       "enforcement": "report"
     },
@@ -290,7 +290,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true on cells continued from a horizontal merge anchor (CT_TableCell @hMerge).",
+      "description": "横向合并锚点后续单元格上的 true 标记（CT_TableCell @hMerge）。",
       "readback": "true on continuation cells",
       "enforcement": "report"
     },
@@ -299,7 +299,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true on cells continued from a vertical merge anchor (CT_TableCell @vMerge). Surfaced by Query for table cells.",
+      "description": "纵向合并锚点后续单元格上的 true 标记（CT_TableCell @vMerge）。table cell 的 Query 会返回此值。",
       "readback": "true on continuation cells",
       "enforcement": "report"
     },
@@ -308,13 +308,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "relationship id of an embedded image used as the cell's blip fill.",
+      "description": "用作单元格 blip fill 的嵌入图片 relationship id。",
       "readback": "relationship id token",
       "enforcement": "report"
     },
     "border.all": {
       "type": "string",
-      "description": "all four cell edges. Format: 'WIDTH[ DASH][ COLOR]' (e.g. '1pt solid FF0000') or 'STYLE;WIDTH;COLOR[;DASH]' (style ignored — kept for docx parity). DASH ∈ solid|dot|dash|lgDash|dashDot|sysDot|sysDash. Use 'none' to clear. Alias: border. Stored as a:lnL/lnR/lnT/lnB on a:tcPr. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "四个单元格边框。格式为 'WIDTH[ DASH][ COLOR]'（如 '1pt solid FF0000'）或 'STYLE;WIDTH;COLOR[;DASH]'（style 会被忽略，仅为与 docx 保持一致）。DASH 可为 solid|dot|dash|lgDash|dashDot|sysDot|sysDash；使用 'none' 清除。别名：border。会以 a:lnL/lnR/lnT/lnB 写入 a:tcPr。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "aliases": [
         "border"
       ],
@@ -331,7 +331,7 @@
     },
     "border.bottom": {
       "type": "string",
-      "description": "bottom border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units).",
+      "description": "底边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'（SIZE 单位为 1/8 pt）。",
       "add": false,
       "set": true,
       "get": true,
@@ -344,7 +344,7 @@
     },
     "border.left": {
       "type": "string",
-      "description": "left border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units).",
+      "description": "左边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'（SIZE 单位为 1/8 pt）。",
       "add": false,
       "set": true,
       "get": true,
@@ -357,7 +357,7 @@
     },
     "border.right": {
       "type": "string",
-      "description": "right border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units).",
+      "description": "右边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'（SIZE 单位为 1/8 pt）。",
       "add": false,
       "set": true,
       "get": true,
@@ -370,7 +370,7 @@
     },
     "border.tl2br": {
       "type": "string",
-      "description": "diagonal from top-left to bottom-right (a:lnTlToBr). Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient. Get returns sub-keys border.tl2br.color, border.tl2br.width, border.tl2br.dash, and a summary border.tl2br key.",
+      "description": "从左上到右下的对角线（a:lnTlToBr）。格式与 border.all 相同。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。Get 返回子键 border.tl2br.color、border.tl2br.width、border.tl2br.dash，以及汇总键 border.tl2br。",
       "add": true,
       "set": true,
       "get": true,
@@ -383,7 +383,7 @@
     },
     "border.top": {
       "type": "string",
-      "description": "top border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units).",
+      "description": "上边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'（SIZE 单位为 1/8 pt）。",
       "add": false,
       "set": true,
       "get": true,
@@ -396,7 +396,7 @@
     },
     "border.tr2bl": {
       "type": "string",
-      "description": "diagonal from top-right to bottom-left (a:lnBlToTr). Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient. Get returns sub-keys border.tr2bl.color, border.tr2bl.width, border.tr2bl.dash, and a summary border.tr2bl key.",
+      "description": "从右上到左下的对角线（a:lnBlToTr）。格式与 border.all 相同。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。Get 返回子键 border.tr2bl.color、border.tr2bl.width、border.tr2bl.dash，以及汇总键 border.tr2bl。",
       "add": true,
       "set": true,
       "get": true,

@@ -22,11 +22,11 @@ static partial class CommandBuilder
 
     private static Command BuildGotoCommand(Option<bool> jsonOption, string name = "goto")
     {
-        var fileArg = new Argument<FileInfo>("file") { Description = "Office document path (.docx)" };
-        var pathArg = new Argument<string>("path") { Description = "Element path to scroll to (e.g. /body/p[5], /body/table[1], /body/table[1]/tr[2]/tc[3])" };
+        var fileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.docx）" };
+        var pathArg = new Argument<string>("path") { Description = "要滚动到的元素路径（例如 /body/p[5]、/body/table[1]、/body/table[1]/tr[2]/tc[3]）" };
 
         var cmd = new Command(name,
-            "Scroll the running watch viewer(s) to the given element. Path resolves to an HTML anchor; broadcast to all SSE clients of the file. Word: paragraph, table, table row, table cell.");
+            "将运行中的 watch viewer 滚动到指定元素。路径会解析为 HTML anchor，并广播给该文件的全部 SSE client。Word 支持：paragraph、table、table row、table cell。");
         cmd.Add(fileArg);
         cmd.Add(pathArg);
         cmd.Add(jsonOption);

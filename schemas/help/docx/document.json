@@ -15,7 +15,7 @@
       "/"
     ]
   },
-  "note": "Root container. Get returns top-level children (body, styles, numbering, headers, footers, etc.). Set exposes core document properties (author/title/subject/keywords/description).",
+  "note": "Root container。Get 返回顶层 children（body、styles、numbering、headers、footers 等）。Set 可修改 core document properties（author/title/subject/keywords/description）。",
   "children": [
     {
       "element": "body",
@@ -98,7 +98,7 @@
     },
     "category": {
       "type": "string",
-      "description": "document category metadata. Emitted only when present.",
+      "description": "document 分类元数据。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -107,7 +107,7 @@
     },
     "revisionNumber": {
       "type": "string",
-      "description": "document save counter from docProps/core.xml (cp:revision). Distinct from tracked-change revisions — see `help docx revision`.",
+      "description": "来自 docProps/core.xml（cp:revision）的 document 保存计数器。不同于 tracked-change revision；参见 `help docx revision`。",
       "add": false,
       "set": false,
       "get": true,
@@ -116,7 +116,7 @@
     },
     "created": {
       "type": "string",
-      "description": "creation timestamp (ISO-8601). Emitted only when present.",
+      "description": "创建时间戳（ISO-8601）。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -125,7 +125,7 @@
     },
     "modified": {
       "type": "string",
-      "description": "last modification timestamp (ISO-8601). Emitted only when present.",
+      "description": "最后修改时间戳（ISO-8601）。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -141,7 +141,7 @@
         "trackedChanges",
         "forms"
       ],
-      "description": "document protection mode.",
+      "description": "document 保护模式。",
       "add": false,
       "set": false,
       "get": true,
@@ -150,7 +150,7 @@
     },
     "protectionEnforced": {
       "type": "bool",
-      "description": "whether document protection is enforced.",
+      "description": "是否强制启用 document 保护。",
       "add": false,
       "set": false,
       "get": true,
@@ -165,7 +165,7 @@
         "linesAndChars",
         "snapToChars"
       ],
-      "description": "document grid type.",
+      "description": "document grid 类型。",
       "add": false,
       "set": true,
       "get": true,
@@ -174,7 +174,7 @@
     },
     "docGrid.linePitch": {
       "type": "number",
-      "description": "document grid line pitch.",
+      "description": "document grid 行距。",
       "add": false,
       "set": true,
       "get": true,
@@ -183,7 +183,7 @@
     },
     "docGrid.charSpace": {
       "type": "number",
-      "description": "document grid char space.",
+      "description": "document grid 字符间距。",
       "add": false,
       "set": true,
       "get": true,
@@ -197,7 +197,7 @@
         "compressPunctuationAndJapaneseKana",
         "doNotCompress"
       ],
-      "description": "CJK character spacing control.",
+      "description": "CJK 字符间距控制。",
       "add": false,
       "set": true,
       "get": true,
@@ -206,7 +206,7 @@
     },
     "compatibility.mode": {
       "type": "string",
-      "description": "compatibility mode identifier.",
+      "description": "兼容模式标识符。",
       "add": false,
       "set": true,
       "get": true,
@@ -215,7 +215,7 @@
     },
     "docDefaults.font": {
       "type": "string",
-      "description": "default Latin font.",
+      "description": "默认 Latin 字体。",
       "aliases": [
         "defaultFont"
       ],
@@ -227,7 +227,7 @@
     },
     "docDefaults.font.eastAsia": {
       "type": "string",
-      "description": "default East Asian font slot.",
+      "description": "默认 East Asian 字体槽位。",
       "add": false,
       "set": true,
       "get": true,
@@ -236,7 +236,7 @@
     },
     "docDefaults.font.hAnsi": {
       "type": "string",
-      "description": "default hAnsi font slot.",
+      "description": "默认 hAnsi 字体槽位。",
       "add": false,
       "set": true,
       "get": true,
@@ -245,7 +245,7 @@
     },
     "docDefaults.font.complexScript": {
       "type": "string",
-      "description": "default complex-script font slot.",
+      "description": "默认 complex-script 字体槽位。",
       "add": false,
       "set": true,
       "get": true,
@@ -254,7 +254,7 @@
     },
     "docDefaults.fontSize": {
       "type": "font-size",
-      "description": "default font size.",
+      "description": "默认字体大小。",
       "add": false,
       "set": true,
       "get": true,
@@ -263,7 +263,7 @@
     },
     "docDefaults.color": {
       "type": "color",
-      "description": "default text color.",
+      "description": "默认文本颜色。",
       "add": false,
       "set": true,
       "get": true,
@@ -272,7 +272,7 @@
     },
     "docDefaults.bold": {
       "type": "bool",
-      "description": "default bold flag.",
+      "description": "默认粗体标记。",
       "add": false,
       "set": true,
       "get": true,
@@ -281,7 +281,7 @@
     },
     "docDefaults.italic": {
       "type": "bool",
-      "description": "default italic flag.",
+      "description": "默认斜体标记。",
       "add": false,
       "set": true,
       "get": true,
@@ -290,7 +290,7 @@
     },
     "docDefaults.rtl": {
       "type": "bool",
-      "description": "default right-to-left flag.",
+      "description": "默认从右到左标记。",
       "add": false,
       "set": true,
       "get": true,
@@ -299,7 +299,7 @@
     },
     "docDefaults.alignment": {
       "type": "string",
-      "description": "default paragraph alignment.",
+      "description": "默认段落对齐方式。",
       "add": false,
       "set": true,
       "get": true,
@@ -308,7 +308,7 @@
     },
     "docDefaults.spaceBefore": {
       "type": "string",
-      "description": "default paragraph space-before.",
+      "description": "默认段前间距。",
       "add": false,
       "set": true,
       "get": true,
@@ -317,7 +317,7 @@
     },
     "docDefaults.spaceAfter": {
       "type": "string",
-      "description": "default paragraph space-after.",
+      "description": "默认段后间距。",
       "add": false,
       "set": true,
       "get": true,
@@ -326,7 +326,7 @@
     },
     "docDefaults.lineSpacing": {
       "type": "string",
-      "description": "default paragraph line spacing.",
+      "description": "默认段落行距。",
       "add": false,
       "set": true,
       "get": true,
@@ -335,7 +335,7 @@
     },
     "autoSpaceDE": {
       "type": "bool",
-      "description": "auto-spacing between East Asian and Latin text.",
+      "description": "East Asian 与 Latin 文本之间的自动间距。",
       "add": false,
       "set": true,
       "get": false,
@@ -344,7 +344,7 @@
     },
     "autoSpaceDN": {
       "type": "bool",
-      "description": "auto-spacing between East Asian and numeric text.",
+      "description": "East Asian 与数字文本之间的自动间距。",
       "add": false,
       "set": true,
       "get": false,
@@ -353,7 +353,7 @@
     },
     "kinsoku": {
       "type": "bool",
-      "description": "Japanese kinsoku line breaking rules.",
+      "description": "日文禁则换行规则。",
       "add": false,
       "set": true,
       "get": false,
@@ -362,7 +362,7 @@
     },
     "overflowPunct": {
       "type": "bool",
-      "description": "allow punctuation to overflow margin.",
+      "description": "允许标点溢出页边距。",
       "add": false,
       "set": true,
       "get": false,
@@ -371,7 +371,7 @@
     },
     "embedFonts": {
       "type": "bool",
-      "description": "embed TrueType fonts.",
+      "description": "嵌入 TrueType 字体。",
       "add": false,
       "set": true,
       "get": false,
@@ -380,7 +380,7 @@
     },
     "embedSystemFonts": {
       "type": "bool",
-      "description": "embed system fonts.",
+      "description": "嵌入系统字体。",
       "add": false,
       "set": true,
       "get": false,
@@ -389,7 +389,7 @@
     },
     "saveSubsetFonts": {
       "type": "bool",
-      "description": "save font subsets.",
+      "description": "保存字体子集。",
       "add": false,
       "set": true,
       "get": false,
@@ -398,7 +398,7 @@
     },
     "mirrorMargins": {
       "type": "bool",
-      "description": "mirror margins for facing pages.",
+      "description": "为对页使用镜像页边距。",
       "add": false,
       "set": true,
       "get": false,
@@ -407,7 +407,7 @@
     },
     "gutterAtTop": {
       "type": "bool",
-      "description": "gutter at top.",
+      "description": "在顶部设置装订线。",
       "add": false,
       "set": true,
       "get": false,
@@ -416,7 +416,7 @@
     },
     "bookFoldPrinting": {
       "type": "bool",
-      "description": "book fold printing layout.",
+      "description": "书册折页打印布局。",
       "add": false,
       "set": true,
       "get": false,
@@ -425,7 +425,7 @@
     },
     "evenAndOddHeaders": {
       "type": "bool",
-      "description": "different headers for even/odd pages.",
+      "description": "为奇偶页使用不同的 header。",
       "add": false,
       "set": true,
       "get": true,
@@ -434,7 +434,7 @@
     },
     "updateFields": {
       "type": "bool",
-      "description": "write <w:updateFields w:val=\"true\"/> so Word recomputes every field (TOC / PAGE / NUMPAGES / SEQ / PAGEREF) on open instead of showing the stale write-time cache. Set on /settings or /.",
+      "description": "写入 <w:updateFields w:val=\"true\"/>，使 Word 在打开时重新计算每个 field（TOC / PAGE / NUMPAGES / SEQ / PAGEREF），而非显示写入时已过期的 cache。可在 /settings 或 / 上设置。",
       "aliases": ["updateFieldsOnOpen"],
       "add": false,
       "set": true,
@@ -445,7 +445,7 @@
     "recalcFields": {
       "type": "enum",
       "values": ["seq"],
-      "description": "compute and write cached field values officecli CAN evaluate without a layout engine — currently SEQ numbering (Figure/Table 1,2,3… counted in body document order, honouring \\n / \\c / \\r and arabic/roman/alphabetic formats). PAGE/PAGEREF/TOC page numbers need pagination — pair with updateFields=true to defer those to Word. Heading-relative SEQ (\\s) and SEQ outside the body are left for Word. Set on / .",
+      "description": "计算并写入 officecli 无需 layout engine 即可计算的 cached field 值——当前为 SEQ 编号（Figure/Table 1、2、3…，按 body document 顺序计数，并遵循 \\n / \\c / \\r 以及 arabic/roman/alphabetic 格式）。PAGE/PAGEREF/TOC 页码需要 pagination；请结合 updateFields=true 将其延后交给 Word 计算。相对于 heading 的 SEQ（\\s）及 body 外的 SEQ 仍交给 Word。可在 / 上设置。",
       "add": false,
       "set": true,
       "get": false,
@@ -454,7 +454,7 @@
     },
     "autoHyphenation": {
       "type": "bool",
-      "description": "enable automatic hyphenation (settings/autoHyphenation).",
+      "description": "启用自动连字符（settings/autoHyphenation）。",
       "add": false,
       "set": true,
       "get": true,
@@ -463,7 +463,7 @@
     },
     "trackRevisions": {
       "type": "bool",
-      "description": "document-level track-changes MODE toggle (settings/trackRevisions; Word: Review > Track Changes). Turns the document into tracked mode so edits made in a word processor become revisions. Distinct from the per-run/paragraph revision.type keys that author the tracked-change DATA itself. Set on /settings or /.",
+      "description": "document 级 track-changes MODE 开关（settings/trackRevisions；Word：Review > Track Changes）。开启后，word processor 中的编辑会成为 revision。不同于逐 run/paragraph 的 revision.type key，后者用于写入 tracked-change DATA 本身。可在 /settings 或 / 上设置。",
       "aliases": ["trackChanges"],
       "add": false,
       "set": true,
@@ -473,7 +473,7 @@
     },
     "defaultTabStop": {
       "type": "string",
-      "description": "default tab stop (e.g. \"720\" twips or \"0.5in\").",
+      "description": "默认 tab stop（例如 \"720\" twips 或 \"0.5in\"）。",
       "add": false,
       "set": true,
       "get": false,
@@ -486,7 +486,7 @@
     },
     "displayBackgroundShape": {
       "type": "bool",
-      "description": "display background shape.",
+      "description": "显示背景 shape。",
       "add": false,
       "set": true,
       "get": false,
@@ -495,7 +495,7 @@
     },
     "removePersonalInformation": {
       "type": "bool",
-      "description": "remove personal info on save.",
+      "description": "保存时删除个人信息。",
       "add": false,
       "set": true,
       "get": false,
@@ -504,7 +504,7 @@
     },
     "removeDateAndTime": {
       "type": "bool",
-      "description": "remove date/time on save.",
+      "description": "保存时删除日期和时间。",
       "add": false,
       "set": true,
       "get": false,
@@ -513,7 +513,7 @@
     },
     "printFormsData": {
       "type": "bool",
-      "description": "print only form data.",
+      "description": "仅打印 form data。",
       "add": false,
       "set": true,
       "get": false,
@@ -525,7 +525,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm (e.g. \"21cm\")",
       "examples": [
         "--prop pageWidth=21cm"
@@ -540,7 +540,7 @@
       "add": false,
       "set": true,
       "get": false,
-      "description": "dump→batch round-trip marker: forces the body's final section to emit a (possibly empty) <w:sectPr/> so an empty source sectPr is not dropped. Internal round-trip use; not an interactive edit.",
+      "description": "dump→batch 往返标记：强制 body 的最后一个 section 输出（可能为空的）<w:sectPr/>，避免空的源 sectPr 被丢弃。供内部往返使用，不是交互式编辑项。",
       "examples": [
         "--prop sectPr=present"
       ],
@@ -551,7 +551,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm (e.g. \"29.7cm\")",
       "examples": [
         "--prop pageHeight=29.7cm"
@@ -567,7 +567,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "orientation token",
       "examples": [
         "--prop orientation=landscape"
@@ -579,7 +579,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginTop=2.54cm"
@@ -591,7 +591,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginBottom=2.54cm"
@@ -603,7 +603,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginLeft=3.18cm"
@@ -615,7 +615,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginRight=3.18cm"
@@ -627,7 +627,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "header-from-top-edge distance (pgMar @header). Convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "header 到顶部边缘的距离（pgMar @header）。从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginHeader=1.5cm"
@@ -639,7 +639,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "footer-from-bottom-edge distance (pgMar @footer). Convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "footer 到底部边缘的距离（pgMar @footer）。从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginFooter=1.75cm"
@@ -651,7 +651,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "binding gutter width (pgMar @gutter). Convenience readback from sectPr; primary edit path is /section[N].",
+      "description": "装订线宽度（pgMar @gutter）。从 sectPr 读取的快捷结果；主要编辑路径为 /section[N]。",
       "readback": "length in cm",
       "examples": [
         "--prop marginGutter=0cm"
@@ -663,7 +663,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "from docProps/app.xml application identifier (e.g. \"Microsoft Word\").",
+      "description": "来自 docProps/app.xml 的 application 标识符（例如 \"Microsoft Word\"）。",
       "readback": "application string",
       "enforcement": "report"
     },
@@ -672,7 +672,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "settings.xml bookFoldPrintingSheets — sheets per booklet signature when book-fold printing.",
+      "description": "settings.xml 的 bookFoldPrintingSheets：书册折页打印时每个 booklet signature 的 sheet 数。",
       "readback": "integer sheets-per-signature",
       "enforcement": "report"
     },
@@ -681,7 +681,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "settings.xml bookFoldRevPrinting flag — true when book-fold printing reverses the page order.",
+      "description": "settings.xml 的 bookFoldRevPrinting 标记：书册折页打印反转页序时为 true。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -690,7 +690,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "settings.xml doNotDisplayPageBoundaries flag — Word view hides the page-boundary frame.",
+      "description": "settings.xml 的 doNotDisplayPageBoundaries 标记：Word view 隐藏 page-boundary frame。",
       "readback": "true when set",
       "enforcement": "report"
     },
@@ -699,7 +699,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "document-default columns equal-width flag (sectPr cols @equalWidth on the body sectPr).",
+      "description": "document 默认 column 的等宽标记（body sectPr 中 sectPr cols @equalWidth）。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -708,13 +708,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "document-default columns separator flag (sectPr cols @sep on the body sectPr).",
+      "description": "document 默认 column 的分隔线标记（body sectPr 中 sectPr cols @sep）。",
       "readback": "true|false",
       "enforcement": "report"
     },
     "locale": {
       "type": "string",
-      "description": "primary document locale derived from theme themeFontLang (e.g. 'en-US', 'zh-CN', 'ar-SA'). Read-only summary — change via run lang.* slots or theme themeFontLang.",
+      "description": "从 theme themeFontLang 推导的主 document locale（例如 'en-US'、'zh-CN'、'ar-SA'）。仅读摘要；请通过 run lang.* 槽位或 theme themeFontLang 修改。",
       "add": false,
       "set": false,
       "get": true,

@@ -14,35 +14,35 @@
   "paths": {
     "positional": ["/SheetName/A1:C10"]
   },
-  "note": "Read-only synthetic node. A header-row block heuristically detected in unstructured cells (not a real ListObject), surfaced as a Type=detectedtable node inside `query <table-selector>` / outline results and used to resolve row[ColumnName op value] predicates. Not independently addressable, creatable, or settable — to make it a real table use `add table`. stable=false because its boundaries can shift as cells change.",
+  "note": "只读 synthetic node。它是在非结构化 cell 中启发式检测出的 header-row block，不是真实 ListObject；会作为 Type=detectedtable node 出现在 query <table-selector> 或 outline 结果中，并用于解析 row[ColumnName op value] predicates。不能独立寻址、创建或 Set；要创建真实 table，请使用 add table。stable=false，因为 cell 变化时 block 边界可能变化。",
   "properties": {
     "source": {
       "type": "string",
-      "description": "always `header-sniff` — marks the node as a heuristically-detected block rather than a ListObject.",
+      "description": "始终为 `header-sniff`，表示此 node 是启发式检测出的 block，而不是 ListObject。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "stable": {
       "type": "bool",
-      "description": "always false — a detected block's boundaries may shift as surrounding cells change (a real ListObject has a fixed ref).",
+      "description": "始终为 false：周围单元格变化时，detected block 的边界可能移动（真实 ListObject 具有固定 ref）。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "ref": {
       "type": "string",
-      "description": "A1 range of the whole detected block including the header row.",
+      "description": "整个 detected block 的 A1 range，包括 header row。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "columns": {
       "type": "string",
-      "description": "comma-separated detected header names (used to resolve row[ColumnName op value] predicates).",
+      "description": "以逗号分隔的 detected header names（用于解析 row[ColumnName op value] predicates）。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "dataRange": {
       "type": "string",
-      "description": "A1 range of the data body only (header row excluded).",
+      "description": "仅 data body 的 A1 range（不包含 header row）。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     }

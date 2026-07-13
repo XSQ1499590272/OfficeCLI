@@ -11,16 +11,16 @@ static partial class CommandBuilder
 {
     private static Command BuildRawCommand(Option<bool> jsonOption)
     {
-        var rawFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var rawPathArg = new Argument<string>("part") { Description = "Part path (e.g. /document, /styles, /header[1])" };
+        var rawFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var rawPathArg = new Argument<string>("part") { Description = "Part 路径（例如 /document、/styles、/header[1]）" };
         rawPathArg.DefaultValueFactory = _ => "/document";
 
-        var rawStartOpt = new Option<int?>("--start") { Description = "Start row number (Excel sheets only)" };
-        var rawEndOpt = new Option<int?>("--end") { Description = "End row number (Excel sheets only)" };
+        var rawStartOpt = new Option<int?>("--start") { Description = "起始行号（仅 Excel sheet）" };
+        var rawEndOpt = new Option<int?>("--end") { Description = "结束行号（仅 Excel sheet）" };
 
-        var rawColsOpt = new Option<string?>("--cols") { Description = "Column filter, comma-separated (Excel only, e.g. A,B,C)" };
+        var rawColsOpt = new Option<string?>("--cols") { Description = "列过滤器，使用逗号分隔（仅 Excel，例如 A,B,C）" };
 
-        var rawCommand = new Command("raw", "View raw XML of a document part");
+        var rawCommand = new Command("raw", "查看文档 part 的原始 XML");
         rawCommand.Add(rawFileArg);
         rawCommand.Add(rawPathArg);
         rawCommand.Add(rawStartOpt);
@@ -59,13 +59,13 @@ static partial class CommandBuilder
 
     private static Command BuildRawSetCommand(Option<bool> jsonOption)
     {
-        var rawSetFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var rawSetPartArg = new Argument<string>("part") { Description = "Part path (e.g. /document, /styles, /Sheet1, /slide[1])" };
-        var rawSetXpathOpt = new Option<string>("--xpath") { Description = "XPath to target element(s)", Required = true };
-        var rawSetActionOpt = new Option<string>("--action") { Description = "Action: append, prepend, insertbefore, insertafter, replace, remove, setattr", Required = true };
-        var rawSetXmlOpt = new Option<string?>("--xml") { Description = "XML fragment or attr=value for setattr" };
+        var rawSetFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var rawSetPartArg = new Argument<string>("part") { Description = "Part 路径（例如 /document、/styles、/Sheet1、/slide[1]）" };
+        var rawSetXpathOpt = new Option<string>("--xpath") { Description = "目标元素的 XPath", Required = true };
+        var rawSetActionOpt = new Option<string>("--action") { Description = "操作：append、prepend、insertbefore、insertafter、replace、remove、setattr", Required = true };
+        var rawSetXmlOpt = new Option<string?>("--xml") { Description = "XML fragment，或供 setattr 使用的 attr=value" };
 
-        var rawSetCommand = new Command("raw-set", "Modify raw XML in a document part (universal fallback for any OpenXML operation)");
+        var rawSetCommand = new Command("raw-set", "修改文档 part 的原始 XML（适用于任意 OpenXML 操作的通用回退）");
         rawSetCommand.Add(rawSetFileArg);
         rawSetCommand.Add(rawSetPartArg);
         rawSetCommand.Add(rawSetXpathOpt);
@@ -110,10 +110,10 @@ static partial class CommandBuilder
 
     private static Command BuildAddPartCommand(Option<bool> jsonOption)
     {
-        var addPartFileArg = new Argument<string>("file") { Description = "Document file path" };
-        var addPartParentArg = new Argument<string>("parent") { Description = "Parent part path (e.g. / for document root, /Sheet1 for Excel sheet, /slide[0] for PPT slide)" };
-        var addPartTypeOpt = new Option<string>("--type") { Description = "Part type to create. Word: chart, header, footer. PPT/Excel: chart", Required = true };
-        var addPartCommand = new Command("add-part", "Create a new document part and return its relationship ID for use with raw-set");
+        var addPartFileArg = new Argument<string>("file") { Description = "文档文件路径" };
+        var addPartParentArg = new Argument<string>("parent") { Description = "父 part 路径（例如文档根为 /、Excel sheet 为 /Sheet1、PPT slide 为 /slide[0]）" };
+        var addPartTypeOpt = new Option<string>("--type") { Description = "要创建的 part 类型。Word：chart、header、footer；PPT/Excel：chart", Required = true };
+        var addPartCommand = new Command("add-part", "创建新的文档 part，并返回供 raw-set 使用的 relationship ID");
         addPartCommand.Add(addPartFileArg);
         addPartCommand.Add(addPartParentArg);
         addPartCommand.Add(addPartTypeOpt);

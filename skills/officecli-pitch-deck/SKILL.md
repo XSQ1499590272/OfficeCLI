@@ -1,6 +1,6 @@
 ---
 name: officecli-pitch-deck
-description: "Use this skill when the user is building a fundraising / investor pitch deck — seed, Series A / B / C, convertible note, SAFE round, strategic raise. Trigger on: 'pitch deck', 'investor deck', 'Series A deck', 'Series B deck', 'Series C deck', 'fundraising deck', 'seed pitch', 'VC deck', 'raising capital', 'term sheet presentation'. Output is a single .pptx. This skill is a scene layer on top of officecli-pptx — inherits every pptx v2 rule (visual floor, grid, palettes, connector canon, Delivery Gate). DO NOT invoke for a generic board review, sales deck, all-hands, or product launch — route those to officecli-pptx base."
+description: "当用户要创建融资或投资人 pitch deck 时使用此 Skill，包括 seed、Series A / B / C、convertible note、SAFE round 和 strategic raise。触发词包括：'pitch deck'、'investor deck'、'Series A deck'、'Series B deck'、'Series C deck'、'fundraising deck'、'seed pitch'、'VC deck'、'raising capital'、'term sheet presentation'。输出为单个 .pptx。此 Skill 是 officecli-pptx 之上的 scene layer，继承 pptx v2 的规则；通用 board review、sales deck、all-hands 或 product launch 不应触发，应转到基础 officecli-pptx。"
 ---
 
 # OfficeCLI Pitch Deck Skill
@@ -8,15 +8,6 @@ description: "Use this skill when the user is building a fundraising / investor 
 **This skill is a scene layer on top of `officecli-pptx`.** Every pptx hard rule — visual delivery floor (title ≥ 36pt / body ≥ 18pt / title ≥ 2× body), 12-column grid on 33.87×19.05cm, 4 canonical palettes, chart-choice decision table, connector canon (`shape` / `from` / `to` / `tailEnd=triangle`), shell escape, resident + batch, Delivery Gate 1–5a — is inherited, not re-taught. This file adds only what **fundraising** needs on top: stage diagnosis (A / B / C), 5 赛道 arc templates, 10 key-slide recipes (cover / problem / solution / market / product / model / traction / team / financials / ask), pitch-specific numbers convention, a VC ship-check, and a pitch-specific fresh-eyes Gate 6.
 
 When the pptx base rules cover it, the text here says `→ see pptx v2 §X`. Read `skills/officecli-pptx/SKILL.md` first if you have not.
-
-## Setup
-
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
 
 ## ⚠️ Help-First Rule
 

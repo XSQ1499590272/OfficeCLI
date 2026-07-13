@@ -20,16 +20,16 @@ static partial class CommandBuilder
 
     private static Command BuildMarkCommand(Option<bool> jsonOption, string name = "mark")
     {
-        var fileArg = new Argument<FileInfo>("file") { Description = "Office document path (.pptx, .xlsx, .docx)" };
-        var pathArg = new Argument<string>("path") { Description = "DOM path to the element to mark. The 'selected' pseudo-path still works but is discouraged: prefer `get selected` first, then `mark <path>` per path, so the target lives in the command line." };
+        var fileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.pptx、.xlsx、.docx）" };
+        var pathArg = new Argument<string>("path") { Description = "要标记元素的 DOM 路径。'selected' pseudo-path 仍可使用但不建议：请先用 `get selected` 获取路径，再逐个使用 `mark <path>`，使目标存在于命令行中。" };
         var propsOpt = new Option<string[]>("--prop")
         {
-            Description = "Mark property: find=..., color=..., note=..., tofix=..., regex=true",
+            Description = "Mark 属性：find=...、color=...、note=...、tofix=...、regex=true",
             AllowMultipleArgumentsPerToken = true,
         };
 
         var cmd = new Command(name,
-            "Attach an in-memory advisory mark to a document element via the watch process. Path must be in data-path format (e.g. /body/p[1]); 'selected' marks all selected elements.");
+            "通过 watch process 为文档元素附加内存 advisory mark。路径必须是 data-path 格式（例如 /body/p[1]）；'selected' 会标记全部选中的元素。");
         cmd.Add(fileArg);
         cmd.Add(pathArg);
         cmd.Add(propsOpt);
@@ -239,12 +239,12 @@ static partial class CommandBuilder
 
     private static Command BuildUnmarkMarkCommand(Option<bool> jsonOption, string name = "unmark")
     {
-        var fileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
-        var pathOpt = new Option<string?>("--path") { Description = "Element path to unmark" };
-        var allOpt = new Option<bool>("--all") { Description = "Remove all marks for this file" };
+        var fileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
+        var pathOpt = new Option<string?>("--path") { Description = "要取消标记的元素路径" };
+        var allOpt = new Option<bool>("--all") { Description = "删除该文件的全部 mark" };
 
         var cmd = new Command(name,
-            "Remove marks from the watch process. Specify --path <data-path> or --all.");
+            "从 watch process 删除 mark。指定 --path <data-path> 或 --all。");
         cmd.Add(fileArg);
         cmd.Add(pathOpt);
         cmd.Add(allOpt);
@@ -295,10 +295,10 @@ static partial class CommandBuilder
 
     private static Command BuildGetMarksCommand(Option<bool> jsonOption, string name = "get-marks")
     {
-        var fileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
+        var fileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
 
         var cmd = new Command(name,
-            "List all marks currently held by the watch process.");
+            "列出 watch process 当前持有的全部 mark。");
         cmd.Add(fileArg);
         cmd.Add(jsonOption);
 

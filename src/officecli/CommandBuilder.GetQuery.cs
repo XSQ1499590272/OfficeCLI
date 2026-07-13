@@ -11,14 +11,14 @@ static partial class CommandBuilder
 {
     private static Command BuildGetCommand(Option<bool> jsonOption)
     {
-        var getFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var pathArg = new Argument<string>("path") { Description = "DOM path (e.g. /body/p[1]) or 'selected' to read the current watch selection" };
+        var getFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var pathArg = new Argument<string>("path") { Description = "DOM 路径（例如 /body/p[1]），或使用 'selected' 读取当前 watch 选择" };
         pathArg.DefaultValueFactory = _ => "/";
-        var depthOpt = new Option<int>("--depth") { Description = "Depth of child nodes to include" };
+        var depthOpt = new Option<int>("--depth") { Description = "要包含的子节点深度" };
         depthOpt.DefaultValueFactory = _ => 1;
-        var saveOpt = new Option<string?>("--save") { Description = "Extract the backing binary payload (picture/ole/media) to this file path" };
+        var saveOpt = new Option<string?>("--save") { Description = "将底层二进制 payload（picture/ole/media）提取到此文件路径" };
 
-        var getCommand = new Command("get", "Get a document node by path");
+        var getCommand = new Command("get", "按路径获取文档节点");
         getCommand.Add(getFileArg);
         getCommand.Add(pathArg);
         getCommand.Add(depthOpt);
@@ -167,12 +167,12 @@ static partial class CommandBuilder
 
     private static Command BuildQueryCommand(Option<bool> jsonOption)
     {
-        var queryFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var selectorArg = new Argument<string>("selector") { Description = "CSS-like selector (e.g. paragraph[style=Normal] > run[font!=Arial])" };
+        var queryFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var selectorArg = new Argument<string>("selector") { Description = "CSS 风格 selector（例如 paragraph[style=Normal] > run[font!=Arial]）" };
 
-        var queryFindOpt = new Option<string?>("--find") { Description = "Filter results to elements containing this text (case-insensitive substring)" };
+        var queryFindOpt = new Option<string?>("--find") { Description = "将结果过滤为包含此文本的元素（不区分大小写的子串）" };
 
-        var queryCommand = new Command("query", "Query document elements with CSS-like selectors");
+        var queryCommand = new Command("query", "使用 CSS 风格 selector 查询文档元素");
         queryCommand.Add(queryFileArg);
         queryCommand.Add(selectorArg);
         queryCommand.Add(jsonOption);

@@ -15,11 +15,11 @@
   "paths": {
     "positional": ["/numbering/abstractNum[@id=N]/level[L]"]
   },
-  "note": "Single <w:lvl> under an <w:abstractNum>. L is the level index (w:ilvl, 0..8). 'add abstractNum' pre-populates 9 default levels (lvl%3 cycle); adding another --type level with the same ilvl replaces it in place. Aliases lvl / level. Top-level abstractNum.* properties also accept level0.* dotted forms for level-0 customization at creation time — this element is for adjusting levels 1..8 or replacing levels post-Add.",
+  "note": "单个 <w:lvl>，位于 <w:abstractNum> 下。L 是 level index（w:ilvl，0..8）。'add abstractNum' 会预填 9 个默认 level（lvl%3 cycle）；使用相同 ilvl 再 Add 一个 --type level 会原位替换。Aliases：lvl、level。顶层 abstractNum.* props 也支持 level0.* 点号形式，用于创建时定制 level 0；此 element 用于调整 level 1..8 或在 Add 后替换 level。",
   "properties": {
     "ilvl": {
       "type": "int",
-      "description": "level index 0..8 (w:ilvl). Required on Add.",
+      "description": "level 索引 0..8（w:ilvl）。Add 时必填。",
       "add": true,
       "set": false,
       "get": true,
@@ -29,7 +29,7 @@
     },
     "format": {
       "type": "string",
-      "description": "numFmt for this level. Common values: decimal, decimalZero, upperRoman, lowerRoman, upperLetter, lowerLetter, ordinal, cardinalText, ordinalText, bullet, chineseCounting, chineseLegalSimplified, japaneseCounting, koreanCounting, hex. Default decimal.",
+      "description": "当前 level 的 numFmt。常用值：decimal、decimalZero、upperRoman、lowerRoman、upperLetter、lowerLetter、ordinal、cardinalText、ordinalText、bullet、chineseCounting、chineseLegalSimplified、japaneseCounting、koreanCounting、hex。默认 decimal。",
       "aliases": ["fmt", "numFmt"],
       "add": true,
       "set": true,
@@ -57,7 +57,7 @@
     },
     "start": {
       "type": "int",
-      "description": "starting number. Default 1.",
+      "description": "起始编号。默认 1。",
       "add": true,
       "set": true,
       "get": true,
@@ -67,7 +67,7 @@
     },
     "indent": {
       "type": "int",
-      "description": "left indent in twips (pPr/ind/left). On Add, default (ilvl+1)*720.",
+      "description": "左缩进，单位为 twips（pPr/ind/left）。Add 时默认 (ilvl+1)*720。",
       "add": true,
       "set": true,
       "get": true,
@@ -77,7 +77,7 @@
     },
     "hanging": {
       "type": "int",
-      "description": "hanging indent in twips (pPr/ind/hanging). Default 360.",
+      "description": "悬挂缩进，单位为 twips（pPr/ind/hanging）。默认 360。",
       "add": true,
       "set": true,
       "get": true,
@@ -89,7 +89,7 @@
       "type": "enum",
       "values": ["left", "center", "right"],
       "aliases": ["jc"],
-      "description": "lvlJc — marker alignment within the indent area. Default left.",
+      "description": "lvlJc：marker 在缩进区域内的对齐方式。默认 left。",
       "add": true,
       "set": true,
       "get": true,
@@ -100,7 +100,7 @@
     "suff": {
       "type": "enum",
       "values": ["tab", "space", "nothing"],
-      "description": "separator between the marker and the text content. Default tab.",
+      "description": "marker 与文本内容之间的分隔内容。默认 tab。",
       "add": true,
       "set": true,
       "get": false,
@@ -110,7 +110,7 @@
     },
     "lvlRestart": {
       "type": "int",
-      "description": "w:lvlRestart — level at which to restart this counter (0 = never restart).",
+      "description": "w:lvlRestart：重新开始当前计数器的 level（0 = 永不重启）。",
       "add": true,
       "set": true,
       "get": false,
@@ -120,7 +120,7 @@
     },
     "isLgl": {
       "type": "bool",
-      "description": "w:isLgl — render this level's counter as decimal regardless of numFmt (legal-style numbering).",
+      "description": "w:isLgl：无论 numFmt 为何，均将当前 level 的计数器渲染为 decimal（legal-style numbering）。",
       "add": true,
       "set": true,
       "get": false,
@@ -132,7 +132,7 @@
       "type": "enum",
       "values": ["rtl", "ltr"],
       "aliases": ["dir", "bidi"],
-      "description": "right-to-left direction on the level's pPr. Only 'rtl' writes <w:bidi/>; 'ltr' is the canonical clear.",
+      "description": "level pPr 的 right-to-left 方向。仅 'rtl' 写入 <w:bidi/>；'ltr' 为规范的清除值。",
       "add": true,
       "set": false,
       "get": false,
@@ -142,7 +142,7 @@
     },
     "font": {
       "type": "string",
-      "description": "marker font (rPr/rFonts). Useful for bullet glyphs that need Symbol or Wingdings.",
+      "description": "marker font（rPr/rFonts）。适用于需要 Symbol 或 Wingdings 的 bullet glyph。",
       "add": true,
       "set": true,
       "get": false,
@@ -152,7 +152,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "marker font size (rPr/sz). Bare number = pt.",
+      "description": "marker font size（rPr/sz）。裸数字按 pt 处理。",
       "add": true,
       "set": true,
       "get": false,
@@ -162,7 +162,7 @@
     },
     "color": {
       "type": "color",
-      "description": "marker color (rPr/color).",
+      "description": "marker 的颜色（rPr/color）。",
       "add": true,
       "set": true,
       "get": false,
@@ -172,7 +172,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "bold marker (rPr/b).",
+      "description": "marker 的 bold 设置（rPr/b）。",
       "add": true,
       "set": true,
       "get": false,
@@ -182,7 +182,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "italic marker (rPr/i).",
+      "description": "marker 的 italic 设置（rPr/i）。",
       "add": true,
       "set": true,
       "get": false,

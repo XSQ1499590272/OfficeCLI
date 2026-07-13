@@ -15,7 +15,7 @@
       "/body/p[N]/chart[M]"
     ]
   },
-  "note": "Embedded as inline DrawingML chart (c:chart) or extended chart (cx:chart) depending on chartType. Data via inline spec or per-series props. Mirrors pptx/chart surface. Axis configuration: chart-level axis* props (axismin, axismax, axistitle, axisfont, ...) are Add-time only; for post-creation axis Set/Get use the chart-axis element.",
+  "note": "根据 chartType，chart 会以内嵌 DrawingML chart（c:chart）或 extended chart（cx:chart）形式嵌入。数据可通过 inline spec 或 per-series props 提供。此处 surface 与 pptx/chart 对应。chart-level axis* props（axismin、axismax、axistitle、axisfont 等）仅在 Add 时使用；创建后要操作 axis，请使用 chart-axis element。",
   "extends": [
     "_shared/chart",
     "_shared/chart.docx-pptx",
@@ -27,7 +27,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "value-axis display units token readback (e.g. thousands, millions). Surfaces on the chart node when emitted by the value axis.",
+      "description": "value-axis display units token 的读回值（例如 thousands、millions）。由 value axis 输出时，会出现在 chart node 上。",
       "readback": "display unit token",
       "enforcement": "report",
       "aliases": [

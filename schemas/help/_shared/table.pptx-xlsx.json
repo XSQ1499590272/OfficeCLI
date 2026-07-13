@@ -4,7 +4,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "NonVisualDrawingProperties Name (used for stable @name addressing).",
+      "description": "NonVisualDrawingProperties Name（用于稳定的 @name 寻址）。",
       "add": true,
       "set": true,
       "get": true,

@@ -14,19 +14,19 @@ static partial class CommandBuilder
 {
     public static RootCommand BuildRootCommand()
     {
-        var jsonOption = new Option<bool>("--json") { Description = "Output as JSON (AI-friendly)" };
+        var jsonOption = new Option<bool>("--json") { Description = "以 JSON 输出（适合 AI）" };
 
         var rootCommand = new RootCommand("""
-            officecli: AI-friendly CLI for Office documents (.docx, .xlsx, .pptx)
+            officecli：面向 AI 的 Office 文档 CLI（.docx、.xlsx、.pptx）
 
-            Run 'officecli help' for the schema-driven capability reference (formats, elements, properties).
-            See the Commands section below for the full list of subcommands.
+            运行 'officecli help' 查看 schema 驱动的能力参考（格式、元素、属性）。
+            完整子命令列表见下方 Commands 区域。
             """);
         rootCommand.Add(jsonOption);
 
         // ==================== open command (start resident) ====================
-        var openFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var openCommand = new Command("open", "Start a resident process to keep the document in memory for faster subsequent commands");
+        var openFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var openCommand = new Command("open", "启动 resident process，将文档保留在内存中以加快后续命令");
         openCommand.Add(openFileArg);
         openCommand.Add(jsonOption);
 
@@ -67,8 +67,8 @@ static partial class CommandBuilder
         rootCommand.Add(openCommand);
 
         // ==================== close command (stop resident) ====================
-        var closeFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var closeCommand = new Command("close", "Flush in-memory changes to disk and stop the resident (releases the file). Use 'save' instead to flush but keep the resident warm. Either is needed before a non-officecli program reads the file; a live resident also auto-flushes shortly after going idle (adaptive 2-10s; see OFFICECLI_RESIDENT_FLUSH: each|auto|<seconds>|off).");
+        var closeFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var closeCommand = new Command("close", "将内存修改写入磁盘并停止 resident（释放文件）。如只需写入且保持 resident 温热，请用 save。非 officecli 程序读取文件前需执行其中之一；运行中的 resident 空闲后也会自动写入（自适应 2–10 秒；参见 OFFICECLI_RESIDENT_FLUSH: each|auto|<seconds>|off）。");
         closeCommand.Add(closeFileArg);
         closeCommand.Add(jsonOption);
 
@@ -115,8 +115,8 @@ static partial class CommandBuilder
         rootCommand.Add(closeCommand);
 
         // ==================== __resident-serve__ (internal, hidden) ====================
-        var serveFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var serveCommand = new Command("__resident-serve__", "Internal: run resident server (do not call directly)");
+        var serveFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var serveCommand = new Command("__resident-serve__", "内部命令：运行 resident server（请勿直接调用）");
         serveCommand.Hidden = true;
         serveCommand.Add(serveFileArg);
 
@@ -159,14 +159,25 @@ static partial class CommandBuilder
         rootCommand.Add(BuildImportCommand(jsonOption));
         rootCommand.Add(BuildCreateCommand(jsonOption));
         rootCommand.Add(BuildMergeCommand(jsonOption));
-        rootCommand.Add(BuildPluginsCommand(jsonOption));
-
         foreach (var stub in BuildIntegrationStubCommands())
             rootCommand.Add(stub);
 
         rootCommand.Add(BuildHelpCommand(jsonOption, rootCommand));
 
+        LocalizeDefaultHelpOptions(rootCommand);
         return rootCommand;
+    }
+
+    private static void LocalizeDefaultHelpOptions(Command command)
+    {
+        foreach (var option in command.Options)
+        {
+            if (option is System.CommandLine.Help.HelpOption)
+                option.Description = "显示帮助和用法信息";
+        }
+
+        foreach (var subcommand in command.Subcommands)
+            LocalizeDefaultHelpOptions(subcommand);
     }
 
     // ==================== Helper: fork a __resident-serve__ subprocess ====================
@@ -411,44 +422,14 @@ static partial class CommandBuilder
 
     internal static int SafeRun(Func<int> action, bool json = false)
     {
-        if (!OfficeCli.Core.CliLogger.Enabled)
-        {
-            try
-            {
-                return action();
-            }
-            catch (Exception ex)
-            {
-                WriteError(ex, json);
-                return 1;
-            }
-        }
-
-        // Logging enabled: capture stdout/stderr
-        var stdoutWriter = new StringWriter();
-        var stderrWriter = new StringWriter();
-        var origOut = Console.Out;
-        var origErr = Console.Error;
-        Console.SetOut(new TeeWriter(origOut, stdoutWriter));
-        Console.SetError(new TeeWriter(origErr, stderrWriter));
         try
         {
-            var code = action();
-            var stdout = stdoutWriter.ToString().TrimEnd('\r', '\n');
-            OfficeCli.Core.CliLogger.LogOutput(stdout);
-            return code;
+            return action();
         }
         catch (Exception ex)
         {
             WriteError(ex, json);
-            var stderr = stderrWriter.ToString().TrimEnd('\r', '\n');
-            OfficeCli.Core.CliLogger.LogError(stderr);
             return 1;
-        }
-        finally
-        {
-            Console.SetOut(origOut);
-            Console.SetError(origErr);
         }
     }
 
@@ -1620,18 +1601,4 @@ static partial class CommandBuilder
         WatchNotifier.NotifyIfWatching(filePath, new WatchMessage { Action = "full", FullHtml = ppt.ViewAsHtml() });
     }
 
-    /// <summary>
-    /// TextWriter that writes to two targets simultaneously (tee pattern).
-    /// </summary>
-    private class TeeWriter : TextWriter
-    {
-        private readonly TextWriter _a;
-        private readonly TextWriter _b;
-        public TeeWriter(TextWriter a, TextWriter b) { _a = a; _b = b; }
-        public override Encoding Encoding => _a.Encoding;
-        public override void Write(char value) { _a.Write(value); _b.Write(value); }
-        public override void Write(string? value) { _a.Write(value); _b.Write(value); }
-        public override void WriteLine(string? value) { _a.WriteLine(value); _b.WriteLine(value); }
-        public override void Flush() { _a.Flush(); _b.Flush(); }
-    }
 }

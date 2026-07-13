@@ -16,7 +16,7 @@
       "/SheetName/ole[N]"
     ]
   },
-  "note": "Aliases: oleobject, object, embed. Binary package + preview image. Anchor accepts cell range (B2:F7) or x/y/width/height in cell units.",
+  "note": "Aliases：oleobject、object、embed。包含 binary package 和 preview image。Anchor 可使用 cell range（B2:F7），也可使用 cell units 的 x/y/width/height。",
   "extends": [
     "_shared/ole",
     "_shared/ole.pptx-xlsx"
@@ -41,7 +41,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "VML shape id of the OLE container (xlsx legacy drawing).",
+      "description": "OLE container 的 VML shape id（xlsx legacy drawing）。",
       "readback": "integer shape id",
       "enforcement": "report"
     }

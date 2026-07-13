@@ -16,7 +16,7 @@
       "/slide[N]/comment[M]"
     ]
   },
-  "note": "Comments live in CommentsPart with an author list. Anchored at x/y EMU on the slide.",
+  "note": "Comment 保存在带 author list 的 CommentsPart 中，使用 slide 上的 x/y EMU 作为锚点。",
   "extends": [
     "_shared/comment",
     "_shared/comment.docx-pptx"
@@ -24,7 +24,7 @@
   "properties": {
     "index": {
       "type": "int",
-      "description": "Per-author monotonic index, assigned by the engine.",
+      "description": "按 author 递增的 index，由 engine 分配。",
       "add": false,
       "set": false,
       "get": true,
@@ -59,7 +59,7 @@
         "dir",
         "rtl"
       ],
-      "description": "Reading direction for the comment text. rtl prepends U+200F (RIGHT-TO-LEFT MARK) so Arabic / Hebrew comments render with proper bidi context. p:cm has no native rtl attribute, so this is the standard pure-text convention.",
+      "description": "comment 文本的文字方向。rtl 会在开头添加 U+200F（RIGHT-TO-LEFT MARK），使 Arabic / Hebrew comment 在正确的 bidi context 中渲染。p:cm 没有原生 rtl attribute，因此采用此标准的纯文本约定。",
       "add": true,
       "set": false,
       "get": false,

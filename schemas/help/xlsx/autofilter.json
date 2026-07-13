@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName/autofilter"]
   },
-  "note": "A sheet has at most one AutoFilter. Per-column criteria via 'criteriaN.OP=VAL' props where N is the 0-based column offset from the filter range and OP ∈ {equals, notEquals, contains, doesNotContain, beginsWith, endsWith, gt, gte, lt, lte, between, notBetween, top, topPercent, bottom, bottomPercent, blanks, nonBlanks, values, dynamic}. Canonical key matches sheet.autoFilter alias.",
+  "note": "每个 sheet 最多有一个 AutoFilter。按列设置 criteriaN.OP=VAL props，其中 N 是相对于 filter range 的 0-based column offset，OP ∈ {equals、notEquals、contains、doesNotContain、beginsWith、endsWith、gt、gte、lt、lte、between、notBetween、top、topPercent、bottom、bottomPercent、blanks、nonBlanks、values、dynamic}。canonical key 与 sheet.autoFilter alias 相同。",
   "properties": {
     "range": {
       "type": "string",
-      "description": "cell range the filter applies to. Required.",
+      "description": "筛选器适用的 cell range。必填。",
       "aliases": ["ref"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop range=A1:F100"],
@@ -26,7 +26,7 @@
     },
     "criteria0": {
       "type": "string",
-      "description": "column 0 filter criterion. Use dotted key: --prop criteria0.OP=VAL. OP ∈ equals/notEquals/contains/doesNotContain/beginsWith/endsWith/gt/gte/lt/lte/between/notBetween/top/topPercent/bottom/bottomPercent/blanks/nonBlanks/values/dynamic. Use criteria1, criteria2, … for additional columns. Add-time only — Set on /sheet/autofilter currently accepts only `range`, and Get does not surface stored criteria back today.",
+      "description": "第 0 列的筛选条件。使用带点的 key：--prop criteria0.OP=VAL。OP ∈ equals/notEquals/contains/doesNotContain/beginsWith/endsWith/gt/gte/lt/lte/between/notBetween/top/topPercent/bottom/bottomPercent/blanks/nonBlanks/values/dynamic。其他列使用 criteria1、criteria2、… 。仅支持 Add；当前对 /sheet/autofilter 执行 Set 时只接受 `range`，Get 也不会返回已保存的 criteria。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop criteria0.equals=Red", "--prop criteria2.gt=100"],
       "readback": "criterion spec",

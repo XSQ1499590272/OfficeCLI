@@ -16,7 +16,7 @@
       "/slide[N]/picture[M]"
     ]
   },
-  "note": "Aliases: image, img. 'src' (alias 'path') required. Source resolved by ImageSource — file path, URL, data-URI, raw bytes.",
+  "note": "Aliases：image、img。'src' 必填（alias：'path'）。source 由 ImageSource 解析，接受 file path、URL、data-URI、raw bytes。",
   "extends": [
     "_shared/picture",
     "_shared/picture.docx-pptx",
@@ -25,7 +25,7 @@
   "properties": {
     "id": {
       "type": "number",
-      "description": "cNvPr picture id; @id in /picture[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr picture id，即 /picture[@id=ID] 中的 @id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "add": true,
       "set": false,
       "get": true,
@@ -34,7 +34,7 @@
     },
     "mediaType": {
       "type": "string",
-      "description": "logical media kind derived from VideoFromFile / AudioFromFile presence under the picture. One of `picture`, `video`, `audio`. Surfaces only via the `image`/`video`/`audio`/`media` selectors.",
+      "description": "根据 picture 下是否存在 VideoFromFile / AudioFromFile 推导的逻辑 media 类型。可为 picture、video、audio。仅通过 image/video/audio/media selector 返回。",
       "add": false,
       "set": false,
       "get": true,
@@ -43,7 +43,7 @@
     },
     "x": {
       "type": "length",
-      "description": "x offset in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "x 偏移量，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "add": true,
       "set": true,
       "get": true,
@@ -56,7 +56,7 @@
     },
     "y": {
       "type": "length",
-      "description": "y offset in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "y 偏移量，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "add": true,
       "set": true,
       "get": true,
@@ -69,7 +69,7 @@
     },
     "width": {
       "type": "length",
-      "description": "width — EMU/length form (e.g. 1.5cm). Required if not inferred from native ratio.",
+      "description": "宽度，使用 EMU/长度格式（如 1.5cm）。若不能从 native ratio 推导则必须提供。",
       "add": true,
       "set": true,
       "get": true,
@@ -82,7 +82,7 @@
     },
     "height": {
       "type": "length",
-      "description": "height — EMU/length form (e.g. 1.5cm). Required if not inferred from native ratio.",
+      "description": "高度，使用 EMU/长度格式（如 1.5cm）。若不能从 native ratio 推导则必须提供。",
       "add": true,
       "set": true,
       "get": true,
@@ -95,7 +95,7 @@
     },
     "rotation": {
       "type": "number",
-      "description": "clockwise rotation in degrees. Mirrors shape/connector/group rotation — stored on the same a:xfrm rot attribute (degrees * 60000). Alias: rotate.",
+      "description": "顺时针旋转角度。与 shape/connector/group 的 rotation 一致，存储在相同的 a:xfrm rot 属性（degrees * 60000）。别名：rotate。",
       "add": true,
       "set": true,
       "get": true,
@@ -109,7 +109,7 @@
     },
     "flipH": {
       "type": "boolean",
-      "description": "mirror the picture horizontally (left-right). Mirrors shape/connector flip — stored on the same a:xfrm @flipH attribute. Pass false to clear.",
+      "description": "左右镜像图片。与 shape/connector 的 flip 一致，存储在相同的 a:xfrm @flipH 属性。传入 false 清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -122,7 +122,7 @@
     },
     "flipV": {
       "type": "boolean",
-      "description": "mirror the picture vertically (top-bottom). Mirrors shape/connector flip — stored on the same a:xfrm @flipV attribute. Pass false to clear.",
+      "description": "上下镜像图片。与 shape/connector 的 flip 一致，存储在相同的 a:xfrm @flipV 属性。传入 false 清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -135,7 +135,7 @@
     },
     "link": {
       "type": "string",
-      "description": "click-hyperlink target attached to the picture's cNvPr (so the whole image is clickable). Accepts absolute URI (https://, mailto:), slide[N] for in-deck jumps, or named actions (firstslide, lastslide, nextslide, previousslide). Pass 'none' or empty to clear.",
+      "description": "附加到 picture cNvPr 的 click-hyperlink 目标（使整张图片可点击）。支持 absolute URI（https://、mailto:）、用于 deck 内跳转的 slide[N]，或命名 action（firstslide、lastslide、nextslide、previousslide）。传入 'none' 或空值清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -149,7 +149,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "hover tooltip text for the click-hyperlink. Applied together with `link` in a single set/add call; standalone tooltip change without link is not supported.",
+      "description": "click-hyperlink 的 hover tooltip 文本。必须与 link 在同一次 set/add 中设置；不支持脱离 link 单独修改 tooltip。",
       "add": true,
       "set": true,
       "get": true,
@@ -161,7 +161,7 @@
     },
     "opacity": {
       "type": "number",
-      "description": "picture opacity. Input as a decimal 0.0-1.0 or a percent 2-100. Stored on the blip as a:alphaModFix @amt (value * 100000); readback emits the decimal 0.0-1.0 form.",
+      "description": "picture 透明度。可传入 0.0–1.0 小数或 2–100 百分比。会以 a:alphaModFix @amt（value * 100000）存储在 blip 上；读取返回 0.0–1.0 小数形式。",
       "add": true,
       "set": true,
       "get": true,
@@ -174,7 +174,7 @@
     },
     "brightness": {
       "type": "number",
-      "description": "luminance brightness in [-100, 100]. Stored on the blip as a:lum @bright (value * 1000). Combine with `contrast` to mirror PowerPoint's Picture Format → Corrections.",
+      "description": "luminance brightness，范围 [-100, 100]。会以 a:lum @bright（value * 1000）存储在 blip 上。与 contrast 配合可对应 PowerPoint 的 Picture Format → Corrections。",
       "add": false,
       "set": true,
       "get": true,
@@ -187,7 +187,7 @@
     },
     "contrast": {
       "type": "number",
-      "description": "luminance contrast in [-100, 100]. Stored on the blip as a:lum @contrast (value * 1000). Combine with `brightness`.",
+      "description": "luminance contrast，范围 [-100, 100]。会以 a:lum @contrast（value * 1000）存储在 blip 上。可与 brightness 配合。",
       "add": false,
       "set": true,
       "get": true,
@@ -200,7 +200,7 @@
     },
     "shadow": {
       "type": "string",
-      "description": "outer shadow as `color-blur-angle-dist-opacity` (mirrors shape `shadow`). Input color is hex (with or without `#`, 6- or 8-digit `RRGGBBAA`) or a scheme name; blur/dist in points; angle in degrees; opacity 0-100. Readback emits `#RRGGBB-blur-angle-dist-opacity` (always `#`-prefixed 6-digit color; the alpha is carried solely by the trailing opacity field, never double-encoded as an alpha byte).",
+      "description": "外部阴影，格式为 color-blur-angle-dist-opacity（与 shape shadow 一致）。颜色可为 hex（可带 #，6 位或 8 位 RRGGBBAA）或 scheme name；blur/dist 单位为 pt，angle 单位为度，opacity 范围为 0–100。读取返回 #RRGGBB-blur-angle-dist-opacity（固定使用带 # 的 6 位颜色；alpha 仅由末尾 opacity 字段承载，不会重复编码为 alpha byte）。",
       "add": false,
       "set": true,
       "get": true,
@@ -213,7 +213,7 @@
     },
     "glow": {
       "type": "string",
-      "description": "outer glow as `color-radius-opacity` (mirrors shape `glow`). color is hex (no `#`) or scheme; radius in points; opacity 0-100.",
+      "description": "外部发光，格式为 color-radius-opacity（与 shape glow 一致）。颜色可为 hex（不带 #）或 scheme；radius 单位为 pt，opacity 范围为 0–100。",
       "add": false,
       "set": true,
       "get": true,
@@ -226,7 +226,7 @@
     },
     "compressionState": {
       "type": "string",
-      "description": "blip compression target (a:blip cstate attribute). PowerPoint's Picture Format → Compress Pictures → target use. Accepted values: email, print, hqprint, screen, none. `none` (the schema default) is suppressed on readback.",
+      "description": "blip 压缩目标（a:blip cstate 属性），对应 PowerPoint 的 Picture Format → Compress Pictures → target。可选 email、print、hqprint、screen、none。none（schema 默认值）不会在读取结果中返回。",
       "add": true,
       "set": true,
       "get": true,

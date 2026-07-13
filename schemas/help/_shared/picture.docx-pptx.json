@@ -4,7 +4,7 @@
   "properties": {
     "id": {
       "type": "number",
-      "description": "OOXML shape id; source of the @id in the stable path /picture[@id=ID].",
+      "description": "OOXML shape id；是稳定路径 /picture[@id=ID] 中 @id 的来源。",
       "add": false,
       "set": false,
       "get": true,

@@ -11,7 +11,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "fill applied to every series shape. Solid color or gradient 'c1-c2[:angle]'.",
+      "description": "应用到每个 series shape 的填充。可为纯色或渐变 'c1-c2[:angle]'。",
       "examples": [
         "--prop areafill=4472C4-A5C8FF:90"
       ]
@@ -21,7 +21,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "suppress the auto-generated 'Chart Title' placeholder.",
+      "description": "隐藏自动生成的 'Chart Title' placeholder。",
       "examples": [
         "--prop autotitledeleted=true"
       ]
@@ -34,7 +34,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] axisFont; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 axisFont 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisfont=10:8B949E:Helvetica"
       ]
@@ -47,7 +47,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] lineWidth/lineDash; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 lineWidth/lineDash 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisline=666666:1"
       ]
@@ -60,7 +60,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] max (on value/value2); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 max 快捷入口，作用于 value/value2；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axismax=1000",
         "--prop axismax=250"
@@ -74,7 +74,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] min (on value/value2); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 min 快捷入口，作用于 value/value2；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axismin=0"
       ]
@@ -87,7 +87,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] axisNumFmt / format; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 axisNumFmt / format 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisnumfmt=\"#,##0\""
       ]
@@ -100,7 +100,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] axisOrientation; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 axisOrientation 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisorientation=true"
       ]
@@ -113,7 +113,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] tickLabelPos / crossBetween; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 tickLabelPos / crossBetween 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisposition=top"
       ]
@@ -126,7 +126,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] title (value-axis); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 title 快捷入口，作用于 value-axis；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axistitle=\"Revenue\""
       ]
@@ -140,7 +140,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] visible; see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 visible 快捷入口；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop axisvisible=false"
       ]
@@ -150,7 +150,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "bubble chart scale (% of default).",
+      "description": "bubble chart 缩放比例（默认值的百分比）。",
       "readback": "integer percentage",
       "enforcement": "report",
       "aliases": [
@@ -170,7 +170,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] visible (on role=category); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 visible 快捷入口，作用于 role=category；完整的 axis 级选项请参见 chart-axis schema。",
       "readback": "true | false",
       "enforcement": "report",
       "aliases": [
@@ -186,7 +186,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "category axis title text.",
+      "description": "category axis 标题文本。",
       "readback": "title string",
       "enforcement": "report",
       "aliases": [
@@ -205,14 +205,14 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] lineWidth/lineDash (on role=category); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 lineWidth/lineDash 快捷入口，作用于 role=category；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop cataxisline=333333:1"
       ]
     },
     "categories": {
       "type": "string",
-      "description": "comma-separated category labels, OR a cell range reference (e.g. Sheet1!A2:A5)",
+      "description": "以逗号分隔的 category labels，或 cell range reference（例如 Sheet1!A2:A5）。",
       "add": true,
       "set": true,
       "get": true,
@@ -229,7 +229,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "chart-level fill color (accepts #RRGGBB, named colors, or scheme names).",
+      "description": "chart 级填充颜色，接受 #RRGGBB、命名颜色或 scheme 名称。",
       "readback": "#RRGGBB or color descriptor",
       "enforcement": "report"
     },
@@ -328,7 +328,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "chart-area background fill. Solid color, gradient, or 'none'.",
+      "description": "chart-area 背景填充。可为纯色、渐变或 'none'。",
       "examples": [
         "--prop chartareafill=FFFFFF"
       ]
@@ -341,7 +341,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "chart-area outer border line. Same format as plotborder.",
+      "description": "chart-area 外边框线。格式与 plotborder 相同。",
       "examples": [
         "--prop chartborder=000000:1",
         "--prop chartborder=none"
@@ -356,14 +356,14 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "conditional per-data-point color. Format: 'threshold:belowColor:aboveColor'.",
+      "description": "按 data-point 应用的条件颜色。格式：'threshold:belowColor:aboveColor'。",
       "examples": [
         "--prop colorrule=0:FF0000:00AA00"
       ]
     },
     "colors": {
       "type": "string",
-      "description": "comma-separated series fill colors, positional (1st color → series 1). Per-series dotted keys (series1.color=...) override positions.",
+      "description": "以逗号分隔的 series 填充颜色，按位置对应（第 1 个颜色 → series 1）。每个 series 的点分 key（series1.color=...）会覆盖位置指定。",
       "add": true,
       "set": false,
       "get": false,
@@ -377,7 +377,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "combo chart split index: first N series use primary chart type, rest use secondary. Add-time only.",
+      "description": "combo chart 的切分索引：前 N 个 series 使用主 chart type，其余使用次 chart type。仅 add 时使用。",
       "examples": [
         "--prop combosplit=2"
       ]
@@ -390,7 +390,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "rebuild as combo chart with per-series chart types (column,line,area,...). Comma-separated, one per series.",
+      "description": "按每个 series 的 chart type 重建为 combo chart（column、line、area 等）。以逗号分隔，每个 series 一个值。",
       "examples": [
         "--prop combotypes=\"column,column,line\""
       ]
@@ -400,7 +400,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "category axis cross-between behavior (between / midCat).",
+      "description": "category axis 的 cross-between 行为（between / midCat）。",
       "examples": [
         "--prop crossBetween=between",
         "--prop crossbetween=midcat"
@@ -416,7 +416,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "where the value axis crosses the category axis. Values: autoZero (default), max, min.",
+      "description": "value axis 与 category axis 的交叉位置。可选值：autoZero（默认）、max、min。",
       "examples": [
         "--prop crosses=max"
       ],
@@ -427,7 +427,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "value-axis crossesAt value readback.",
+      "description": "value-axis 的 crossesAt 读取结果。",
       "readback": "numeric value",
       "enforcement": "report",
       "aliases": [
@@ -439,7 +439,7 @@
     },
     "data": {
       "type": "string",
-      "description": "inline series spec 'Name:1,2,3' or 'Name1:1,2,3;Name2:4,5,6'. Add-time only; use per-series chart-series Set after creation.",
+      "description": "内联 series 规格：'Name:1,2,3' 或 'Name1:1,2,3;Name2:4,5,6'。仅 add 时使用；创建后请使用每个 series 的 chart-series Set。",
       "add": true,
       "set": false,
       "get": false,
@@ -459,7 +459,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "show/hide data labels. Use 'none' to hide; otherwise comma list of flags: value, percent, category, series, all (also accepts seriesName/categoryName/percentage/values aliases). Position values (outsideEnd/center/insideEnd/insideBase/top/bottom/left/right/bestFit) implicitly enable showVal and apply as dLblPos.",
+      "description": "显示或隐藏 data labels。传入 'none' 隐藏；否则传入以逗号分隔的 flags：value、percent、category、series、all（也接受 seriesName/categoryName/percentage/values 别名）。位置值 outsideEnd/center/insideEnd/insideBase/top/bottom/left/right/bestFit 会隐式启用 showVal，并作为 dLblPos 应用。",
       "examples": [
         "--prop dataLabels=value",
         "--prop dataLabels=\"value,percent\"",
@@ -476,7 +476,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "show data table beneath the chart (with default borders + legend keys).",
+      "description": "在 chart 下方显示 data table（带默认边框和 legend keys）。",
       "examples": [
         "--prop dataTable=true"
       ],
@@ -487,7 +487,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "waterfall: negative bar color. Add-time only.",
+      "description": "waterfall：负值 bar 的颜色。仅 add 时使用。",
       "examples": [
         "--prop decreaseColor=FF0000"
       ]
@@ -502,7 +502,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "how empty cells render (gap leaves a hole, zero plots as 0, span connects across).",
+      "description": "空 cell 的呈现方式：gap 留出空缺、zero 按 0 绘制、span 跨越空缺连接。",
       "examples": [
         "--prop dispBlanksAs=gap"
       ],
@@ -519,7 +519,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "drop lines on line chart. true|false toggle or line spec 'color[:width[:dash]]'; 'none' removes.",
+      "description": "line chart 的 drop lines。可传 true|false 开关或线条规格 'color[:width[:dash]]'；传入 'none' 可移除。",
       "examples": [
         "--prop droplines=true",
         "--prop droplines=808080:0.5"
@@ -533,7 +533,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "error bars on each series. Format: 'type:value' where type ∈ fixed (alias: fixedValue), percent (alias: percentage, pct), stddev (alias: standardDeviation), stderr (alias: standardError). 'none' removes.",
+      "description": "每个 series 的 error bars。格式：'type:value'，其中 type ∈ fixed（别名：fixedValue）、percent（别名：percentage、pct）、stddev（别名：standardDeviation）、stderr（别名：standardError）。传入 'none' 可移除。",
       "examples": [
         "--prop errbars=fixed:5",
         "--prop errbars=none",
@@ -548,7 +548,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "pie/doughnut slice explosion 0..100 (percent of radius); 0 removes.",
+      "description": "pie/doughnut 切片的分离程度，范围 0..100（半径百分比）；0 表示取消分离。",
       "examples": [
         "--prop explosion=10"
       ],
@@ -559,7 +559,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "pie/doughnut first slice angle (degrees).",
+      "description": "pie/doughnut 第一个切片的角度（度）。",
       "readback": "integer degrees",
       "enforcement": "report",
       "aliases": [
@@ -587,7 +587,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "depth gap between series in 3D bar/line/area charts (percent).",
+      "description": "3D bar/line/area chart 中 series 之间的深度间隔（百分比）。",
       "examples": [
         "--prop gapdepth=150"
       ]
@@ -600,7 +600,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "gap between bar/column groups, 0..500 (percent of bar width).",
+      "description": "bar/column 组之间的间隔，范围 0..500（bar 宽度的百分比）。",
       "examples": [
         "--prop gapwidth=150"
       ],
@@ -614,7 +614,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "gradient fill applied to every series. Format: 'c1-c2[-c3][:angle]' (angle in degrees). Errors if chart has no series.",
+      "description": "应用到每个 series 的渐变填充。格式：'c1-c2[-c3][:angle]'（angle 单位为度）。chart 没有 series 时会报错。",
       "examples": [
         "--prop gradient=FF0000-0000FF",
         "--prop gradient=FF0000-00FF00-0000FF:90"
@@ -626,7 +626,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "per-series gradient fills, semicolon-separated; one entry per series.",
+      "description": "每个 series 的渐变填充，以分号分隔；每个 series 对应一个条目。",
       "examples": [
         "--prop gradients=\"FF0000-0000FF;00FF00-FFFF00\""
       ]
@@ -639,7 +639,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "value-axis major gridlines. true|false toggle, or line spec 'color', 'color:width', 'color:width:dash' to style; 'none' removes.",
+      "description": "value-axis 的主网格线。可传 true|false 开关，或使用线条规格 'color'、'color:width'、'color:width:dash' 设置样式；传入 'none' 可移除。",
       "examples": [
         "--prop gridlines=true",
         "--prop gridlines=E0E0E0:0.3",
@@ -652,7 +652,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "chart frame height; accepts cm/in/pt/EMU. Ignored if anchor= is set.",
+      "description": "chart frame 高度；接受 cm/in/pt/EMU。设置 anchor= 时会忽略此值。",
       "examples": [
         "--prop height=10cm"
       ]
@@ -668,7 +668,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "high-low lines on line/stock chart. Same format as droplines.",
+      "description": "line/stock chart 的 high-low lines。格式与 droplines 相同。",
       "examples": [
         "--prop hilowlines=true"
       ]
@@ -678,7 +678,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "doughnut hole size readback.",
+      "description": "doughnut hole size 的读取结果。",
       "readback": "integer 10..90 percent",
       "enforcement": "report",
       "aliases": [
@@ -699,7 +699,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "waterfall: positive bar color. Add-time only.",
+      "description": "waterfall：正值 bar 的颜色。仅 add 时使用。",
       "examples": [
         "--prop increaseColor=00AA00"
       ]
@@ -712,7 +712,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "if true, draw negative bars in an inverted (lighter) color.",
+      "description": "为 true 时，使用反相（更浅）的颜色绘制负值 bar。",
       "examples": [
         "--prop invertifneg=true"
       ]
@@ -726,7 +726,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "data label position. Values: center|ctr, insideEnd|inEnd|inside, insideBase|inBase|base, outsideEnd|outEnd|outside, bestFit|best|auto, top|t, bottom|b, left|l, right|r. Restrictions: not supported on doughnut/area/radar/stock; pie/pie3D restricted to ctr/inEnd/inBase/bestFit (other tokens rejected, per OOXML ST_DLblPosPie); stacked series clamp to ctr/inBase/inEnd; combo charts skip entirely.",
+      "description": "data label 位置。可选值：center|ctr、insideEnd|inEnd|inside、insideBase|inBase|base、outsideEnd|outEnd|outside、bestFit|best|auto、top|t、bottom|b、left|l、right|r。限制：doughnut/area/radar/stock 不支持；pie/pie3D 仅限 ctr/inEnd/inBase/bestFit（其他 token 会按 OOXML ST_DLblPosPie 被拒绝）；stacked series 会限制为 ctr/inBase/inEnd；combo chart 完全跳过。",
       "examples": [
         "--prop labelPos=outsideEnd"
       ],
@@ -737,7 +737,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "data label text font. Format: 'size:color:fontname' (any segment optional). Readback is split into labelFont.size / labelFont.color / labelFont.bold / labelFont.name (one key per slot) so dump→replay can rebuild the compound spec without parsing.",
+      "description": "data label 文本字体。格式：'size:color:fontname'（每一段均可省略）。读取结果会拆为 labelFont.size / labelFont.color / labelFont.bold / labelFont.name（每个槽位一个 key），使 dump→replay 无需解析即可重建复合规格。",
       "examples": [
         "--prop labelfont=9:333333:Calibri"
       ]
@@ -745,25 +745,25 @@
     "labelFont.size": {
       "type": "number",
       "get": true,
-      "description": "data label font size in points. Readback of the size slot inside labelfont= (BuildLabelTextProperties' DefaultRunProperties.FontSize).",
+      "description": "data label 字体大小，单位为 points。为 labelfont= 中 size 槽位的读取结果（BuildLabelTextProperties 的 DefaultRunProperties.FontSize）。",
       "examples": []
     },
     "labelFont.color": {
       "type": "string",
       "get": true,
-      "description": "data label font color (hex, e.g. #FF0000). Readback of the color slot inside labelfont=.",
+      "description": "data label 字体颜色（hex，例如 #FF0000）。为 labelfont= 中 color 槽位的读取结果。",
       "examples": []
     },
     "labelFont.bold": {
       "type": "bool",
       "get": true,
-      "description": "data label font bold flag. Emitted only when true.",
+      "description": "data label 字体粗体标记。仅在为 true 时输出。",
       "examples": []
     },
     "labelFont.name": {
       "type": "string",
       "get": true,
-      "description": "data label font typeface (latin). Readback of the fontname slot inside labelfont=.",
+      "description": "data label 字体（latin）。为 labelfont= 中 fontname 槽位的读取结果。",
       "examples": []
     },
     "labeloffset": {
@@ -771,7 +771,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "category-axis label offset 0..1000 (percent of font height); category axis only.",
+      "description": "category-axis label 偏移量，范围 0..1000（字体高度的百分比）；仅 category axis 支持。",
       "examples": [
         "--prop labeloffset=100"
       ]
@@ -792,7 +792,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "tick-label rotation in degrees (-90..90). Bare 'labelrotation' targets both axes; xaxis.* targets category, yaxis./valaxis.* targets value.",
+      "description": "tick-label 旋转角度，范围 -90..90。不带前缀的 'labelrotation' 作用于两个 axis；xaxis.* 作用于 category，yaxis./valaxis.* 作用于 value。",
       "examples": [
         "--prop labelrotation=-45",
         "--prop xaxis.labelrotation=30"
@@ -806,7 +806,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "show/hide leader lines connecting data labels to slices (pie/doughnut).",
+      "description": "显示或隐藏连接 data labels 与切片的 leader lines（pie/doughnut）。",
       "examples": [
         "--prop leaderlines=true"
       ]
@@ -827,7 +827,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "legend position. 'none'/'false' hides; otherwise place at top|t, bottom|b, left|l, right|r, topRight|tr. Hyphen and underscore variants accepted.",
+      "description": "legend 位置。'none'/'false' 表示隐藏；否则可设为 top|t、bottom|b、left|l、right|r、topRight|tr。接受连字符和下划线变体。",
       "examples": [
         "--prop legend=bottom",
         "--prop legend=none"
@@ -841,7 +841,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "if true, legend overlays the plot area instead of reserving space.",
+      "description": "为 true 时，legend 覆盖 plot area，而非为其预留空间。",
       "examples": [
         "--prop legend.overlay=true"
       ],
@@ -856,7 +856,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "legend text font. Format: 'size:color:fontname' (any segment optional).",
+      "description": "legend 文本字体。格式：'size:color:fontname'（每一段均可省略）。",
       "examples": [
         "--prop legendFont=10:CCCCCC:Arial",
         "--prop legendFont=9:808080"
@@ -871,7 +871,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "line dash style for every series. Values: solid, dash, dashDot, dot, lgDash, lgDashDot, sysDash, sysDot, sysDashDot.",
+      "description": "每个 series 的线条 dash style。可选值：solid、dash、dashDot、dot、lgDash、lgDashDot、sysDash、sysDot、sysDashDot。",
       "examples": [
         "--prop linedash=dash"
       ]
@@ -881,7 +881,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "line width in points (applies to every series line).",
+      "description": "线宽，单位为 points（应用到每个 series line）。",
       "examples": [
         "--prop linewidth=2"
       ]
@@ -895,7 +895,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "value-axis logarithmic base (2..1000 typically). Shorthand: true|yes|log|1 → base 10; false|none|linear|0 removes log scale.",
+      "description": "value-axis 的对数底数（通常为 2..1000）。简写：true|yes|log|1 → base 10；false|none|linear|0 移除 log scale。",
       "examples": [
         "--prop logbase=10",
         "--prop logscale=true",
@@ -907,7 +907,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "major tick mark style (out / in / cross / none).",
+      "description": "major tick mark 样式（out / in / cross / none）。",
       "examples": [
         "--prop majorTickMark=out",
         "--prop majortickmark=out"
@@ -924,7 +924,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "value-axis major gridline / tick spacing.",
+      "description": "value-axis 的 major gridline / tick 间距。",
       "examples": [
         "--prop majorunit=200",
         "--prop majorunit=50"
@@ -938,7 +938,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "marker symbol for line/scatter/radar series only (other types silently skipped). Format: 'symbol' or 'symbol:size' or 'symbol:size:color'. Symbols: none, auto, circle, square, diamond, triangle, x, plus, star, dash, dot. (picture markers are not implemented.) Chart-level Get does not surface marker because applicability is chart-type-conditional — read per-series via /chart[N]/series[K] (chart-series schema declares marker get:true).",
+      "description": "仅适用于 line/scatter/radar series 的 marker symbol（其他类型会静默跳过）。格式：'symbol'、'symbol:size' 或 'symbol:size:color'。symbol 可为 none、auto、circle、square、diamond、triangle、x、plus、star、dash、dot。（picture marker 尚未实现。）chart 级 Get 不返回 marker，因为其适用性取决于 chart type；请通过 /chart[N]/series[K] 按 series 读取（chart-series schema 声明 marker get:true）。",
       "examples": [
         "--prop marker=circle",
         "--prop marker=square:8:FF0000"
@@ -950,7 +950,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "marker size 2..72 (line/scatter/radar series only).",
+      "description": "marker 大小，范围 2..72（仅 line/scatter/radar series）。",
       "examples": [
         "--prop markersize=8"
       ]
@@ -962,7 +962,7 @@
       ],
       "set": true,
       "get": true,
-      "description": "marker fill color (line/scatter/radar series only). Fans out to every applicable series; preserves existing marker symbol/size. Read back from the first series' marker spPr/solidFill.",
+      "description": "marker 填充颜色（仅 line/scatter/radar series）。会应用到每个适用的 series，并保留现有 marker symbol/size。读取时取第一个 series 的 marker spPr/solidFill。",
       "examples": [
         "--prop markerColor=FF0000"
       ],
@@ -976,7 +976,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "value-axis minor gridlines; same format as gridlines.",
+      "description": "value-axis 的次网格线；格式与 gridlines 相同。",
       "examples": [
         "--prop minorGridlines=true",
         "--prop minorGridlines=F0F0F0:0.25"
@@ -988,7 +988,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "minor tick mark style (out / in / cross / none).",
+      "description": "minor tick mark 样式（out / in / cross / none）。",
       "examples": [
         "--prop minorTickMark=none",
         "--prop minortickmark=in"
@@ -1005,7 +1005,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "value-axis minor gridline / tick spacing.",
+      "description": "value-axis 的 minor gridline / tick 间距。",
       "examples": [
         "--prop minorunit=50",
         "--prop minorunit=10"
@@ -1016,7 +1016,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "bar/column overlap within a group, -100..100 (negative = gap, positive = overlap).",
+      "description": "同一组内 bar/column 的重叠程度，范围 -100..100（负值表示间隔，正值表示重叠）。",
       "examples": [
         "--prop overlap=0",
         "--prop overlap=100"
@@ -1032,7 +1032,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "plot-area background fill. Solid color, gradient 'c1-c2[:angle]', or 'none'.",
+      "description": "plot-area 背景填充。可为纯色、渐变 'c1-c2[:angle]' 或 'none'。",
       "examples": [
         "--prop plotFill=FAFAFA",
         "--prop plotareafill=FAFAFA",
@@ -1048,7 +1048,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "plot-area border line. Format: 'color', 'color:width', 'color:width:dash'; or 'none'.",
+      "description": "plot-area 边框线。格式：'color'、'color:width'、'color:width:dash'，或 'none'。",
       "examples": [
         "--prop plotborder=CCCCCC:0.5",
         "--prop plotborder=none"
@@ -1062,7 +1062,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "if true, skip plotting hidden worksheet rows/columns.",
+      "description": "为 true 时，不绘制隐藏 worksheet 的 row/column。",
       "examples": [
         "--prop plotvisonly=true"
       ]
@@ -1076,7 +1076,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "named style bundle. Values: minimal, dark, corporate, magazine, dashboard, colorful, monochrome (alias mono).",
+      "description": "命名样式组合。可选值：minimal、dark、corporate、magazine、dashboard、colorful、monochrome（别名 mono）。",
       "examples": [
         "--prop preset=minimal",
         "--prop preset=corporate",
@@ -1092,7 +1092,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "horizontal reference / target line. Format: 'value' or 'value:color' or 'value:color:label' or 'value:color:label:dash'. Pass 'none' to remove.",
+      "description": "水平 reference / target line。格式：'value'、'value:color'、'value:color:label' 或 'value:color:label:dash'。传入 'none' 可移除。",
       "examples": [
         "--prop referenceline=100:FF0000:Target",
         "--prop referenceline=none",
@@ -1109,7 +1109,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "scatter chart subtype. Values: line|lineOnly, lineMarker, marker|markerOnly, smooth|smoothLine, smoothMarker.",
+      "description": "scatter chart 子类型。可选值：line|lineOnly、lineMarker、marker|markerOnly、smooth|smoothLine、smoothMarker。",
       "examples": [
         "--prop scatterstyle=smoothMarker"
       ]
@@ -1122,7 +1122,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "comma-separated 1-based series indices to plot on a secondary value axis.",
+      "description": "要绘制到 secondary value axis 的 series 索引（从 1 开始），以逗号分隔。",
       "examples": [
         "--prop secondaryaxis=2",
         "--prop secondary=\"2,3\""
@@ -1133,7 +1133,7 @@
       "add": false,
       "set": true,
       "get": false,
-      "description": "legacy bare per-series data update (N is the 1-based series index). 'series{N}=\"1,2,3\"' replaces the numeric values for series N; 'series{N}=\"Name:1,2,3\"' also updates the series label. Prefer the dotted form (series{N}.name=, series{N}.values=) for clarity — see chart-series schema.",
+      "description": "旧版不带子字段的逐 series 数据更新（N 是从 1 开始的 series 索引）。'series{N}=\"1,2,3\"' 会替换 series N 的数值；'series{N}=\"Name:1,2,3\"' 还会更新 series label。为保证清晰，优先使用点分形式（series{N}.name=、series{N}.values=）；参见 chart-series schema。",
       "examples": [
         "--prop series1=\"10,20,30\"",
         "--prop series2=\"Revenue:5,8,12\""
@@ -1147,7 +1147,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "series outline. Format: 'color', 'color:width', or 'color:width:dash' (also accepts '-' separator); 'none' removes.",
+      "description": "series 轮廓线。格式：'color'、'color:width' 或 'color:width:dash'（也接受 '-' 分隔符）；传入 'none' 可移除。",
       "examples": [
         "--prop seriesoutline=000000:0.5",
         "--prop seriesoutline=none"
@@ -1161,7 +1161,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "outer shadow on every series shape. Format: 'COLOR-BLUR-ANGLE-DIST-OPACITY'; 'none' removes.",
+      "description": "每个 series shape 的外阴影。格式：'COLOR-BLUR-ANGLE-DIST-OPACITY'；传入 'none' 可移除。",
       "examples": [
         "--prop seriesshadow=000000-5-45-3-50",
         "--prop seriesshadow=none"
@@ -1175,7 +1175,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "series lines on stacked bar charts (true/false).",
+      "description": "stacked bar chart 的 series line（true/false）。",
       "examples": [
         "--prop serlines=true"
       ]
@@ -1193,7 +1193,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "3D bar shape. Values: box|cuboid, cone, coneToMax, cylinder, pyramid, pyramidToMax. Bar3D charts only.",
+      "description": "3D bar shape。可选值：box|cuboid、cone、coneToMax、cylinder、pyramid、pyramidToMax。仅 Bar3D chart 支持。",
       "examples": [
         "--prop shape=cylinder"
       ]
@@ -1203,7 +1203,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "show markers on line/scatter series at chart level (true|false).",
+      "description": "在 chart 级显示 line/scatter series 的 marker（true|false）。",
       "examples": [
         "--prop showMarker=true"
       ],
@@ -1220,7 +1220,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "render negative-valued bubbles. Bubble charts only.",
+      "description": "呈现负值 bubble。仅 Bubble chart 支持。",
       "examples": [
         "--prop shownegbubbles=true"
       ]
@@ -1235,7 +1235,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "how bubble size value is mapped. Values: area (default), width|w. Bubble charts only.",
+      "description": "bubble size 值的映射方式。可选值：area（默认）、width|w。仅 Bubble chart 支持。",
       "examples": [
         "--prop sizerepresents=area"
       ]
@@ -1251,7 +1251,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "smooth lines on line/scatter charts (true|false). Reported unsupported for other chart types.",
+      "description": "line/scatter chart 的平滑线（true|false）。其他 chart type 会报告不支持。",
       "examples": [
         "--prop smooth=true"
       ],
@@ -1265,7 +1265,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "built-in chart style id 1..48; pass 'none' to clear.",
+      "description": "内置 chart style id，范围 1..48；传入 'none' 可清除。",
       "examples": [
         "--prop style=2"
       ],
@@ -1276,7 +1276,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tick label position (high / low / nextTo / none).",
+      "description": "tick label 位置（high / low / nextTo / none）。",
       "examples": [
         "--prop tickLabelPos=nextTo",
         "--prop ticklabelpos=low"
@@ -1296,14 +1296,14 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "draw tick labels every Nth category (category axis).",
+      "description": "每隔 N 个 category 绘制一个 tick label（category axis）。",
       "examples": [
         "--prop ticklabelskip=2"
       ]
     },
     "title": {
       "type": "string",
-      "description": "chart title text; pass 'none' (case-insensitive) or an empty string to omit/remove the title — on add this skips creating the title element, on set it removes an existing title. Get also returns sub-keys title.font, title.size, title.color, title.bold when set; these are get-only readback fields surfaced from chart title runs.",
+      "description": "chart 标题文本；传入 'none'（不区分大小写）或空字符串可省略或移除标题——add 时不创建 title 元素，set 时移除已有 title。设置后 Get 还会返回子 key title.font、title.size、title.color、title.bold；它们是从 chart title run 输出的仅读取结果。",
       "add": true,
       "set": true,
       "get": true,
@@ -1320,7 +1320,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "title bold flag (true|false).",
+      "description": "title 粗体标记（true|false）。",
       "readback": "true | false"
     },
     "title.color": {
@@ -1328,7 +1328,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "title font color (#RRGGBB, named, or scheme color).",
+      "description": "title 字体颜色（#RRGGBB、命名颜色或 scheme color）。",
       "readback": "#RRGGBB"
     },
     "title.font": {
@@ -1336,7 +1336,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "title font name.",
+      "description": "title 字体名称。",
       "readback": "font name"
     },
     "title.overlay": {
@@ -1347,7 +1347,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "if true, title overlays the plot area instead of reserving space above it.",
+      "description": "为 true 时，title 覆盖 plot area，而非在上方预留空间。",
       "examples": [
         "--prop title.overlay=true"
       ],
@@ -1358,7 +1358,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "title font size (e.g. 14 or 14pt).",
+      "description": "title 字体大小（例如 14 或 14pt）。",
       "readback": "Npt"
     },
     "totalColor": {
@@ -1366,7 +1366,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "waterfall: subtotal/total bar color. Add-time only.",
+      "description": "waterfall：subtotal/total bar 的颜色。仅 add 时使用。",
       "examples": [
         "--prop totalColor=4472C4"
       ]
@@ -1380,7 +1380,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "series fill transparency (0..100, percent). 'transparency' is inverse of 'opacity'/'alpha' (transparency=30 ≡ opacity=70).",
+      "description": "series 填充透明度，范围 0..100（百分比）。'transparency' 与 'opacity'/'alpha' 互为反值（transparency=30 ≡ opacity=70）。",
       "examples": [
         "--prop transparency=30",
         "--prop opacity=70"
@@ -1391,7 +1391,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "add trendline to every series. Format: 'type[:order]' or 'type:forward:backward'. Types: linear (default), exp|exponential, log|logarithmic, poly|polynomial, power, movingAvg|moving|movingAverage. Order applies to poly/movingAvg. Pass 'none' to clear.",
+      "description": "为每个 series 添加 trendline。格式：'type[:order]' 或 'type:forward:backward'。type 可为 linear（默认）、exp|exponential、log|logarithmic、poly|polynomial、power、movingAvg|moving|movingAverage。order 用于 poly/movingAvg。传入 'none' 可清除。",
       "examples": [
         "--prop trendline=linear",
         "--prop trendline=poly:3",
@@ -1411,7 +1411,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "up/down bars on line chart. true | 'gapWidth:upColor:downColor' | 'none'/'false'.",
+      "description": "line chart 的 up/down bars。可传 true、'gapWidth:upColor:downColor' 或 'none'/'false'。",
       "examples": [
         "--prop updownbars=true",
         "--prop updownbars=150:00AA00:FF0000"
@@ -1425,7 +1425,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] lineWidth/lineDash (on role=value); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 lineWidth/lineDash 快捷入口，作用于 role=value；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop valaxisline=333333:1"
       ]
@@ -1435,7 +1435,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "vary colors by data point (true|false; single-series charts).",
+      "description": "按 data point 分别使用不同颜色（true|false；单 series chart）。",
       "examples": [
         "--prop varyColors=true"
       ],
@@ -1451,7 +1451,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3D view angles. Format: 'rotX,rotY,perspective' (any tail optional) or single integer for perspective only. Named-key form (rotX=...) is rejected.",
+      "description": "3D view 角度。格式：'rotX,rotY,perspective'（末尾各段均可省略），或仅传一个整数表示 perspective。会拒绝命名 key 形式（rotX=...）。",
       "examples": [
         "--prop view3d=15,20,30",
         "--prop view3d=20",
@@ -1464,7 +1464,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "chart frame width; accepts cm/in/pt/EMU. Ignored if anchor= is set.",
+      "description": "chart frame 宽度；接受 cm/in/pt/EMU。设置 anchor= 时会忽略此值。",
       "examples": [
         "--prop width=18cm",
         "--prop width=15cm"

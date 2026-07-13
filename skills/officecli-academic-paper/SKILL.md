@@ -1,6 +1,6 @@
 ---
 name: officecli-academic-paper
-description: "Use this skill to build academic-style .docx output: journal / conference / thesis chapters carrying formal citation style (APA, Chicago, IEEE, MLA), numbered equations, figure & table cross-references, footnotes/endnotes, bibliography, or multi-column journal layout. Trigger on: 'research paper', 'journal paper', 'conference paper', 'manuscript', 'thesis', 'APA', 'MLA', 'Chicago', 'IEEE two-column', 'bibliography', 'hanging indent', 'citation style', 'abstract + keywords', 'equation numbering', 'cross-reference', paper with footnotes/endnotes. Output is a single .docx."
+description: "使用此 Skill 创建学术风格 .docx，包括带正式引文格式（APA、Chicago、IEEE、MLA）的期刊/会议/论文篇章、编号公式、图表交叉引用、脚注/尾注、参考文献或双栏期刊布局。触发词包括：'research paper'、'journal paper'、'conference paper'、'manuscript'、'thesis'、'APA'、'MLA'、'Chicago'、'IEEE two-column'、'bibliography'、'hanging indent'、'citation style'、'abstract + keywords'、'equation numbering'、'cross-reference'、带 footnotes/endnotes 的论文。输出为单个 .docx。"
 ---
 
 # OfficeCLI Academic Paper Skill
@@ -8,15 +8,6 @@ description: "Use this skill to build academic-style .docx output: journal / con
 **This skill is a scene layer on top of `officecli-docx`.** Every docx hard rule — style architecture, heading hierarchy, shell quoting, `break=newPage` alias, belt-and-suspenders page breaks, live PAGE field, Delivery Gate, renderer quirks — is inherited, not re-taught. This file adds only what academic papers need on top: citation styles, equations, SEQ / PAGEREF cross-refs, multi-column journal layout, bibliography hanging indent, abstract/keywords/affiliation block.
 
 When the docx base rules cover it, the text here says `→ see docx v2 §X`. Read docx v2 first if you have not.
-
-## Setup
-
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
 
 ## ⚠️ Help-First Rule
 

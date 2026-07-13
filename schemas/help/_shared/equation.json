@@ -5,7 +5,7 @@
   "properties": {
     "formula": {
       "type": "string",
-      "description": "math expression. Aliases: text.",
+      "description": "数学表达式。别名：text。",
       "aliases": [
         "text"
       ],

@@ -14,12 +14,12 @@
   "paths": {
     "positional": ["/slide[N]/connector[M]"]
   },
-  "note": "Aliases: connection. Straight / bent / curved connector lines. 'from' and 'to' reference shape paths to auto-attach endpoints; with no explicit x/y/width/height the line is anchored edge-to-edge (auto-picks the facing edges) so it spans the gap instead of crossing both shapes. Use fromSide/toSide to force a specific edge. NOTE: the chosen edge drives only the drawn geometry (offset/extent) — the low-level stCxn/endCxn idx is not yet derived from a side, so after a manual drag in PowerPoint the connector re-anchors to the auto-picked edge.",
+  "note": "Aliases：connection。支持 straight、bent、curved connector line。'from' 和 'to' 引用 shape path，自动连接端点；未显式提供 x/y/width/height 时，line 会 edge-to-edge 锚定并自动选择相对的两条边，使其跨过间隙而不是穿过两个 shape。使用 fromSide/toSide 可强制指定边。注意：所选边只影响绘制 geometry（offset/extent），底层 stCxn/endCxn idx 尚未根据 side 推导，因此在 PowerPoint 中手动拖动后，connector 会重新锚定到自动选择的边。",
   "properties": {
     "shape": {
       "type": "enum",
       "values": ["straight", "elbow", "curve"],
-      "description": "Connector geometry preset. Add/Set accept the short names (straight, elbow, curve) or OOXML full names (straightConnector1, bentConnector2, bentConnector3, curvedConnector2, curvedConnector3 — bent/curved 2-segment forms map to the 3-segment primitive). Get readback returns the OOXML full name.",
+      "description": "Connector geometry 预设。Add/Set 支持短名称（straight、elbow、curve）或 OOXML 完整名称（straightConnector1、bentConnector2、bentConnector3、curvedConnector2、curvedConnector3；bent/curved 的 2-segment 形式映射到 3-segment primitive）。Get 返回 OOXML 完整名称。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop shape=straight", "--prop shape=elbow", "--prop shape=curve"],
       "readback": "OOXML preset full name (straightConnector1, bentConnector3, curvedConnector3)",
@@ -27,7 +27,7 @@
     },
     "from": {
       "type": "string",
-      "description": "start-point frame reference (Add/Set only). Accepts a frame index (1, 2, …), a positional path /slide[N]/<type>[M], an @id path /slide[N]/<type>[@id=M] (as returned by query/get), or an @name path /slide[N]/<type>[@name=Foo]. <type> may be shape, picture, table, chart, group, connector, etc. — any top-level frame, not only shapes. Reverse path resolution is not implemented.",
+      "description": "起点 frame 引用（仅 Add/Set）。支持 frame index（1、2 等）、位置路径 /slide[N]/<type>[M]、@id 路径 /slide[N]/<type>[@id=M]（query/get 返回的形式），或 @name 路径 /slide[N]/<type>[@name=Foo]。<type> 可为 shape、picture、table、chart、group、connector 等任意 top-level frame，不限于 shape。尚未实现反向路径解析。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop from='/slide[1]/shape[1]'", "--prop from='/slide[1]/shape[@id=10001]'", "--prop from='/slide[1]/shape[@name=BoxA]'"],
       "readback": "see startShape/endShape get-only properties for resolved endpoint shape ids",
@@ -35,7 +35,7 @@
     },
     "to": {
       "type": "string",
-      "description": "end-point frame reference (Add/Set only). Accepts a frame index (1, 2, …), a positional path /slide[N]/<type>[M], an @id path /slide[N]/<type>[@id=M] (as returned by query/get), or an @name path /slide[N]/<type>[@name=Foo]. <type> may be shape, picture, table, chart, group, connector, etc. — any top-level frame, not only shapes. Reverse path resolution is not implemented.",
+      "description": "终点 frame 引用（仅 Add/Set）。支持 frame index（1、2 等）、位置路径 /slide[N]/<type>[M]、@id 路径 /slide[N]/<type>[@id=M]（query/get 返回的形式），或 @name 路径 /slide[N]/<type>[@name=Foo]。<type> 可为 shape、picture、table、chart、group、connector 等任意 top-level frame，不限于 shape。尚未实现反向路径解析。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop to='/slide[1]/shape[2]'", "--prop to='/slide[1]/shape[@id=10002]'", "--prop to='/slide[1]/shape[@name=BoxB]'"],
       "readback": "see startShape/endShape get-only properties for resolved endpoint shape ids",
@@ -87,7 +87,7 @@
     "lineDash": {
       "type": "enum",
       "values": ["solid", "dot", "dash", "dashDot", "lgDash", "lgDashDot", "lgDashDotDot", "sysDot", "sysDash", "sysDashDot", "sysDashDotDot", "longdash", "longdashdot"],
-      "description": "outline dash pattern (drawingML prstDash). Get readback emits the canonical OOXML token (lgDash/lgDashDot/lgDashDotDot/sysDot/...); the long* aliases are accepted on Add/Set only. 'dashDotDot' has no native enum member; it is accepted as an alias for sysDashDotDot (Get readback returns sysDashDotDot).",
+      "description": "outline dash pattern（drawingML prstDash）。Get 返回规范的 OOXML token（lgDash/lgDashDot/lgDashDotDot/sysDot/...）；long* aliases 仅 Add/Set 接受。'dashDotDot' 没有原生 enum member，作为 sysDashDotDot 的别名接受（Get 返回 sysDashDotDot）。",
       "add": true, "set": true, "get": true,
       "aliases": ["linedash"],
       "examples": ["--prop lineDash=dash", "--prop lineDash=lgDash", "--prop lineDash=sysDash"],
@@ -97,7 +97,7 @@
     "lineJoin": {
       "type": "enum",
       "values": ["round", "bevel", "miter"],
-      "description": "line join style at connector corners (drawingML <a:ln> child <a:round/> | <a:bevel/> | <a:miter/>). Accepts compound 'miter:<lim>' to also set the miter limit in one key.",
+      "description": "connector 转角处的 line join 样式（drawingML <a:ln> 子节点 <a:round/> | <a:bevel/> | <a:miter/>）。也可传入组合格式 'miter:<lim>'，一次设置 miter limit。",
       "add": true, "set": true, "get": true,
       "aliases": ["linejoin", "line.join"],
       "examples": ["--prop lineJoin=miter", "--prop lineJoin=miter:800000", "--prop lineJoin=round"],
@@ -106,7 +106,7 @@
     },
     "miterLimit": {
       "type": "number",
-      "description": "miter join limit (drawingML <a:miter @lim>) in 1000ths of a percent (e.g. 800000 = 800%). Implies lineJoin=miter when set without an explicit lineJoin.",
+      "description": "miter join limit（drawingML <a:miter @lim>），单位为千分之一百分比（如 800000 = 800%）。未显式设置 lineJoin 时，设置它会隐含 lineJoin=miter。",
       "add": true, "set": true, "get": true,
       "aliases": ["miterlimit", "miter.limit", "line.miterlimit"],
       "examples": ["--prop miterLimit=800000"],
@@ -133,14 +133,14 @@
     },
     "id": {
       "type": "number",
-      "description": "cNvPr shape id; @id in /connector[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr shape id，即 /connector[@id=ID] 中的 @id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "add": true, "set": false, "get": true,
       "readback": "integer shape id",
       "enforcement": "report"
     },
     "name": {
       "type": "string",
-      "description": "connector name",
+      "description": "connector 名称。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=\"Arrow1\""],
       "readback": "plain string",
@@ -148,7 +148,7 @@
     },
     "text": {
       "type": "string",
-      "description": "inline text label on the connector (<p:cxnSp> child <p:txBody>). Single-paragraph single-run; Set replaces any existing label. Multi-paragraph labels arrive via subsequent add paragraph/run ops against the connector path.",
+      "description": "connector 上的 inline text label（<p:cxnSp> 子节点 <p:txBody>）。仅单段落单 run；Set 会替换已有 label。多段落 label 请后续对 connector path 执行 add paragraph/run。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop text=\"Yes\"", "--prop text=\"No\""],
       "readback": "plain text content of the connector txBody",
@@ -157,7 +157,7 @@
     "fromSide": {
       "type": "enum",
       "values": ["top", "bottom", "left", "right", "center"],
-      "description": "which edge of the 'from' shape the line leaves. Omitted (default) = auto-pick the edge facing the 'to' shape (right↔left for a same-row layout, bottom↔top for stacked) so the line spans the gap instead of crossing both boxes. 'center' pins the endpoint to the shape center (line enters the box), reproducing the legacy center-to-center look on demand. Drives the drawn geometry (offset/extent); the endpoint still follows the shape when it moves, but re-anchors to the auto edge (sides are not persisted).",
+      "description": "连线离开 'from' shape 的边。省略（默认）时会自动选择面向 'to' shape 的边（同一行时 right↔left，上下排列时 bottom↔top），使连线跨越间隙而不穿过两个 box。'center' 将端点固定到 shape 中心（线会进入 box），可按需还原旧的中心到中心效果。该值决定绘制几何（offset/extent）；端点会随 shape 移动，但会重新锚定到自动边（side 不会持久化）。",
       "add": true, "set": true, "get": false,
       "aliases": ["fromside", "startSide", "startside"],
       "examples": ["--prop fromSide=right", "--prop fromSide=bottom", "--prop fromSide=center"],
@@ -166,7 +166,7 @@
     "toSide": {
       "type": "enum",
       "values": ["top", "bottom", "left", "right", "center"],
-      "description": "which edge of the 'to' shape the line enters. See fromSide; default auto-picks the edge facing the 'from' shape.",
+      "description": "连线进入 'to' shape 的边。参见 fromSide；默认自动选择面向 'from' shape 的边。",
       "add": true, "set": true, "get": false,
       "aliases": ["toside", "endSide", "endside"],
       "examples": ["--prop toSide=left", "--prop toSide=top"],
@@ -174,7 +174,7 @@
     },
     "fromIdx": {
       "type": "number",
-      "description": "low-level connection-site index on the 'from' shape (writes <a:stCxn idx>). Prefer fromSide unless you know the preset's cxnLst ordering. 0-based; defaults to 0.",
+      "description": "'from' shape 上的低层 connection-site 索引（写入 <a:stCxn idx>）。除非了解该 preset 的 cxnLst 顺序，否则优先使用 fromSide。从 0 开始，默认 0。",
       "add": true, "set": true, "get": false,
       "aliases": ["fromidx", "startIdx", "startidx"],
       "examples": ["--prop fromIdx=3"],
@@ -182,19 +182,19 @@
     },
     "toIdx": {
       "type": "number",
-      "description": "low-level connection-site index on the 'to' shape (writes <a:endCxn idx>). Prefer toSide. 0-based; defaults to 0.",
+      "description": "'to' shape 上的低层 connection-site 索引（写入 <a:endCxn idx>）。优先使用 toSide。从 0 开始，默认 0。",
       "add": true, "set": true, "get": false,
       "aliases": ["toidx", "endIdx", "endidx"],
       "examples": ["--prop toIdx=1"],
       "enforcement": "report"
     },
-    "startShape": { "type":"number", "add":false, "set":false, "get":true, "description":"shape id of the start connection endpoint.", "readback":"integer shape id", "enforcement":"report" },
-    "startIdx":   { "type":"number", "add":false, "set":false, "get":true, "description":"connection point index on start shape (0-based; emitted whenever the start endpoint is connected, 0 = default anchor). Get-side readback of fromIdx.", "readback":"integer", "enforcement":"report" },
-    "endShape":   { "type":"number", "add":false, "set":false, "get":true, "description":"shape id of the end connection endpoint.", "readback":"integer shape id", "enforcement":"report" },
-    "endIdx":     { "type":"number", "add":false, "set":false, "get":true, "description":"connection point index on end shape (0-based; emitted whenever the end endpoint is connected, 0 = default anchor). Get-side readback of toIdx.", "readback":"integer", "enforcement":"report" },
+    "startShape": { "type":"number", "add":false, "set":false, "get":true, "description":"起始连接端点的 shape id。", "readback":"integer shape id", "enforcement":"report" },
+    "startIdx":   { "type":"number", "add":false, "set":false, "get":true, "description":"start shape 上的 connection point 索引（从 0 开始；起始端点连接时总会写入，0 = 默认 anchor）。Get 侧的 fromIdx 读取结果。", "readback":"integer", "enforcement":"report" },
+    "endShape":   { "type":"number", "add":false, "set":false, "get":true, "description":"结束连接端点的 shape id。", "readback":"integer shape id", "enforcement":"report" },
+    "endIdx":     { "type":"number", "add":false, "set":false, "get":true, "description":"end shape 上的 connection point 索引（从 0 开始；结束端点连接时总会写入，0 = 默认 anchor）。Get 侧的 toIdx 读取结果。", "readback":"integer", "enforcement":"report" },
     "zorder": {
       "type": "string",
-      "description": "1-based z-order in slide shape tree. Add accepts 'top'/'bottom'/'forward'/'backward'/integer (same vocabulary as shape/picture/group); Get returns the resolved integer position.",
+      "description": "slide shape tree 中从 1 开始计数的 z-order。Add 支持 'top'/'bottom'/'forward'/'backward'/整数（与 shape/picture/group 使用相同 token）；Get 返回解析后的整数位置。",
       "aliases": ["z-order", "order"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop zorder=top", "--prop zorder=2"],

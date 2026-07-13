@@ -15,11 +15,11 @@
     "stable": ["/numbering/num[@id=N]"],
     "positional": ["/numbering/num[N]"]
   },
-  "note": "Numbering instance (<w:num>). A thin pointer that references one <w:abstractNum> via abstractNumId — the abstractNum is the template, the num is the live counter. Paragraphs reference 'numId' (this element's id), not abstractNumId. Two modes: (B/C) --prop abstractNumId=N reuses an existing template; (A) --prop format=... auto-creates a matching abstractNum on the fly. By default each new num gets a startOverride on level 0 so two instances of the same abstractNum count independently — pass --prop continue=true to inherit Word's literal counter-continuation behavior instead.",
+  "note": "Numbering instance（<w:num>）。它通过 abstractNumId 指向一个 <w:abstractNum>；abstractNum 是 template，num 是实际计数器。Paragraph 引用的是此 element 的 id（numId），而不是 abstractNumId。两种模式：使用 --prop abstractNumId=N 复用现有 template；或使用 --prop format=... 自动创建匹配的 abstractNum。默认每个新 num 会在 level 0 设置 startOverride，使同一 abstractNum 的两个 instance 独立计数；如需继承 Word 的 literal counter continuation 行为，请传 --prop continue=true。",
   "properties": {
     "id": {
       "type": "int",
-      "description": "numId (w:numId, unique within /numbering). Omit for auto-assignment. Paragraphs reference this id via --prop numId=N.",
+      "description": "numId（w:numId，在 /numbering 内唯一）。省略时自动分配。paragraph 通过 --prop numId=N 引用它。",
       "add": true,
       "set": false,
       "get": true,
@@ -29,7 +29,7 @@
     },
     "abstractNumId": {
       "type": "int",
-      "description": "abstractNum to reuse (mode B/C). Must already exist in /numbering. Mutually exclusive with mode-A format-based auto-create. Set to mutate after creation.",
+      "description": "要复用的 abstractNum（mode B/C）。必须已存在于 /numbering。与 mode-A 基于 format 的 auto-create 互斥。创建后可通过 Set 修改。",
       "add": true,
       "set": true,
       "get": true,
@@ -39,7 +39,7 @@
     },
     "format": {
       "type": "string",
-      "description": "mode A: when no abstractNumId is supplied, build a matching abstractNum from these props (format/text/indent/type/start) and bind this num to it. Same vocabulary as abstractNum.format.",
+      "description": "mode A：未提供 abstractNumId 时，使用这些 props（format/text/indent/type/start）创建匹配的 abstractNum，并将当前 num 绑定到它。可用值与 abstractNum.format 相同。",
       "aliases": ["fmt", "numFmt"],
       "add": true,
       "set": false,
@@ -53,7 +53,7 @@
     },
     "text": {
       "type": "string",
-      "description": "mode A: lvlText for the auto-created abstractNum level 0.",
+      "description": "mode A：自动创建的 abstractNum level 0 的 lvlText。",
       "aliases": ["lvlText"],
       "add": true,
       "set": false,
@@ -64,7 +64,7 @@
     },
     "indent": {
       "type": "int",
-      "description": "mode A: left indent (twips) for the auto-created abstractNum level 0.",
+      "description": "mode A：自动创建的 abstractNum level 0 的左缩进（twips）。",
       "add": true,
       "set": false,
       "get": false,
@@ -75,7 +75,7 @@
     "type": {
       "type": "enum",
       "values": ["hybridMultilevel", "multilevel", "singleLevel"],
-      "description": "mode A: multiLevelType for the auto-created abstractNum.",
+      "description": "mode A：自动创建的 abstractNum 的 multiLevelType。",
       "add": true,
       "set": false,
       "get": false,
@@ -85,7 +85,7 @@
     },
     "start": {
       "type": "int",
-      "description": "starting number for level 0. Shorthand for startOverride.0. Default behavior: a fresh num auto-injects a startOverride on level 0 (using the abstractNum's level-0 start, typically 1) so independent instances of the same template don't share counters. Pass --prop continue=true to suppress this.",
+      "description": "level 0 的起始编号。是 startOverride.0 的简写。默认情况下，新 num 会在 level 0 自动写入 startOverride（使用 abstractNum 的 level-0 start，通常为 1），从而让同一 template 的独立实例不共用计数器。传入 --prop continue=true 可禁止此行为。",
       "add": true,
       "set": false,
       "get": false,
@@ -95,7 +95,7 @@
     },
     "startOverride.<N>": {
       "type": "int",
-      "description": "per-level startOverride (N = 0..8). Emits <w:lvlOverride w:ilvl=N><w:startOverride w:val=...>. Use to reset specific levels without disturbing others.",
+      "description": "每个 level 的 startOverride（N = 0..8）。会写入 <w:lvlOverride w:ilvl=N><w:startOverride w:val=...>。用于重置指定 level，而不影响其他 level。",
       "add": true,
       "set": false,
       "get": false,
@@ -107,7 +107,7 @@
     },
     "continue": {
       "type": "bool",
-      "description": "if true, suppress the default level-0 startOverride injection — this num inherits Word's literal counter-continuation behavior from the abstractNum (two num instances on the same abstractNum keep counting together).",
+      "description": "为 true 时，禁止默认的 level-0 startOverride 写入；当前 num 从 abstractNum 继承 Word 的原生计数器续接行为（同一 abstractNum 的两个 num 实例会连续计数）。",
       "add": true,
       "set": false,
       "get": false,
@@ -117,7 +117,7 @@
     },
     "numId": {
       "type": "int",
-      "description": "readback alias for id (matches the w:numId attribute name).",
+      "description": "id 的读取别名（与 w:numId 属性名称一致）。",
       "add": false,
       "set": false,
       "get": true,

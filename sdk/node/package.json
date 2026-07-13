@@ -34,8 +34,5 @@
   ],
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "@officecli/officecli": "^1.0.0"
   }
 }

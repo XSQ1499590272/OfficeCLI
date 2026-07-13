@@ -15,7 +15,7 @@
       "/"
     ]
   },
-  "note": "Root container. Get returns the presentation node with slide count + theme/master/layout references as children. Not addressable via Add. Set on '/' exposes core document metadata (title/author/subject/keywords/description/category) — written to docProps/core.xml, same source as docx/xlsx. Element-level mutations go through /slide[N], /theme, etc.",
+  "note": "Root container。Get 返回 presentation node，并将 slide count 以及 theme/master/layout references 作为 children。不能通过 Add 定位。对 '/' 执行 Set 可修改 core document metadata（title/author/subject/keywords/description/category），写入 docProps/core.xml，来源与 docx/xlsx 相同。element 级修改通过 /slide[N]、/theme 等 path 执行。",
   "children": [
     {
       "element": "slide",
@@ -112,7 +112,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/core.xml Revision field — presentation save counter.",
+      "description": "docProps/core.xml 中的 Revision 字段，即 presentation 保存计数器。",
       "examples": [
         "--prop revisionNumber=3"
       ],
@@ -121,7 +121,7 @@
     },
     "created": {
       "type": "string",
-      "description": "creation timestamp from docProps/core.xml.",
+      "description": "来自 docProps/core.xml 的创建时间戳。",
       "add": false,
       "set": false,
       "get": true,
@@ -130,7 +130,7 @@
     },
     "modified": {
       "type": "string",
-      "description": "last-modified timestamp from docProps/core.xml.",
+      "description": "来自 docProps/core.xml 的最后修改时间戳。",
       "add": false,
       "set": false,
       "get": true,
@@ -140,7 +140,7 @@
     "slideWidth": {
       "type": "string",
       "aliases": ["width"],
-      "description": "slide width from <p:sldSz/@cx>, formatted via FormatEmu. Set accepts unit-qualified or raw EMU; setting width or height alone switches @type to 'custom'.",
+      "description": "来自 <p:sldSz/@cx> 的 slide 宽度，经 FormatEmu 格式化。Set 接受带单位的值或原始 EMU；仅设置 width 或 height 会将 @type 切换为 'custom'。",
       "add": false,
       "set": true,
       "get": true,
@@ -154,7 +154,7 @@
     "slideHeight": {
       "type": "string",
       "aliases": ["height"],
-      "description": "slide height from <p:sldSz/@cy>, formatted via FormatEmu. Set accepts unit-qualified or raw EMU; setting width or height alone switches @type to 'custom'.",
+      "description": "来自 <p:sldSz/@cy> 的 slide 高度，经 FormatEmu 格式化。Set 接受带单位的值或原始 EMU；仅设置 width 或 height 会将 @type 切换为 'custom'。",
       "add": false,
       "set": true,
       "get": true,
@@ -167,7 +167,7 @@
     },
     "slideSize": {
       "type": "string",
-      "description": "slide size preset name derived from <p:sldSz/@type>. Set accepts one of the listed preset names (widescreen | standard | 16:10 | a4 | a3 | letter | b4 | b5 | 35mm | overhead | banner | ledger | custom) and rewrites @cx/@cy + @type accordingly; unlisted names are rejected (use slideWidth/slideHeight for an arbitrary custom size).",
+      "description": "由 <p:sldSz/@type> 得到的 slide size preset 名称。Set 接受列出的 preset 名称之一（widescreen | standard | 16:10 | a4 | a3 | letter | b4 | b5 | 35mm | overhead | banner | ledger | custom），并相应重写 @cx/@cy + @type；未列出的名称会被拒绝（任意 custom size 请使用 slideWidth/slideHeight）。",
       "add": false,
       "set": true,
       "get": true,
@@ -180,7 +180,7 @@
     },
     "defaultFont": {
       "type": "string",
-      "description": "default minor (body) font from the first slide master's theme FontScheme.",
+      "description": "来自第一个 slide master 的 theme FontScheme 的默认 minor（body）字体。",
       "add": false,
       "set": false,
       "get": true,
@@ -192,7 +192,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "from docProps/app.xml application identifier (e.g. \"Microsoft PowerPoint\").",
+      "description": "来自 docProps/app.xml 的 application 标识符（例如 \"Microsoft PowerPoint\"）。",
       "readback": "application string",
       "enforcement": "report"
     },
@@ -202,7 +202,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "presentation @compatMode flag — true when the file is in legacy-compatibility mode.",
+      "description": "presentation 的 @compatMode 标记：文件处于 legacy-compatibility mode 时为 true。",
       "examples": [
         "--prop compatMode=true"
       ],
@@ -215,7 +215,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "presentation @firstSlideNum — slide number of the first slide (default 1).",
+      "description": "presentation 的 @firstSlideNum，即第一个 slide 的编号（默认 1）。",
       "examples": [
         "--prop firstSlideNum=10"
       ],
@@ -227,7 +227,7 @@
       "add": false,
       "set": true,
       "get": false,
-      "description": "Set-only input alias for presentation @rtl (right-to-left reading order). Get exposes the same OOXML attribute under the canonical key `direction` ('rtl' when true), matching docx convention. Asymmetric by design — set with `rtl=true|false`, read via `direction`.",
+      "description": "presentation @rtl（从右到左阅读顺序）的仅 Set 输入别名。Get 按与 docx 一致的约定，以标准 key `direction` 返回同一 OOXML 属性（为 true 时为 'rtl'）。这是有意的非对称设计：通过 `rtl=true|false` 设置，通过 `direction` 读取。",
       "examples": [
         "--prop rtl=true"
       ],
@@ -238,7 +238,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "Get-only canonical key for presentation reading direction. Emits 'rtl' when @rtl=true is set; absent otherwise. To set, use the input-only `rtl=true|false` key.",
+      "description": "presentation 阅读方向的仅 Get 标准 key。设置 @rtl=true 时返回 'rtl'；否则不返回。设置请使用仅输入的 `rtl=true|false` key。",
       "readback": "'rtl' when right-to-left; key absent for default left-to-right",
       "enforcement": "report"
     },
@@ -248,7 +248,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "PrintingProperties color mode. Set accepts: color|clr, grayscale|gray, blackAndWhite|bw.",
+      "description": "PrintingProperties 的 color mode。Set 接受：color|clr、grayscale|gray、blackAndWhite|bw。",
       "examples": [
         "--prop print.colorMode=gray",
         "--prop print.colorMode=color"
@@ -261,7 +261,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "PrintingProperties FrameSlides flag — print a thin border around each slide.",
+      "description": "PrintingProperties 的 FrameSlides 标记：在每个 slide 周围打印细边框。",
       "examples": [
         "--prop print.frameSlides=true"
       ],
@@ -273,7 +273,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "PrintingProperties HiddenSlides flag — include hidden slides in printed output.",
+      "description": "PrintingProperties 的 HiddenSlides 标记：在打印输出中包含隐藏的 slide。",
       "examples": [
         "--prop print.hiddenSlides=true"
       ],
@@ -286,7 +286,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "PrintingProperties PrintWhat — what gets printed. Set accepts shorthand (slides, handouts, notes, outline) and explicit OOXML tokens (handouts1, handouts2, handouts3, handouts4, handouts6, handouts9). Bare `handouts` is an alias for handouts1. Get returns the OOXML token (e.g. handouts1).",
+      "description": "PrintingProperties 的 PrintWhat，即打印内容。Set 接受简写（slides、handouts、notes、outline）和明确的 OOXML token（handouts1、handouts2、handouts3、handouts4、handouts6、handouts9）。不带子字段的 `handouts` 是 handouts1 的别名。Get 返回 OOXML token（例如 handouts1）。",
       "examples": [
         "--prop print.what=handouts",
         "--prop print.what=handouts4",
@@ -300,7 +300,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "PrintingProperties ScaleToFitPaper flag — scale slides to fill the paper page.",
+      "description": "PrintingProperties 的 ScaleToFitPaper 标记：缩放 slide 以填满纸张页面。",
       "examples": [
         "--prop print.scaleToFitPaper=true"
       ],
@@ -313,7 +313,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "ShowProperties Loop flag — auto-restart slideshow when reaching the end.",
+      "description": "ShowProperties 的 Loop 标记：slideshow 到达末尾时自动重新开始。",
       "examples": [
         "--prop show.loop=true"
       ],
@@ -326,7 +326,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "ShowProperties ShowNarration flag — play recorded narration during slideshow.",
+      "description": "ShowProperties 的 ShowNarration 标记：slideshow 时播放录制的 narration。",
       "examples": [
         "--prop show.narration=true"
       ],
@@ -339,7 +339,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "ShowProperties ShowAnimation flag — play animations during slideshow.",
+      "description": "ShowProperties 的 ShowAnimation 标记：slideshow 时播放 animation。",
       "examples": [
         "--prop show.animation=true"
       ],
@@ -352,7 +352,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "ShowProperties UseTimings flag — use stored slide timings during slideshow.",
+      "description": "ShowProperties 的 UseTimings 标记：slideshow 时使用保存的 slide timing。",
       "examples": [
         "--prop show.useTimings=true"
       ],
@@ -365,7 +365,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "ExtendedProperties RemovePersonalInfoOnSave — strip author/last-saved-by metadata on save.",
+      "description": "ExtendedProperties 的 RemovePersonalInfoOnSave：保存时移除 author/last-saved-by 元数据。",
       "examples": [
         "--prop removePersonalInfo=true"
       ],

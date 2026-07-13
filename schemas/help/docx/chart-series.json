@@ -15,6 +15,6 @@
       "/body/p[N]/chart[M]/series[K]"
     ]
   },
-  "note": "At Add time, series pass as dotted props on the parent chart (series1.name, series1.values, series1.color, series1.categories); this schema is per-series Set/Get after creation. Combo charts (mixed chartType / secondary axis) are unsupported — create separate charts. `lineStyle` is not a key (rejected as UNSUPPORTED — use lineWidth + lineDash).",
+  "note": "Add 时，series 通过 parent chart 上的点号 props 传入（series1.name、series1.values、series1.color、series1.categories）；创建后使用此 schema 对单个 series 执行 Set/Get。不支持 Combo chart（混合 chartType 或 secondary axis），请创建多个 chart。lineStyle 不是有效 key（会被拒绝并报告 UNSUPPORTED），请改用 lineWidth + lineDash。",
   "extends": "_shared/chart-series"
 }

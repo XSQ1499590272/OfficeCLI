@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName/colbreak[N]"]
   },
-  "note": "Manual page break before the specified column. Accepts numeric index or column letter.",
+  "note": "在指定 column 前插入 manual page break。接受 numeric index 或 column letter。",
   "properties": {
     "col": {
       "type": "string",
-      "description": "column index or letter. Aliases: column, index.",
+      "description": "column index 或字母。Aliases: column、index。",
       "aliases": ["column", "index"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop col=F"],
@@ -26,19 +26,19 @@
     },
     "manual": {
       "type": "bool",
-      "description": "true ⇒ user-inserted (manual) break; false ⇒ automatic.",
+      "description": "true 表示用户插入的（manual）分页符；false 表示 automatic。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     },
     "min": {
       "type": "int",
-      "description": "zero-based start row the break spans (OOXML brk@min).",
+      "description": "分页符覆盖范围的起始 row，使用 0-based index（OOXML brk@min）。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     },
     "max": {
       "type": "int",
-      "description": "zero-based end row the break spans (OOXML brk@max).",
+      "description": "分页符覆盖范围的结束 row，使用 0-based index（OOXML brk@max）。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     }

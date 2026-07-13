@@ -10,9 +10,9 @@ static partial class CommandBuilder
 {
     private static Command BuildRefreshCommand(Option<bool> jsonOption)
     {
-        var fileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
+        var fileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
 
-        var cmd = new Command("refresh", "Recalculate derived field values (TOC page numbers, PAGE/NUMPAGES, cross-references). Word + Windows required for .docx.");
+        var cmd = new Command("refresh", "重新计算派生 field 值（TOC 页码、PAGE/NUMPAGES、cross-reference）。.docx 需要 Word + Windows。");
         cmd.Add(fileArg);
         cmd.Add(jsonOption);
 

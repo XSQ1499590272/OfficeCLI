@@ -35,7 +35,7 @@
     },
     "font": {
       "type": "string",
-      "description": "bare font family — write-only convenience that sets ASCII+HighAnsi+EastAsia to the same value. Get normalizes the readback to per-script canonical keys (font.latin / font.ea / font.cs) so a get→set round-trip preserves divergent slot values.",
+      "description": "不带子字段的字体族名称。此写入快捷方式会将 ASCII、HighAnsi 和 EastAsia 设为同一值。Get 会将读取结果规范为各脚本的标准 key（font.latin / font.ea / font.cs），因此 get→set 往返可保留不同槽位的值。",
       "aliases": [
         "fontname",
         "fontFamily",

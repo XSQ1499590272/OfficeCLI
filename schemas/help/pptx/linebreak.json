@@ -17,6 +17,6 @@
       "/slide[N]/placeholder[X]/paragraph[K]/br[B]"
     ]
   },
-  "note": "Soft line break (<a:br/>) inside a paragraph's text body — a new line within the same paragraph, not a new paragraph. Add to a shape/placeholder or a specific paragraph: `add /slide[1]/shape[2] --type br` (appends to the last paragraph) or target `/slide[1]/shape[2]/paragraph[1]`. The break inherits the run formatting at its position; there are no properties to set. Aliases: br, line-break.",
+  "note": "Soft line break（<a:br/>），位于 paragraph 的 text body 内；它是在同一 paragraph 中换行，不会创建新 paragraph。可添加到 shape/placeholder 或指定 paragraph：'add /slide[1]/shape[2] --type br'（追加到最后一个 paragraph），或将目标设为 '/slide[1]/shape[2]/paragraph[1]'。break 会继承所在位置的 run formatting，没有可设置的 property。Aliases：br、line-break。",
   "properties": {}
 }

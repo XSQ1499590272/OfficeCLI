@@ -9,10 +9,8 @@ same object you'd put in an officecli `batch` list.
 npm install @officecli/sdk
 ```
 
-Installing the SDK pulls `@officecli/officecli`, which bundles an auto-updating
-native binary — so the CLI comes with it and you don't manage it separately. If
-the binary is ever missing, the SDK provisions it on first use (downloads the
-bundled signed binary, or falls back to the official installer).
+The SDK requires an existing `officecli` binary on `PATH`, or an explicit
+`binary` option pointing to it.
 
 ## Usage
 
@@ -58,10 +56,8 @@ await doc.send({ command: 'get', path: '/body/p[1]' });
 - `Document.batch(items, { force = true, stopOnError = false, timeoutMs? })`.
 - `Document.alive(timeoutMs?)` — is a resident serving this file?
 - `Document.close()` — stop the resident (flushes to disk).
-- `install()` — run the official installer (unix only).
-
-`options`: `{ binary?, timeoutMs?, autoInstall? }`. Pass `binary` to point at a
-specific officecli; `autoInstall: false` to disable provisioning a missing CLI.
+`options`: `{ binary?, timeoutMs? }`. Pass `binary` to point at a specific
+officecli executable.
 
 ## Errors vs business outcomes
 

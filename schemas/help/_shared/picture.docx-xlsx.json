@@ -4,7 +4,7 @@
   "properties": {
     "fallback": {
       "type": "string",
-      "description": "optional PNG fallback for SVG sources. When omitted, a 1x1 transparent PNG is generated.",
+      "description": "SVG 来源可选的 PNG fallback。省略时会生成 1x1 的透明 PNG。",
       "add": true,
       "set": false,
       "get": false,

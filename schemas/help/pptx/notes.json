@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/notes"]
   },
-  "note": "Speaker notes live in a NotesSlidePart paired with the slide. Add creates the part if absent; Set replaces text.",
+  "note": "Speaker notes 保存在与 slide 配对的 NotesSlidePart 中。Add 在 part 不存在时创建，Set 替换文本。",
   "properties": {
     "text": {
       "type": "string",
-      "description": "notes body text.",
+      "description": "notes 正文文本。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop text=\"Emphasize slide 3 data\""],
       "readback": "notes text",
@@ -28,14 +28,14 @@
       "type": "enum",
       "values": ["ltr", "rtl"],
       "aliases": ["dir", "rtl"],
-      "description": "Reading direction for the notes body. Sets <a:pPr rtl=\"1\"/> on every paragraph and rtlCol=\"1\" on the body shape's bodyPr. Required for Arabic / Hebrew speaker notes.",
+      "description": "notes 正文的文字方向。会在每个 paragraph 上设置 <a:pPr rtl=\"1\"/>，并在 body shape 的 bodyPr 上设置 rtlCol=\"1\"。Arabic / Hebrew speaker notes 需要此设置。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop direction=rtl"],
       "enforcement": "report"
     },
     "lang": {
       "type": "string",
-      "description": "BCP-47 language tag applied to every run in the notes body (a:rPr/@lang). Mirrors the shape Set vocabulary.",
+      "description": "应用到 notes 正文每个 run 的 BCP-47 language tag（a:rPr/@lang）。可使用与 shape Set 相同的取值。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop lang=ar-SA"],
       "enforcement": "report"

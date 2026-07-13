@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/model3d[M]"]
   },
-  "note": "Only .glb (glTF-Binary) accepted. Placeholder PNG auto-generated for non-3D-aware viewers. Defaults to 10cm × 10cm centered on the slide.",
+  "note": "仅接受 .glb（glTF-Binary）。会为不支持 3D 的 viewer 自动生成 placeholder PNG。默认尺寸为 10cm × 10cm，并在 slide 中居中。",
   "properties": {
     "src": {
       "type": "string",
-      "description": ".glb source (file path, URL, data-URI). Non-glb rejected. Accepted on add/set only; Get does NOT surface this key (no Format[\"src\"] or Format[\"relId\"] is emitted for model3d).",
+      "description": ".glb source（file path、URL 或 data-URI）。非 glb 文件会被拒绝。仅在 Add/Set 时接受；Get 不会返回此 key（model3d 不会输出 Format[\"src\"] 或 Format[\"relId\"]）。",
       "aliases": ["path"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop src=/path/to/model.glb"],
@@ -57,7 +57,7 @@
     },
     "rotation": {
       "type": "string",
-      "description": "Model rotation as comma-separated degrees \"ax,ay,az\" (X, Y, Z axes). Missing axes default to 0. Per-axis aliases rotx/roty/rotz also accepted on set.",
+      "description": "Model 的旋转角度，使用逗号分隔的 degrees \"ax,ay,az\"（X、Y、Z 轴）。缺失的轴默认为 0。Set 时也接受按轴指定的 alias：rotx/roty/rotz。",
       "aliases": ["rotx", "roty", "rotz"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop rotation=30,45,0", "--prop rotx=30"],

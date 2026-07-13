@@ -11,16 +11,16 @@ static partial class CommandBuilder
 {
     private static Command BuildSetCommand(Option<bool> jsonOption)
     {
-        var forceOption = new Option<bool>("--force") { Description = "Force write even if document is protected" };
-        var setFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var setPathArg = new Argument<string>("path") { Description = "DOM path to the element. The 'selected' pseudo-path is deprecated for mutations: use `get selected` to capture path(s) first, then `set <path>` (or a `batch` file for multi-select) so the target lives in the command line, not in transient watch-server state." };
-        var propsOpt = new Option<string[]>("--prop") { Description = "Property to set (key=value)", AllowMultipleArgumentsPerToken = true };
+        var forceOption = new Option<bool>("--force") { Description = "即使文档受保护也强制写入" };
+        var setFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var setPathArg = new Argument<string>("path") { Description = "元素的 DOM 路径。用于 mutation 的 'selected' pseudo-path 已废弃：先用 `get selected` 获取路径，再逐个使用 `set <path>`（多选可结合 `batch` 命令使用），使目标存在于命令行而非临时的 watch-server state 中。" };
+        var propsOpt = new Option<string[]>("--prop") { Description = "要设置的属性（key=value）", AllowMultipleArgumentsPerToken = true };
         // Selector: top-level alternative to --prop find=VALUE. r"..." prefix triggers regex (project-wide CONSISTENCY(find-regex)).
-        var findOpt = new Option<string?>("--find") { Description = "Find this text/pattern (literal substring; `r\"...\"` prefix enables regex). Equivalent to --prop find=VALUE." };
+        var findOpt = new Option<string?>("--find") { Description = "查找此文本/pattern（字面子串；`r\"...\"` 前缀启用 regex）。等同于 --prop find=VALUE。" };
         // Action paired with --find: replacement text. Top-level alternative to --prop replace=VALUE.
-        var replaceOpt = new Option<string?>("--replace") { Description = "Replacement text for --find matches. Equivalent to --prop replace=VALUE." };
+        var replaceOpt = new Option<string?>("--replace") { Description = "替换 --find 匹配项的文本。等同于 --prop replace=VALUE。" };
 
-        var setCommand = new Command("set", "Modify a document node's properties") { TreatUnmatchedTokensAsErrors = false };
+        var setCommand = new Command("set", "修改文档节点属性") { TreatUnmatchedTokensAsErrors = false };
         setCommand.Add(setFileArg);
         setCommand.Add(setPathArg);
         setCommand.Add(propsOpt);

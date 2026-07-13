@@ -11,26 +11,18 @@ namespace OfficeCli;
 /// </summary>
 public static class McpInstaller
 {
-    // Path to record as the MCP server command. Must stay valid across
-    // upgrades, so resolve to a STABLE location in priority order:
-    //   1. The canonical self-install path (~/.local/bin/officecli) — self-
-    //      install overwrites that file in place, so the path never changes.
-    //   2. `officecli` as found on PATH. For a package-manager install this is
+    // Path to record as the MCP server command. Resolve a stable PATH wrapper
+    // first. For a package-manager install this is
     //      the stable wrapper/symlink (e.g. /opt/homebrew/bin/officecli), which
     //      `brew upgrade` repoints without changing the path. We must NOT use
     //      Environment.ProcessPath here: it resolves the symlink to the
     //      versioned target (…/Cellar/officecli/1.0.106/…) which rots on upgrade.
-    //   3. The running binary — last resort for a download/dev build that has
-    //      not been installed anywhere on PATH yet.
+    // The running binary is the fallback for a download or development build.
     private static string OfficecliPath
     {
         get
         {
             var exe = OperatingSystem.IsWindows() ? "officecli.exe" : "officecli";
-
-            var installed = Core.Installer.InstalledBinaryPath;
-            if (File.Exists(installed))
-                return installed;
 
             var onPath = ResolveOnPath(exe);
             if (onPath != null)
@@ -83,13 +75,13 @@ public static class McpInstaller
                 // it on stderr, matching the default branch below and
                 // WriteEarlyDispatchUsage. Otherwise scripts that capture stdout
                 // see the error text mixed into normal output.
-                Console.Error.WriteLine("Usage: officecli mcp uninstall <target>");
-                Console.Error.WriteLine("Targets: lms, claude, cursor, vscode");
+                Console.Error.WriteLine("用法：officecli mcp uninstall <target>");
+                Console.Error.WriteLine("目标：lms、claude、cursor、vscode");
                 return false;
             default:
-                Console.Error.WriteLine($"Unknown target: {target}");
-                Console.Error.WriteLine("Supported: lms (LM Studio), claude (Claude Code), cursor, vscode (Copilot)");
-                Console.Error.WriteLine("Use 'officecli mcp list' to see current status.");
+                Console.Error.WriteLine($"未知目标：{target}");
+                Console.Error.WriteLine("支持：lms（LM Studio）、claude（Claude Code）、cursor、vscode（Copilot）");
+                Console.Error.WriteLine("使用 'officecli mcp list' 查看当前状态。");
                 return false;
         }
     }
@@ -392,7 +384,7 @@ public static class McpInstaller
 
     private static void ListStatus()
     {
-        Console.WriteLine("officecli MCP registration status:");
+        Console.WriteLine("officecli MCP 注册状态：");
         Console.WriteLine();
 
         CheckStatus("LM Studio", Path.Combine(
@@ -403,9 +395,9 @@ public static class McpInstaller
         CheckJsonStatus("VS Code", GetVsCodeMcpPath());
 
         Console.WriteLine();
-        Console.WriteLine("Commands:");
-        Console.WriteLine("  officecli mcp <target>              Register (lms, claude, cursor, vscode)");
-        Console.WriteLine("  officecli mcp uninstall <target>    Unregister");
+        Console.WriteLine("命令：");
+        Console.WriteLine("  officecli mcp <target>              注册（lms、claude、cursor、vscode）");
+        Console.WriteLine("  officecli mcp uninstall <target>    注销");
     }
 
     private static void CheckStatus(string name, string path)

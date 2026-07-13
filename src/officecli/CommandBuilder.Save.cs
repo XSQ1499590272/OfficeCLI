@@ -24,8 +24,8 @@ static partial class CommandBuilder
     // wrong mode.
     private static Command BuildSaveCommand(Option<bool> jsonOption)
     {
-        var saveFileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
-        var saveCommand = new Command("save", "Flush in-memory changes to disk, keeping the resident running. Run before a non-officecli program reads the file (officecli's own reads always see edits; a direct disk reader sees the pre-edit file until a flush). A live resident also auto-flushes shortly after going idle (adaptive 2-10s; see OFFICECLI_RESIDENT_FLUSH: each|auto|<seconds>|off). No-op if no resident is active.");
+        var saveFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
+        var saveCommand = new Command("save", "将内存修改写入磁盘，同时保持 resident 运行。非 officecli 程序读取文件前请执行；officecli 自身读取始终可见修改，直接磁盘读取在 flush 前只会看到修改前文件。运行中的 resident 空闲后也会自动写入（自适应 2–10 秒；参见 OFFICECLI_RESIDENT_FLUSH: each|auto|<seconds>|off）。没有活动 resident 时为 no-op。");
         saveCommand.Add(saveFileArg);
         saveCommand.Add(jsonOption);
 

@@ -200,7 +200,7 @@ officecli add "$OUTPUT" '/slide[1]' --type shape \
 
 officecli add "$OUTPUT" '/slide[1]' --type shape \
   --prop 'name=#s3-p2-desc' \
-  --prop text='尤里·加加林乘坐东方1号完成108分钟环绕地球飞行，成为第一个进入太空的人类' \
+  --prop text='尤里·加加林乘坐 Vostok 1 完成108分钟环绕地球飞行，成为第一个进入太空的人类' \
   --prop font=苹方-简 \
   --prop size=16 \
   --prop color=C0CAD9 \

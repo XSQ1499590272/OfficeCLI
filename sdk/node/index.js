@@ -36,7 +36,6 @@
  *   - response  : {"ExitCode","Stdout","Stderr"}
  */
 
-const os = require('os');
 const net = require('net');
 const path = require('path');
 const fs = require('fs');
@@ -60,22 +59,9 @@ const BUSY_MAX_RETRIES = 3;            // = ResidentBusyMaxRetries
 // interactive window, so a long session over an SDK handle isn't cut short.
 const OPEN_IDLE_SECONDS = 12 * 60;
 
-// Installer scripts: the d.officecli.ai mirror is primary; GitHub raw is only a
-// fallback (same order as install.sh / install-binary.js). The mirror is
-// Cloudflare-fronted and reachable where raw.githubusercontent.com may be
-// rate-limited or blocked.
-const INSTALL_SH_MIRROR = 'https://d.officecli.ai/install.sh';
-const INSTALL_SH_GITHUB = 'https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh';
-const INSTALL_PS1_MIRROR = 'https://d.officecli.ai/install.ps1';
-const INSTALL_PS1_GITHUB = 'https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1';
 const MISSING_CLI =
-  "officecli CLI not found: {bin} is not on PATH nor in the default install " +
-  'location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only ' +
-  'forwards commands to the officecli binary, which must be installed separately. Install it:\n' +
-  '    node -e "require(\'@officecli/sdk\').install()"   # runs the official installer\n' +
-  '    # or: curl -fsSL ' + INSTALL_SH_MIRROR + ' | bash\n' +
-  '    # (npm i @officecli/sdk already pulls @officecli/officecli, which bundles the binary)\n' +
-  'Already installed elsewhere? pass { binary: "/path/to/officecli" }.';
+  'officecli CLI not found: {bin} is not on PATH. ' +
+  'Add it to PATH or pass { binary: "/path/to/officecli" }.';
 
 /**
  * Raised on transport/process failure (could not reach the resident). Business
@@ -276,18 +262,6 @@ async function serves(pingPath, fullPath, timeoutMs = 1000) {
 }
 
 // ---------------------------------------------------------------- binary resolution
-function installDirCandidate(name) {
-  // Where install.sh / install.ps1 drop the binary: ~/.local/bin on macOS/Linux,
-  // %LOCALAPPDATA%\OfficeCLI on Windows. PATH-miss fallback only.
-  if (IS_WIN) {
-    const base = process.env.LOCALAPPDATA;
-    if (!base) return null;
-    const exe = name.toLowerCase().endsWith('.exe') ? name : name + '.exe';
-    return path.join(base, 'OfficeCLI', exe);
-  }
-  return path.join(os.homedir(), '.local', 'bin', name);
-}
-
 function whichOnPath(name) {
   const dirs = (process.env.PATH || '').split(path.delimiter);
   const cands = IS_WIN ? [name, name + '.exe', name + '.cmd'] : [name];
@@ -306,88 +280,10 @@ function whichOnPath(name) {
   return null;
 }
 
-function bundledBinary() {
-  // If the @officecli/officecli installer package is installed (it is a
-  // dependency), prefer its vendored, auto-updating binary. Returns the path if
-  // it is present on disk, else null. require is wrapped so the SDK still works
-  // as a pure thin client when the dependency was omitted.
-  try {
-    const cli = require('@officecli/officecli');
-    const p = cli.binaryPath();
-    return fs.existsSync(p) ? p : null;
-  } catch (_) {
-    return null;
-  }
-}
-
 function resolveBinary(binary) {
-  // Order: explicit path (has a separator) is trusted as-is; then the bundled
-  // installer-package binary; then PATH; then the official installer's known
-  // location. Idempotent — an already-resolved absolute path passes through.
+  // An explicit path is trusted; a bare name must already be on PATH.
   if (binary.includes(path.sep) || binary.includes('/')) return binary;
-  if (binary === 'officecli') {
-    const bundled = bundledBinary();
-    if (bundled) return bundled;
-  }
-  const found = whichOnPath(binary);
-  if (found) return found;
-  const cand = installDirCandidate(binary);
-  if (cand) {
-    try {
-      fs.accessSync(cand, fs.constants.X_OK);
-      return cand;
-    } catch (_) {
-      /* fall through */
-    }
-  }
-  return binary; // give up; runCli raises the helpful error
-}
-
-async function ensureCliBinary(binary, autoInstall) {
-  // Async binary resolution for the entry points (open/create), able to ACTIVELY
-  // provision a missing CLI. Order: explicit path is trusted as-is; then the
-  // bundled installer package (download its binary if not yet present — this is
-  // the package's own signed download, not a surprise); then PATH; then the
-  // installer's known location; finally, if autoInstall, run the official
-  // install.sh. Returns the resolved path (or the bare name, so runCli raises
-  // the helpful MISSING_CLI error if everything failed).
-  if (binary.includes(path.sep) || binary.includes('/')) return binary; // explicit: trust caller
-
-  // Accept the first candidate that actually RUNS (`--version` exit 0), in
-  // priority order: the bundled (auto-updating) binary, then PATH, then the
-  // installer's known location. Probing — not mere file existence — means a
-  // present-but-broken binary is skipped, and a working officecli is never
-  // shadowed by a needless install.
-  const candidates = [];
-  if (binary === 'officecli') {
-    try {
-      const p = require('@officecli/officecli').binaryPath();
-      if (fs.existsSync(p)) candidates.push(p);
-    } catch (_) { /* dependency absent */ }
-  }
-  const onPath = whichOnPath(binary);
-  if (onPath) candidates.push(onPath);
-  const cand = installDirCandidate(binary);
-  if (cand) candidates.push(cand);
-
-  for (const c of candidates) {
-    if (probeVersion(c)) return c;
-  }
-
-  // Nothing usable found anywhere — provision it (only for the default name).
-  if (autoInstall && binary === 'officecli') {
-    process.stderr.write('[officecli] CLI not found — installing from d.officecli.ai …\n');
-    try {
-      const cli = require('@officecli/officecli');
-      await cli.ensureBinary(); // bundled package's own signed download
-      const p = cli.binaryPath();
-      if (probeVersion(p)) return p;
-    } catch (_) { /* fall through to the official installer */ }
-    install(); // install.sh (unix) / install.ps1 (Windows)
-    const after = installDirCandidate('officecli');
-    if (after && probeVersion(after)) return after;
-  }
-  return binary; // give up → runCli raises the helpful MISSING_CLI
+  return whichOnPath(binary) || binary;
 }
 
 // Quote one token for a cmd.exe command line: ALWAYS wrap in double quotes,
@@ -429,16 +325,6 @@ function runCli(binary, argv) {
   }
   if (r.error) throw new OfficeCliError(-1, r.error.message);
   return r;
-}
-
-// Probe a resolved binary by running `<binary> --version`: true iff it actually
-// runs and exits 0. We accept only a WORKING officecli — a present-but-broken
-// file (wrong arch, stale/again-renamed shim, corrupt download) must not be
-// used, and conversely a working officecli on PATH must not be shadowed by a
-// needless auto-install. Output is discarded.
-function probeVersion(binPath) {
-  const r = spawnCli(binPath, ['--version'], { stdio: ['ignore', 'ignore', 'ignore'] });
-  return !r.error && r.status === 0;
 }
 
 // ---------------------------------------------------------------- the shell
@@ -570,9 +456,9 @@ class Document {
  * binds to THAT resident (no second spawn). Inherits officecli's semantics —
  * file_locked (close it first) / file_exists (pass '--force').
  */
-async function create(filePath, args = [], { binary = 'officecli', timeoutMs = 30000, autoInstall = true } = {}) {
+async function create(filePath, args = [], { binary = 'officecli', timeoutMs = 30000 } = {}) {
   const full = path.resolve(filePath);
-  const bin = await ensureCliBinary(binary, autoInstall);
+  const bin = resolveBinary(binary);
   const r = runCli(bin, ['create', full, ...args]);
   if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
   const doc = new Document(full, bin, timeoutMs);
@@ -591,8 +477,8 @@ async function create(filePath, args = [], { binary = 'officecli', timeoutMs = 3
  * the command retried once; an ALIVE-but-busy pipe raises OfficeCliError (retry,
  * or close() and reopen).
  */
-async function open(filePath, { binary = 'officecli', timeoutMs = 30000, autoInstall = true } = {}) {
-  const bin = await ensureCliBinary(binary, autoInstall);
+async function open(filePath, { binary = 'officecli', timeoutMs = 30000 } = {}) {
+  const bin = resolveBinary(binary);
   const doc = new Document(filePath, bin, timeoutMs);
   await doc._start();
   // Mirror CLI `open`: when reusing a resident create() auto-started with a
@@ -603,42 +489,4 @@ async function open(filePath, { binary = 'officecli', timeoutMs = 30000, autoIns
   return doc;
 }
 
-/**
- * Install the officecli CLI binary via its OFFICIAL installer — explicit by
- * design (this SDK never auto-downloads behind your back). Runs install.ps1 via
- * PowerShell on Windows and install.sh via bash elsewhere. Note: when installed
- * via npm, @officecli/officecli already bundles an auto-updating binary, so this
- * is only needed for a standalone (~/.local/bin or %LOCALAPPDATA%\OfficeCLI)
- * install.
- */
-function install() {
-  if (IS_WIN) {
-    process.stderr.write(`Installing officecli via ${INSTALL_PS1_MIRROR} (github fallback) ...\n`);
-    // Fetch the script mirror-first, github fallback, then run it. The whole
-    // try/catch is assigned so a mirror failure transparently falls back.
-    const ps = `$s = try { irm '${INSTALL_PS1_MIRROR}' } catch { irm '${INSTALL_PS1_GITHUB}' }; $s | iex`;
-    const r = spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps], {
-      stdio: 'inherit',
-    });
-    if (r.status !== 0) {
-      throw new OfficeCliError(
-        r.status == null ? -1 : r.status,
-        `officecli install failed. Run manually:\n    irm ${INSTALL_PS1_MIRROR} | iex`
-      );
-    }
-    return;
-  }
-  process.stderr.write(`Installing officecli via ${INSTALL_SH_MIRROR} (github fallback) ...\n`);
-  // (curl mirror || curl github) | bash — the subshell emits whichever script
-  // fetch succeeds; the group keeps the pipe bound to the whole fallback.
-  const sh = `(curl -fsSL ${INSTALL_SH_MIRROR} 2>/dev/null || curl -fsSL ${INSTALL_SH_GITHUB}) | bash`;
-  const r = spawnSync('bash', ['-c', sh], { stdio: 'inherit' });
-  if (r.status !== 0) {
-    throw new OfficeCliError(
-      r.status == null ? -1 : r.status,
-      `officecli install failed. Run manually:\n    curl -fsSL ${INSTALL_SH_MIRROR} | bash`
-    );
-  }
-}
-
-module.exports = { open, create, install, Document, OfficeCliError, pipePaths };
+module.exports = { open, create, Document, OfficeCliError, pipePaths };

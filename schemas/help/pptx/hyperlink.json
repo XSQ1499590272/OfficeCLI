@@ -17,12 +17,12 @@
       "/slide[N]/shape[M]/p[K]/r[L]/hyperlink"
     ]
   },
-  "note": "Aliases: link. add attaches a shape-wide link only; inline run links are created via `set /slide[N]/shape[M]/p[K]/r[L] link=...`. Internal slide jumps use link=slide[N]; named actions use link=firstslide|lastslide|nextslide|previousslide|endshow.",
+  "note": "Aliases：link。Add 只附加 shape-wide link；inline run link 通过 'set /slide[N]/shape[M]/p[K]/r[L] link=...' 创建。内部 slide 跳转使用 link=slide[N]；命名 action 使用 link=firstslide|lastslide|nextslide|previousslide|endshow。",
   "extends": "_shared/hyperlink",
   "properties": {
     "link": {
       "type": "string",
-      "description": "external URL or internal target. pptx Set/Get canonical key on shape/run is 'link'. Alias: url.",
+      "description": "external URL 或 internal target。pptx 在 shape/run 上使用的 Set/Get canonical key 是 'link'。Alias: url。",
       "aliases": [
         "url"
       ],
@@ -37,7 +37,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "hover-text shown by PowerPoint when the link is moused over. Usually paired with 'link'; a tooltip-only set on a run that already has a link updates the existing tooltip.",
+      "description": "鼠标悬停在 link 上时 PowerPoint 显示的 hover-text。通常与 'link' 一起使用；如果 run 已有 link，仅设置 tooltip 会更新现有 tooltip。",
       "add": true,
       "set": true,
       "get": true,

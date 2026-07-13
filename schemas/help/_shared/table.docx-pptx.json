@@ -4,7 +4,7 @@
   "properties": {
     "border.all": {
       "type": "string",
-      "description": "shorthand: applies the border to every edge of every cell. PPT OOXML has no table-level border element — this fans out to per-cell a:lnL/lnR/lnT/lnB. Format: 'WIDTH[ DASH][ COLOR]' space-separated (e.g. '1pt solid FF0000') or 'STYLE;WIDTH;COLOR[;DASH]' semicolon form (style is ignored — kept for docx parity). DASH ∈ solid|dot|dash|lgDash|dashDot|sysDot|sysDash. Use 'none' to clear. Alias: border. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "简写：将边框应用到每个 cell 的所有边。PPT OOXML 没有 table 级边框元素，因此会展开为每个 cell 的 a:lnL/lnR/lnT/lnB。格式：空格分隔的 'WIDTH[ DASH][ COLOR]'（例如 '1pt solid FF0000'），或分号形式 'STYLE;WIDTH;COLOR[;DASH]'（style 会被忽略，仅为与 docx 保持一致）。DASH ∈ solid|dot|dash|lgDash|dashDot|sysDot|sysDash。传入 'none' 可清除。别名：border。跨格式说明：docx 仅接受分号形式 'STYLE;SIZE;COLOR'；pptx 更宽松。",
       "aliases": [
         "border"
       ],
@@ -21,7 +21,7 @@
     },
     "border.bottom": {
       "type": "string",
-      "description": "outer bottom border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR'. Add/Set only — read per-cell.",
+      "description": "外侧下边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 接受空格分隔的 'WIDTH DASH COLOR' 形式；docx 仅接受分号形式 'STYLE;SIZE;COLOR'。仅 Add/Set；请按 cell 读取。",
       "add": true,
       "set": true,
       "get": false,
@@ -34,7 +34,7 @@
     },
     "border.horizontal": {
       "type": "string",
-      "description": "inside-horizontal dividers (between rows). Fans out to bottom of rows 1..N-1 plus top of rows 2..N. PPT has no native inside-border element. Alias: border.insideH. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "内部水平分隔线（行之间）。会展开为第 1..N-1 行的下边框和第 2..N 行的上边框。PPT 没有原生内部边框元素。别名：border.insideH。跨格式说明：docx 仅接受分号形式 'STYLE;SIZE;COLOR'；pptx 更宽松。",
       "aliases": [
         "border.insideh",
         "border.insideH"
@@ -50,7 +50,7 @@
     },
     "border.left": {
       "type": "string",
-      "description": "outer left edge: applies to the left of column-1 cells in every row only. Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "外侧左边：仅应用于每一行第 1 列 cell 的左侧。格式与 border.all 相同。跨格式说明：docx 仅接受分号形式 'STYLE;SIZE;COLOR'；pptx 更宽松。",
       "add": true,
       "set": true,
       "get": false,
@@ -62,7 +62,7 @@
     },
     "border.right": {
       "type": "string",
-      "description": "outer right edge: applies to the right of last-column cells in every row only. Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "外侧右边：仅应用于每一行末列 cell 的右侧。格式与 border.all 相同。跨格式说明：docx 仅接受分号形式 'STYLE;SIZE;COLOR'；pptx 更宽松。",
       "add": true,
       "set": true,
       "get": false,
@@ -74,7 +74,7 @@
     },
     "border.top": {
       "type": "string",
-      "description": "outer top border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units). Add/Set only — table-level border readback is not surfaced today; inspect per-cell border.top instead.",
+      "description": "外侧上边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 接受空格分隔的 'WIDTH DASH COLOR' 形式；docx 仅接受分号形式 'STYLE;SIZE;COLOR'（SIZE 的单位为 1/8 pt）。仅 Add/Set；当前不返回 table 级边框读取结果，请查看每个 cell 的 border.top 替代。",
       "add": true,
       "set": true,
       "get": false,
@@ -86,7 +86,7 @@
     },
     "border.vertical": {
       "type": "string",
-      "description": "inside-vertical dividers (between columns). Fans out to right of cols 1..M-1 plus left of cols 2..M. Alias: border.insideV. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "内部垂直分隔线（列之间）。会展开为第 1..M-1 列的右边框和第 2..M 列的左边框。别名：border.insideV。跨格式说明：docx 仅接受分号形式 'STYLE;SIZE;COLOR'；pptx 更宽松。",
       "aliases": [
         "border.insidev",
         "border.insideV"
@@ -102,7 +102,7 @@
     },
     "cols": {
       "type": "int",
-      "description": "number of columns (ignored if 'data' is supplied).",
+      "description": "列数（提供 'data' 时忽略）。",
       "add": true,
       "set": false,
       "get": true,
@@ -114,7 +114,7 @@
     },
     "data": {
       "type": "string",
-      "description": "inline CSV-ish data ('H1,H2;R1C1,R1C2') or CSV file/URL/data-URI resolvable by FileSource.",
+      "description": "内联 CSV 形式的数据（'H1,H2;R1C1,R1C2'），或可由 FileSource 解析的 CSV 文件/URL/data-URI。",
       "add": true,
       "set": false,
       "get": false,
@@ -126,7 +126,7 @@
     },
     "rows": {
       "type": "int",
-      "description": "number of rows (ignored if 'data' is supplied).",
+      "description": "行数（提供 'data' 时忽略）。",
       "add": true,
       "set": false,
       "get": true,
@@ -138,7 +138,7 @@
     },
     "width": {
       "type": "string",
-      "description": "table width in twips (Dxa) or percent ('50%' → Pct).",
+      "description": "table 宽度，可为 twips（Dxa）或百分比（'50%' → Pct）。",
       "add": true,
       "set": true,
       "get": true,

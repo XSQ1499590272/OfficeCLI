@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/video[M]", "/slide[N]/audio[M]"]
   },
-  "note": "Aliases: video, audio. Video/audio inferred from extension when type=media. Poster image auto-generated when not supplied.",
+  "note": "Aliases：video、audio。当 type=media 时，会根据 extension 推断 video/audio。未提供 poster 时会自动生成 poster image。",
   "properties": {
     "src": {
       "type": "string",
-      "description": "media source — file path, URL, or data-URI; accepted on add/set only. Get does NOT surface this key (no Format[\"src\"] or Format[\"relId\"] is emitted for media).",
+      "description": "media 来源，可以是 file path、URL 或 data-URI；仅在 Add/Set 时接受。Get 不会返回此 key（media 不会输出 Format[\"src\"] 或 Format[\"relId\"]）。",
       "aliases": ["path"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop src=/path/to/video.mp4"],
@@ -27,7 +27,7 @@
     },
     "poster": {
       "type": "string",
-      "description": "custom thumbnail image path.",
+      "description": "自定义 thumbnail 图像路径。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop poster=/path/to/thumb.png"],
       "readback": "n/a",
@@ -63,7 +63,7 @@
     },
     "volume": {
       "type": "int",
-      "description": "playback volume 0-100.",
+      "description": "播放音量，范围为 0-100。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop volume=80"],
       "readback": "volume percent",
@@ -79,7 +79,7 @@
     },
     "loop": {
       "type": "bool",
-      "description": "loop until stopped (repeats the clip indefinitely during playback).",
+      "description": "循环播放，直到手动停止（播放期间会无限重复 clip）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop loop=true"],
       "readback": "true/false",
@@ -87,7 +87,7 @@
     },
     "trimStart": {
       "type": "string",
-      "description": "trim from media start. Accepts ms ('200'), seconds ('1.5s'), or 'hh:mm:ss.fff' ('00:00:01.500'); stored as ms-int. Alias: trimstart.",
+      "description": "从 media 开头裁剪。接受 ms（'200'）、秒（'1.5s'）或 'hh:mm:ss.fff'（'00:00:01.500'）；存储为 ms-int。Alias: trimstart。",
       "aliases": ["trimstart"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop trimStart=1500", "--prop trimStart=1.5s", "--prop trimStart=00:00:01.500"],
@@ -96,7 +96,7 @@
     },
     "trimEnd": {
       "type": "string",
-      "description": "trim from media end. Same input forms as trimStart; stored as ms-int. Alias: trimend.",
+      "description": "从 media 结尾裁剪。输入格式与 trimStart 相同；存储为 ms-int。Alias: trimend。",
       "aliases": ["trimend"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop trimEnd=10000", "--prop trimEnd=10s", "--prop trimEnd=00:00:10.000"],

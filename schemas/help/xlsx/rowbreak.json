@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName/rowbreak[N]"]
   },
-  "note": "Manual page break before the specified row. 'pagebreak' with col= routes to colbreak.",
+  "note": "在指定 row 前插入 manual page break。使用 pagebreak 并传 col= 时会路由到 colbreak。",
   "properties": {
     "row": {
       "type": "int",
-      "description": "1-based row index where the break occurs. Alias: index.",
+      "description": "分页符所在的 row index，从 1 开始。Alias: index。",
       "aliases": ["index"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop row=20"],
@@ -26,19 +26,19 @@
     },
     "manual": {
       "type": "bool",
-      "description": "true ⇒ user-inserted (manual) break; false ⇒ automatic.",
+      "description": "true 表示用户插入的（manual）分页符；false 表示 automatic。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     },
     "min": {
       "type": "int",
-      "description": "zero-based start column the break spans (OOXML brk@min).",
+      "description": "分页符覆盖范围的起始 column，使用 0-based index（OOXML brk@min）。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     },
     "max": {
       "type": "int",
-      "description": "zero-based end column the break spans (OOXML brk@max).",
+      "description": "分页符覆盖范围的结束 column，使用 0-based index（OOXML brk@max）。",
       "add": false, "set": true, "get": false,
       "enforcement": "report"
     }

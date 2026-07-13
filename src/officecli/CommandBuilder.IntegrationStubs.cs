@@ -7,12 +7,11 @@ namespace OfficeCli;
 
 static partial class CommandBuilder
 {
-    // Stub Commands for the early-dispatch trio (mcp/skills/install).
+    // Stub command for the early-dispatched MCP surface.
     // These never execute their SetAction during normal use — Program.cs
     // intercepts those args before System.CommandLine sees them. The stubs
     // exist purely so:
-    //   1. `officecli --help` lists them in its Commands section (no longer
-    //      missing 3 commands relative to `officecli help`).
+    //   1. `officecli --help` lists it in its Commands section.
     //   2. `officecli <cmd> --help` reaches SCL (Program.cs falls through
     //      on --help/-h) and prints the usage from EarlyDispatchHelp.
     // Keep the usage strings in EarlyDispatchHelp (CommandBuilder.Help.cs)
@@ -25,9 +24,7 @@ static partial class CommandBuilder
     private static readonly Dictionary<string, string> StubBlurbs =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            ["mcp"]     = "Start the MCP stdio server, or register/unregister officecli with an MCP client. Run 'officecli help mcp' for full usage.",
-            ["skills"]  = "Install agent skill definitions (Claude Code, Cursor, Copilot, ...). Run 'officecli help skills' for full usage.",
-            ["install"] = "One-step setup: install binary + skills + MCP for detected agents. Run 'officecli help install' for full usage.",
+            ["mcp"] = "启动 MCP stdio server，或向 MCP client 注册/注销 officecli。完整用法请运行 'officecli help mcp'。",
         };
 
     internal static IEnumerable<Command> BuildIntegrationStubCommands()

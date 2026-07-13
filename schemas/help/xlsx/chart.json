@@ -15,7 +15,7 @@
       "/SheetName/chart[N]"
     ]
   },
-  "note": "Validator accepts dotted (axis./series./trendline./datalabels./font./fill./border./… ) and indexed (series{N}./dataLabel{N}./point{N}.) sub-prop namespaces in addition to keys declared below. Chart-level axis* props (axismin, axismax, axistitle, axisfont, …) are Add-time only; post-creation axis Set/Get goes through chart-axis.",
+  "note": "Validator 除声明的 key 外，还接受点号形式（axis./series./trendline./datalabels./font./fill./border./…）和带 index 的 namespace（series{N}./dataLabel{N}./point{N}.）。chart-level axis* props（axismin、axismax、axistitle、axisfont 等）仅在 Add 时使用；创建后通过 chart-axis 执行 axis Set/Get。",
   "extends": [
     "_shared/chart",
     "_shared/chart.docx-xlsx",
@@ -31,7 +31,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "worksheet cell range that sources the chart's series; Add-time only. First column is taken as categories unless an explicit categories= is supplied, in which case every column becomes a series. xlsx-only: pptx/docx charts embed their data and have no host worksheet to reference.",
+      "description": "作为 chart series 数据源的 worksheet 单元格范围，仅在 Add 时可用。未显式提供 categories= 时，第一列作为 categories；提供 categories= 后，每一列都作为一个 series。仅适用于 xlsx：pptx/docx chart 会内嵌数据，没有可供引用的宿主 worksheet。",
       "examples": [
         "--prop dataRange=Sheet1!B2:C5",
         "--prop dataRange=Sheet1!B2:C5 --prop categories=Sheet1!A2:A5"
@@ -42,7 +42,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "radar chart style token (standard | marker | filled).",
+      "description": "radar chart 的样式 token（standard | marker | filled）。",
       "readback": "radar style token",
       "enforcement": "report",
       "aliases": [
@@ -62,7 +62,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "chartSpace roundedCorners flag (true|false).",
+      "description": "chartSpace 的 roundedCorners 标志（true|false）。",
       "readback": "true|false",
       "enforcement": "report",
       "aliases": [
@@ -77,7 +77,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] visible (on role=value); see chart-axis schema for full axis-level options",
+      "description": "用于快捷设置 /chart[N]/axis[@role=...] visible 的选项（role=value）；完整的 axis 级选项请参阅 chart-axis schema。",
       "readback": "true|false",
       "enforcement": "report",
       "aliases": [
@@ -93,7 +93,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "3-D chart perspective (0..240).",
+      "description": "3-D chart 的 perspective（0..240）。",
       "readback": "integer perspective",
       "enforcement": "report"
     },
@@ -102,7 +102,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "3-D chart X rotation in degrees (-90..90).",
+      "description": "3-D chart 绕 X 轴的旋转角度（-90..90）。",
       "readback": "integer degrees",
       "enforcement": "report"
     },
@@ -111,7 +111,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "3-D chart Y rotation in degrees (0..360).",
+      "description": "3-D chart 绕 Y 轴的旋转角度（0..360）。",
       "readback": "integer degrees",
       "enforcement": "report"
     }

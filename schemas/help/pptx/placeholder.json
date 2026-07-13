@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/placeholder[M]", "/slide[N]/shape[M]"]
   },
-  "note": "Aliases: ph. Inserts a Shape with PlaceholderShape nonVisual properties — geometry comes from the slide layout. Add returns /slide[N]/shape[M] (placeholder is a shape at the OOXML layer). effective.* keys behave as documented in pptx/shape.json.",
+  "note": "Alias：ph。插入带 PlaceholderShape nonVisual properties 的 Shape，geometry 由 slide layout 决定。Add 返回 /slide[N]/shape[M]（OOXML 层 placeholder 本身就是 shape）。effective.* 的行为参见 pptx/shape.json。",
   "properties": {
     "id": {
       "type": "number",
-      "description": "cNvPr placeholder id. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr placeholder id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "add": true,
       "set": false,
       "get": true,
@@ -27,7 +27,7 @@
     },
     "phType": {
       "type": "enum",
-      "description": "placeholder type. Required at Add. Set is intentionally not supported: phType binds the placeholder to a slide-layout slot for style/position inheritance, so changing it after creation would produce a half-bound shape rather than a typed placeholder. To change a placeholder's role, remove it and re-add with the new phType.",
+      "description": "placeholder 类型。Add 时必填。有意不支持 Set：phType 会将 placeholder 绑定到 slide-layout slot，以继承 style/position；创建后修改会产生半绑定的 shape，而非有类型的 placeholder。要修改 placeholder role，请先删除，再用新的 phType 重新 Add。",
       "values": ["title", "body", "subtitle", "date", "footer", "slidenum", "header", "picture", "chart", "table", "diagram", "media", "obj", "clipart"],
       "aliases": ["phtype", "type"],
       "add": true, "set": false, "get": true,
@@ -37,7 +37,7 @@
     },
     "name": {
       "type": "string",
-      "description": "placeholder name. Defaults to '{type} Placeholder {id}'.",
+      "description": "placeholder 名称。默认值：'{type} Placeholder {id}'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=\"Title 1\""],
       "readback": "name string",
@@ -45,7 +45,7 @@
     },
     "text": {
       "type": "string",
-      "description": "optional initial text content.",
+      "description": "可选的初始文本内容。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop text=\"Slide title\""],
       "readback": "concatenated run text",
@@ -53,7 +53,7 @@
     },
     "phIndex": {
       "type": "number",
-      "description": "placeholder index within the slide layout (PlaceholderShape/@idx). Disambiguates same-typed placeholders (e.g. two `body` placeholders).",
+      "description": "placeholder 在 slide layout 中的索引（PlaceholderShape/@idx）。用于区分同类型 placeholder（如两个 body placeholder）。",
       "add": false, "set": false, "get": true,
       "readback": "non-negative integer; key omitted when @idx absent",
       "enforcement": "report"
@@ -61,40 +61,40 @@
     "effective.direction": {
       "type": "enum",
       "values": ["rtl", "ltr"],
-      "description": "resolved reading direction inherited from placeholder→layout→master→presentation defaults. Suppressed when 'direction' is set directly on the placeholder.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的阅读方向。placeholder 直接设置 'direction' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "rtl | ltr",
       "enforcement": "report"
     },
     "effective.size": {
       "type": "length",
-      "description": "resolved font size inherited from placeholder→layout→master→presentation defaults. Suppressed when 'size' is set directly on the placeholder.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 font size。placeholder 直接设置 'size' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "unit-qualified pt (e.g. \"18pt\")",
       "enforcement": "report"
     },
     "effective.font": {
       "type": "string",
-      "description": "resolved font name inherited from placeholder→layout→master→presentation defaults. Suppressed when 'font' is set directly on the placeholder.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 font name。placeholder 直接设置 'font' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "font name",
       "enforcement": "report"
     },
     "effective.color": {
       "type": "color",
-      "description": "resolved text color inherited from placeholder→layout→master→presentation defaults. Suppressed when 'color' is set directly on the placeholder.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 text color。placeholder 直接设置 'color' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "#-prefixed uppercase hex (scheme colors pass through)",
       "enforcement": "report"
     },
     "effective.bold": {
       "type": "bool",
-      "description": "resolved bold inherited from placeholder→layout→master→presentation defaults. Suppressed when 'bold' is set directly on the placeholder.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 bold。placeholder 直接设置 'bold' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "true/false",
       "enforcement": "report"
     },
-    "isTitle": { "type":"bool", "add":false, "set":false, "get":true, "description":"true when the shape is the title placeholder (phType=title or ctrTitle).", "readback":"true on title placeholders", "enforcement":"report" },
-    "inheritedFrom": { "type":"string", "add":false, "set":false, "get":true, "description":"placeholder inheritance source — `layout` when the placeholder definition lives on the parent slide layout (not the slide itself).", "readback":"`layout` when inherited", "enforcement":"report" }
+    "isTitle": { "type":"bool", "add":false, "set":false, "get":true, "description":"shape 为 title placeholder 时为 true（phType=title 或 ctrTitle）。", "readback":"true on title placeholders", "enforcement":"report" },
+    "inheritedFrom": { "type":"string", "add":false, "set":false, "get":true, "description":"placeholder 的 inheritance source：当 placeholder 定义位于 parent slide layout（而非 slide 本身）时为 layout。", "readback":"`layout` when inherited", "enforcement":"report" }
   }
 }

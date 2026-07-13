@@ -36,21 +36,21 @@ internal static class SchemaHelpFlatRenderer
         var sb = new StringBuilder();
         if (onlyFormat == null)
         {
-            sb.AppendLine("# officecli help all — grep-friendly schema dump");
+            sb.AppendLine("# officecli help all — 便于 grep 的 schema dump");
         }
         else
         {
-            sb.AppendLine($"# officecli help {onlyFormat} all — grep-friendly schema dump (filtered to {onlyFormat})");
+            sb.AppendLine($"# officecli help {onlyFormat} all — 便于 grep 的 schema dump（筛选为 {onlyFormat}）");
         }
-        sb.AppendLine("# Columns: <format> <element> <ELEM|PROP> <name> <type> ops:[asgqr] <details> <description> ex:<example>");
-        sb.AppendLine("# ops letters: a=add s=set g=get q=query r=remove (- = not supported)");
-        sb.AppendLine("# Add/Set form: officecli <fmt> add <path> --type <element> --prop key=value [--prop ...]");
-        sb.AppendLine("#   (the <element> token here is the value in column 2; the per-row ex:--prop ... shows one valid --prop for that row)");
-            sb.AppendLine("# Machine-readable: append --jsonl for one JSON record per line (for jq / scripts).");
+        sb.AppendLine("# 列：<format> <element> <ELEM|PROP> <name> <type> ops:[asgqr] <details> <description> ex:<example>");
+        sb.AppendLine("# ops 字母：a=add s=set g=get q=query r=remove（- = 不支持）");
+        sb.AppendLine("# Add/Set 形式：officecli <fmt> add <path> --type <element> --prop key=value [--prop ...]");
+        sb.AppendLine("#   （此处 <element> token 是第 2 列值；每行 ex:--prop ... 展示该行一个有效的 --prop）");
+            sb.AppendLine("# Machine-readable：追加 --jsonl 可每行输出一条 JSON record（供 jq / script 使用）。");
         // Tips below intentionally use the literal column tokens (PROP / ELEM)
         // so users can copy-paste them. The leading '#' makes them easy to
         // strip with `grep -v '^#'` if the self-match line is unwanted.
-        sb.AppendLine("# Tips: grep '^docx paragraph'  |  grep '  PROP  '  |  grep align  |  grep aliases:alignment");
+        sb.AppendLine("# 提示：grep '^docx paragraph'  |  grep '  PROP  '  |  grep align  |  grep aliases:alignment");
         sb.AppendLine();
 
         foreach (var format in SchemaHelpLoader.ListFormats())

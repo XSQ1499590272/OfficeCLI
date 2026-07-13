@@ -16,11 +16,11 @@
       "/slide[N]"
     ]
   },
-  "note": "Renders a mermaid diagram into native, editable shapes + connectors on the slide. Aliases: flowchart. ADD-ONLY synthesizer (like 'equation'): there is no persistent 'diagram' node, but the whole diagram is wrapped in ONE group and Add returns its path (/slide[N]/group[K]), so it stays adjustable as a unit. get /slide[N]/group[K] reads it back (x/y/width/height); set /slide[N]/group[K] --prop width=… --prop height=… moves or resizes the whole diagram — child font sizes re-bake with the resize so text stays proportional; and remove /slide[N]/group[K] deletes it. Give ONE of width/height to scale proportionally (aspect preserved), or BOTH for an exact box. A human can also drag the single group object. The mermaid header selects the layout engine; supported: flowchart / graph, sequenceDiagram. Other mermaid types (gantt, pie, classDiagram, stateDiagram, erDiagram, ...) are rejected with a clear message until implemented. SIZING: by default the diagram is scaled to FIT the current slide (the slide size is never changed) and centred; give x/y/width/height to place it in an explicit box (like picture/chart). Pass poster=true to instead grow the slide to the whole diagram (export-a-diagram model). Aspect ratio is always preserved.",
+  "note": "将 mermaid diagram 渲染为 slide 上可编辑的 native shapes 和 connectors。Alias：flowchart。此 element 仅支持 ADD：不会保留独立的 diagram node，而是将整个 diagram 包装在一个 group 中，Add 返回 /slide[N]/group[K]，便于整体调整。可对该 group 执行 get、set width/height 缩放和 remove；只设置 width 或 height 时保持比例，同时设置两者则使用精确 box。header 支持 flowchart/graph 和 sequenceDiagram；其他 mermaid type 在实现前会被拒绝。默认 diagram 会缩放以适配当前 slide 并居中，不会改变 slide size；使用 x/y/width/height 可放入显式 box。传入 poster=true 会让 slide 扩展到整个 diagram。始终保持 aspect ratio。",
   "properties": {
     "mermaid": {
       "type": "string",
-      "description": "Mermaid diagram source. Canonical (mirrors equation's 'formula'). Aliases: text, dsl. The first line's header (flowchart TD / sequenceDiagram / ...) selects the diagram kind.",
+      "description": "Mermaid diagram source。Canonical key（与 equation 的 'formula' 一致）。别名：text、dsl。第一行 header（flowchart TD / sequenceDiagram / 等）决定 diagram kind。",
       "aliases": ["text", "dsl"],
       "add": true,
       "set": false,
@@ -33,7 +33,7 @@
     },
     "src": {
       "type": "string",
-      "description": "Path to a .mmd file to load the mermaid source from (used when no inline mermaid/text/dsl is given). Consistent with picture/media 'src' = a file path. Alias: path.",
+      "description": "用于加载 mermaid source 的 .mmd 文件路径（未提供 inline mermaid/text/dsl 时使用）。与 picture/media 的 'src' = file path 约定一致。别名：path。",
       "aliases": ["path"],
       "add": true,
       "set": false,
@@ -45,7 +45,7 @@
     },
     "x": {
       "type": "length",
-      "description": "Top-left X of the diagram's box (cm/in/pt/EMU). Default: centred horizontally on the slide. The slide size is never changed (use poster=true for that).",
+      "description": "diagram box 左上角 X 坐标（cm/in/pt/EMU）。默认在 slide 上水平居中。不会改变 slide size；需要改变时请使用 poster=true。",
       "add": true,
       "set": false,
       "get": false,
@@ -56,7 +56,7 @@
     },
     "y": {
       "type": "length",
-      "description": "Top-left Y of the diagram's box (cm/in/pt/EMU). Default: centred vertically on the slide.",
+      "description": "diagram box 左上角 Y 坐标（cm/in/pt/EMU）。默认在 slide 上垂直居中。",
       "add": true,
       "set": false,
       "get": false,
@@ -67,7 +67,7 @@
     },
     "width": {
       "type": "length",
-      "description": "Width of the box the diagram is scaled to fit (cm/in/pt/EMU). Aspect ratio is preserved (may letterbox against height). Default: the slide content width. Mirrors picture/chart 'width'.",
+      "description": "diagram 缩放适配的 box 宽度（cm/in/pt/EMU）。保持 aspect ratio（可能相对高度出现 letterbox）。默认使用 slide content width。与 picture/chart 的 'width' 一致。",
       "add": true,
       "set": false,
       "get": false,
@@ -78,7 +78,7 @@
     },
     "height": {
       "type": "length",
-      "description": "Height of the box the diagram is scaled to fit (cm/in/pt/EMU). Aspect ratio is preserved. Default: the slide content height.",
+      "description": "diagram 缩放适配的 box 高度（cm/in/pt/EMU）。保持 aspect ratio。默认使用 slide content height。",
       "add": true,
       "set": false,
       "get": false,
@@ -89,7 +89,7 @@
     },
     "poster": {
       "type": "boolean",
-      "description": "When true, grow the SLIDE to the diagram's natural size instead of fitting the diagram into the slide (export-a-diagram-as-a-slide model). Ignores x/y/width/height. Default false — the slide size is preserved.",
+      "description": "为 true 时，将 SLIDE 扩展到 diagram 的 natural size，而不是将 diagram 适配到 slide 内（export-a-diagram-as-a-slide model）。忽略 x/y/width/height。默认 false，即保留 slide size。",
       "add": true,
       "set": false,
       "get": false,
@@ -100,7 +100,7 @@
     },
     "render": {
       "type": "string",
-      "description": "How to render. auto (default): use real mermaid.js via a headless browser (Chrome/Chromium/Edge) when available — covers EVERY mermaid type (gantt/pie/class/state/er/…) at full fidelity, embedded as a PNG with the mermaid source stamped into alt-text (regenerable); falls back to the native synthesizer when no browser is present. native: always the built-in editable-shape synthesizer (no browser; supported subset only; fully editable in PowerPoint). image: force the browser path (errors if no browser). mermaid.js is fetched once to a local cache (mirror d.officecli.ai, CDN fallback).",
+      "description": "渲染方式。auto（默认）：有 headless browser（Chrome/Chromium/Edge）时使用真实 mermaid.js，覆盖全部 mermaid type（gantt/pie/class/state/er 等），以完整 fidelity 渲染为 PNG，并将 mermaid source 写入 alt-text（可重新生成）；没有 browser 时回退到 native synthesizer。native：始终使用内置 editable-shape synthesizer（无需 browser，仅支持部分语法，但在 PowerPoint 中完全可编辑）。image：强制使用 browser path，无 browser 时出错。mermaid.js 只会下载一次到本地 cache（镜像 d.officecli.ai，CDN 作为 fallback）。",
       "enum": ["auto", "native", "image"],
       "add": true,
       "set": false,

@@ -20,7 +20,7 @@
       "/body/p[N]"
     ]
   },
-  "note": "Get returns canonical keys: spaceBefore/spaceAfter/lineSpacing/align (legacy aliases spacebefore/linespacing/halign still accepted on Add/Set). effective.* keys are read-only values resolved through paragraph style → docDefaults from the first run; each carries an effective.X.src pointer to the writing layer (e.g. /styles/Heading1). Suppressed when the paragraph (or first run) sets the direct value.",
+  "note": "Get 返回 canonical keys：spaceBefore/spaceAfter/lineSpacing/align（Add/Set 仍接受旧 alias：spacebefore/linespacing/halign）。effective.* 是只读的继承解析值，通过 paragraph style → docDefaults 从第一个 run 解析；每个值都带 effective.X.src，指向实际写入层（例如 /styles/Heading1）。如果 paragraph 或第一个 run 设置了 direct value，则不会返回对应的 effective.*。",
   "children": [
     {
       "element": "run",
@@ -32,7 +32,7 @@
   "properties": {
     "lineRule": {
       "type": "enum",
-      "description": "line spacing rule paired with lineSpacing (Word-only: w:spacing@w:lineRule). 'auto' = multiplier (default for 1.5x/150%), 'exact' = exact fixed height (default for Npt), 'atLeast' = minimum height (Npt floor; lines may grow to fit tall content).",
+      "description": "与 lineSpacing 配套的行距规则（仅 Word：w:spacing@w:lineRule）。'auto' = 倍数（1.5x/150% 的默认值），'exact' = 精确固定高度（Npt 的默认值），'atLeast' = 最小高度（Npt 下限；行可随较高内容增大）。",
       "values": [
         "auto",
         "exact",
@@ -75,7 +75,7 @@
     },
     "style": {
       "type": "string",
-      "description": "paragraph styleId (e.g. Heading1, Normal, Quote). Must reference an existing style or one of the built-in style aliases. Aliases mirror the canonical readback keys exposed by Get: styleId targets the OOXML styleId; styleName resolves the display name through the styles part (lenient, falls back to verbatim if no match).",
+      "description": "paragraph 的 styleId（例如 Heading1、Normal、Quote）。必须引用已有 style 或内置 style 别名。别名与 Get 返回的标准 key 对应：styleId 指向 OOXML styleId；styleName 通过 styles part 解析显示名称（宽松匹配，无匹配时按原值使用）。",
       "aliases": [
         "styleId",
         "styleid",
@@ -129,7 +129,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "w:spacing @beforeAutospacing — Word's 'automatic spacing between paragraphs of the same style' toggle for the space BEFORE the paragraph. Surfaced on get only when present.",
+      "description": "w:spacing @beforeAutospacing——控制段前间距的 Word“同样式段落自动间距”开关。仅在存在时由 get 返回。",
       "examples": [
         "--prop spaceBeforeAuto=true"
       ],
@@ -144,7 +144,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "w:spacing @afterAutospacing — automatic spacing toggle for the space AFTER the paragraph. See spaceBeforeAuto.",
+      "description": "w:spacing @afterAutospacing——控制段后间距的自动间距开关。参见 spaceBeforeAuto。",
       "examples": [
         "--prop spaceAfterAuto=true"
       ],
@@ -158,7 +158,7 @@
         "ordered",
         "none"
       ],
-      "description": "high-level list type. 'bullet' (aliases: unordered, ul) creates a bulleted list; 'ordered' (or any other non-bullet value, e.g. 'decimal') creates a numbered list; 'none'/'remove'/'clear' strips list formatting. Preferred over raw numId. Continues the IMMEDIATELY preceding list of the same type automatically; an intervening non-list paragraph (or a list of the other type) starts a fresh list at 1. To continue numbering across such an interruption, pass an explicit 'numId' referencing the earlier list's instance; pass 'start' to force a restart.",
+      "description": "高层 list 类型。'bullet'（别名：unordered、ul）创建项目符号 list；'ordered'（或其他非 bullet 值，例如 'decimal'）创建编号 list；'none'/'remove'/'clear' 清除 list 格式。优先使用此项而非原始 numId。会自动延续紧邻在前的同类型 list；中间出现非 list paragraph（或另一类型 list）时，会从 1 开始新的 list。若要跨越这种中断继续编号，请传入引用先前 list instance 的显式 'numId'；传入 'start' 可强制重新开始。",
       "aliases": [
         "liststyle"
       ],
@@ -174,7 +174,7 @@
     },
     "numId": {
       "type": "int",
-      "description": "numbering definition id (w:numId). Low-level entry point — prefer 'listStyle' unless you specifically need to reference an existing numbering instance. Requires the numId to already exist in /numbering (create via `add /numbering --type num` first).",
+      "description": "numbering definition id（w:numId）。这是低层入口；除非需要引用已有 numbering instance，否则优先使用 'listStyle'。numId 必须已存在于 /numbering 中（先通过 `add /numbering --type num` 创建）。",
       "aliases": [
         "numid"
       ],
@@ -189,7 +189,7 @@
     },
     "numLevel": {
       "type": "int",
-      "description": "list indent level (w:ilvl), 0..8. Requires numId or listStyle to be effective; Get only surfaces numLevel when numId is present on the paragraph.",
+      "description": "list 缩进级别（w:ilvl），范围 0..8。需配合 numId 或 listStyle 才会生效；仅当 paragraph 存在 numId 时 Get 才返回 numLevel。",
       "aliases": [
         "numlevel",
         "ilvl",
@@ -212,7 +212,7 @@
     },
     "start": {
       "type": "int",
-      "description": "starting number for an ordered list (w:start / w:startOverride on level 0 of the numbering definition). Only meaningful together with liststyle=ordered or an existing numid. NOTE: this applies to the whole numbering instance shared by the paragraph, so setting it on one item of a multi-item list renumbers the entire list (every paragraph that shares the numId), not just that item onward. To restart numbering for a sub-range mid-list, give those paragraphs a fresh numId instead. Readback not implemented — w:start lives in the separate numbering part and cross-part traversal is fragile; query the numbering directly if you need it.",
+      "description": "ordered list 的起始编号（numbering definition 第 0 级上的 w:start / w:startOverride）。仅与 liststyle=ordered 或已有 numid 配合时有意义。注意：它作用于 paragraph 共享的整个 numbering instance，因此在多项 list 的一项上设置，会重新编号整个 list（所有共享 numId 的 paragraph），而非仅从此项开始。若要在 list 中间的局部范围重新开始编号，请为这些 paragraph 分配新的 numId。未实现读取结果——w:start 位于独立 numbering part，跨 part 遍历不稳定；需要时请直接 query numbering。",
       "add": true,
       "set": true,
       "get": false,
@@ -224,7 +224,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "run-level bold. On Add, applied to the implicit run created by 'text'. On Set, applied to all runs in the paragraph and to the paragraph-mark run properties so subsequent runs inherit.",
+      "description": "run 级粗体。Add 时应用于由 'text' 创建的隐式 run；Set 时应用于 paragraph 中的所有 run 以及 paragraph-mark run property，使后续 run 继承。",
       "add": true,
       "set": true,
       "get": true,
@@ -235,7 +235,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "run-level italic. Same scope as 'bold'.",
+      "description": "run 级斜体。作用范围与 'bold' 相同。",
       "add": true,
       "set": true,
       "get": true,
@@ -246,7 +246,7 @@
     },
     "font": {
       "type": "string",
-      "description": "run-level font family (applied to Ascii/HighAnsi/EastAsia). On Add, applied to the implicit run created by 'text'. On Set, applied to all runs in the paragraph.",
+      "description": "run 级字体族（应用于 Ascii/HighAnsi/EastAsia）。Add 时应用于由 'text' 创建的隐式 run；Set 时应用于 paragraph 中的所有 run。",
       "add": true,
       "set": true,
       "get": false,
@@ -257,7 +257,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "run-level font size. Accepts bare number (pt), '14pt', '10.5pt'.",
+      "description": "run 级字体大小。接受不带单位的数值（pt）、'14pt'、'10.5pt'。",
       "aliases": [
         "fontsize"
       ],
@@ -272,7 +272,7 @@
     },
     "color": {
       "type": "color",
-      "description": "run-level text color. Accepts #RRGGBB, RRGGBB, named colors (e.g. red), rgb(r,g,b).",
+      "description": "run 级文本颜色。接受 #RRGGBB、RRGGBB、命名颜色（例如 red）、rgb(r,g,b)。",
       "add": true,
       "set": true,
       "get": true,
@@ -284,7 +284,7 @@
     },
     "underline": {
       "type": "string",
-      "description": "run-level underline. Accepts 'true'/'false' or an underline style (single, double, thick, dotted, dash, wavy, etc.).",
+      "description": "run 级下划线。接受 'true'/'false' 或下划线样式（single、double、thick、dotted、dash、wavy 等）。",
       "add": true,
       "set": true,
       "get": true,
@@ -296,7 +296,7 @@
     },
     "underline.color": {
       "type": "color",
-      "description": "underline stroke color, written to w:u/@w:color. Preserved when 'underline' style is toggled.",
+      "description": "下划线笔画颜色，写入 w:u/@w:color。切换 'underline' 样式时会保留。",
       "aliases": [
         "underlineColor",
         "underlinecolor",
@@ -312,7 +312,7 @@
     },
     "strike": {
       "type": "bool",
-      "description": "run-level single strikethrough.",
+      "description": "run 级单删除线。",
       "aliases": [
         "strikethrough"
       ],
@@ -326,7 +326,7 @@
     },
     "highlight": {
       "type": "string",
-      "description": "run-level highlight color (w:highlight values: yellow, green, cyan, magenta, blue, red, darkBlue, darkCyan, darkGreen, darkMagenta, darkRed, darkYellow, darkGray, lightGray, black, white, none).",
+      "description": "run 级突出显示颜色（w:highlight 可选值：yellow、green、cyan、magenta、blue、red、darkBlue、darkCyan、darkGreen、darkMagenta、darkRed、darkYellow、darkGray、lightGray、black、white、none）。",
       "add": true,
       "set": true,
       "get": true,
@@ -337,7 +337,7 @@
     },
     "caps": {
       "type": "bool",
-      "description": "run-level all caps. On Add only (no paragraph-level Set wrapper).",
+      "description": "run 级全大写。仅 Add 支持（没有 paragraph 级 Set 包装）。",
       "aliases": [
         "allCaps"
       ],
@@ -351,7 +351,7 @@
     },
     "smallcaps": {
       "type": "bool",
-      "description": "run-level small caps. On Add only.",
+      "description": "run 级小型大写字母。仅 Add 支持。",
       "aliases": [
         "smallCaps"
       ],
@@ -365,7 +365,7 @@
     },
     "dstrike": {
       "type": "bool",
-      "description": "run-level double strikethrough. On Add only.",
+      "description": "run 级双删除线。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -376,7 +376,7 @@
     },
     "vanish": {
       "type": "bool",
-      "description": "run-level hidden text. On Add only.",
+      "description": "run 级隐藏文本。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -387,7 +387,7 @@
     },
     "outline": {
       "type": "bool",
-      "description": "run-level outline text effect. On Add only.",
+      "description": "run 级轮廓文本效果。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -398,7 +398,7 @@
     },
     "shadow": {
       "type": "bool",
-      "description": "run-level shadow text effect. On Add only.",
+      "description": "run 级阴影文本效果。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -409,7 +409,7 @@
     },
     "emboss": {
       "type": "bool",
-      "description": "run-level emboss text effect. On Add only.",
+      "description": "run 级浮雕文本效果。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -420,7 +420,7 @@
     },
     "imprint": {
       "type": "bool",
-      "description": "run-level imprint (engrave) text effect. On Add only.",
+      "description": "run 级凹印（engrave）文本效果。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -431,7 +431,7 @@
     },
     "noproof": {
       "type": "bool",
-      "description": "run-level no-proofing flag. On Add only.",
+      "description": "run 级不校对标记。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -442,7 +442,7 @@
     },
     "superscript": {
       "type": "bool",
-      "description": "run-level superscript vertical alignment. On Add only (use vertAlign for Set).",
+      "description": "run 级 superscript 垂直对齐。仅 Add 支持（Set 请使用 vertAlign）。",
       "add": true,
       "set": false,
       "get": false,
@@ -453,7 +453,7 @@
     },
     "subscript": {
       "type": "bool",
-      "description": "run-level subscript vertical alignment. On Add only (use vertAlign for Set).",
+      "description": "run 级 subscript 垂直对齐。仅 Add 支持（Set 请使用 vertAlign）。",
       "add": true,
       "set": false,
       "get": false,
@@ -471,7 +471,7 @@
         "super",
         "sub"
       ],
-      "description": "run-level vertical text alignment. On Add only.",
+      "description": "run 级垂直文本对齐。仅 Add 支持。",
       "aliases": [
         "vertalign"
       ],
@@ -485,7 +485,7 @@
     },
     "charSpacing": {
       "type": "length",
-      "description": "run-level character spacing in points (bare number = pt, or 'Xpt'). Stored as twips. On Add only.",
+      "description": "run 级字符间距，单位为 points（不带单位的数值 = pt，也可传 'Xpt'）。以 twips 存储。仅 Add 支持。",
       "aliases": [
         "charspacing",
         "letterspacing",
@@ -501,7 +501,7 @@
     },
     "rtl": {
       "type": "bool",
-      "description": "run-level right-to-left text flag. On Add only.",
+      "description": "run 级从右到左文本标记。仅 Add 支持。",
       "add": true,
       "set": false,
       "get": false,
@@ -516,7 +516,7 @@
         "ltr",
         "rtl"
       ],
-      "description": "paragraph reading direction. 'rtl' writes <w:bidi/> on pPr, <w:rtl/> on the paragraph mark, and <w:rtl/> on every run (so Arabic / Hebrew character order reverses inside runs, not just page-side layout). 'ltr' clears all three.",
+      "description": "paragraph 阅读方向。'rtl' 会在 pPr 写入 <w:bidi/>、在 paragraph mark 写入 <w:rtl/>、在每个 run 写入 <w:rtl/>（使 Arabic / Hebrew 的字符顺序在 run 内反转，而不只是页面侧布局）。'ltr' 会清除这三项。",
       "aliases": [
         "dir",
         "bidi"
@@ -532,7 +532,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font slot (rFonts/cs) — Arabic / Hebrew / Thai typefaces.",
+      "description": "complex-script 字体槽位（rFonts/cs）——Arabic / Hebrew / Thai 字体。",
       "aliases": [
         "font.complexscript",
         "font.complex"
@@ -547,7 +547,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (rFonts/eastAsia) — Chinese / Japanese / Korean typefaces.",
+      "description": "East-Asian 字体槽位（rFonts/eastAsia）——Chinese / Japanese / Korean 字体。",
       "aliases": [
         "font.eastasia",
         "font.eastasian"
@@ -562,7 +562,7 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin font slots (rFonts/ascii + hAnsi) — ASCII / Western text.",
+      "description": "Latin 字体槽位（rFonts/ascii + hAnsi）——ASCII / Western 文本。",
       "add": true,
       "set": true,
       "get": true,
@@ -573,7 +573,7 @@
     },
     "font.asciiTheme": {
       "type": "string",
-      "description": "Theme font binding for the ascii slot (rFonts/asciiTheme). Values: minorHAnsi, majorHAnsi, minorEastAsia, majorEastAsia, minorBidi, majorBidi.",
+      "description": "ascii 槽位的 Theme font binding（rFonts/asciiTheme）。可选值：minorHAnsi、majorHAnsi、minorEastAsia、majorEastAsia、minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -584,7 +584,7 @@
     },
     "font.hAnsiTheme": {
       "type": "string",
-      "description": "Theme font binding for the hAnsi slot (rFonts/hAnsiTheme).",
+      "description": "hAnsi 槽位的 Theme font binding（rFonts/hAnsiTheme）。",
       "add": true,
       "set": true,
       "get": true,
@@ -595,7 +595,7 @@
     },
     "font.eaTheme": {
       "type": "string",
-      "description": "Theme font binding for the East-Asia slot (rFonts/eastAsiaTheme). Values: minorEastAsia, majorEastAsia.",
+      "description": "East-Asia 槽位的 Theme font binding（rFonts/eastAsiaTheme）。可选值：minorEastAsia、majorEastAsia。",
       "aliases": [
         "font.eastAsiaTheme"
       ],
@@ -609,7 +609,7 @@
     },
     "font.csTheme": {
       "type": "string",
-      "description": "Theme font binding for the complex-script slot (rFonts/cstheme). Values: minorBidi, majorBidi.",
+      "description": "complex-script 槽位的 Theme font binding（rFonts/cstheme）。可选值：minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -620,7 +620,7 @@
     },
     "bold.cs": {
       "type": "bool",
-      "description": "complex-script bold for the paragraph's runs (<w:bCs/>). Required for Arabic / Hebrew bold rendering.",
+      "description": "paragraph 各 run 的 complex-script 粗体（<w:bCs/>）。Arabic / Hebrew 的粗体呈现需要此项。",
       "aliases": [
         "font.bold.cs",
         "boldcs"
@@ -636,7 +636,7 @@
     },
     "italic.cs": {
       "type": "bool",
-      "description": "complex-script italic (<w:iCs/>) for the paragraph's runs.",
+      "description": "paragraph 各 run 的 complex-script 斜体（<w:iCs/>）。",
       "aliases": [
         "font.italic.cs",
         "italiccs"
@@ -652,7 +652,7 @@
     },
     "size.cs": {
       "type": "font-size",
-      "description": "complex-script font size (<w:szCs/>) for the paragraph's runs.",
+      "description": "paragraph 各 run 的 complex-script 字体大小（<w:szCs/>）。",
       "aliases": [
         "font.size.cs",
         "sizecs"
@@ -668,7 +668,7 @@
     },
     "shd": {
       "type": "string",
-      "description": "shading. Format: 'fill' or 'val;fill' or 'val;fill;color'. Applied at paragraph level on Add (pPr/shd).",
+      "description": "shading。格式：'fill'、'val;fill' 或 'val;fill;color'。Add 时在 paragraph 级应用（pPr/shd）。",
       "aliases": [
         "shading"
       ],
@@ -683,7 +683,7 @@
     },
     "firstLineIndent": {
       "type": "length",
-      "description": "first-line indent. Routed through SpacingConverter.",
+      "description": "首行缩进。经由 SpacingConverter 处理。",
       "aliases": [
         "firstlineindent"
       ],
@@ -697,7 +697,7 @@
     },
     "rightIndent": {
       "type": "length",
-      "description": "right indentation. Routed through SpacingConverter.",
+      "description": "右缩进。经由 SpacingConverter 处理。",
       "aliases": [
         "rightindent",
         "indentright"
@@ -712,7 +712,7 @@
     },
     "hangingIndent": {
       "type": "length",
-      "description": "hanging indent (pairs with left indent). Routed through SpacingConverter.",
+      "description": "悬挂缩进（与左缩进配合）。经由 SpacingConverter 处理。",
       "aliases": [
         "hangingindent",
         "hanging"
@@ -728,7 +728,7 @@
     },
     "keepNext": {
       "type": "bool",
-      "description": "keep paragraph with the next paragraph (no page break between).",
+      "description": "使本 paragraph 与下一 paragraph 保持在同一页（中间不分页）。",
       "aliases": [
         "keepnext"
       ],
@@ -742,7 +742,7 @@
     },
     "keepLines": {
       "type": "bool",
-      "description": "keep all lines of the paragraph together (no page break within).",
+      "description": "使 paragraph 的所有行保持在同一页（内部不分页）。",
       "aliases": [
         "keeplines",
         "keeptogether",
@@ -758,7 +758,7 @@
     },
     "pageBreakBefore": {
       "type": "bool",
-      "description": "force a page break before this paragraph.",
+      "description": "在此 paragraph 前强制分页。",
       "aliases": [
         "pagebreakbefore",
         "break"
@@ -774,7 +774,7 @@
     },
     "widowControl": {
       "type": "bool",
-      "description": "widow/orphan control.",
+      "description": "孤行/寡行控制。",
       "aliases": [
         "widowcontrol"
       ],
@@ -788,7 +788,7 @@
     },
     "wordWrap": {
       "type": "bool",
-      "description": "Latin-word break behaviour in CJK paragraphs. Set false to allow ASCII text/whitespace to participate in CJK character flow — required for right-aligned CJK lines that rely on trailing underlined whitespace to align with adjacent lines.",
+      "description": "CJK paragraph 中 Latin word 的换行行为。设为 false 时，允许 ASCII 文本/空白参与 CJK 字符流；依赖带下划线的行尾空白与相邻行对齐的右对齐 CJK 行需要此设置。",
       "aliases": [
         "wordwrap"
       ],
@@ -802,7 +802,7 @@
     },
     "contextualSpacing": {
       "type": "bool",
-      "description": "suppress space between paragraphs of the same style. Applied on Add/Set to paragraph pPr; also valid on Style.",
+      "description": "抑制同一 style 的 paragraph 之间的间距。Add/Set 时应用于 paragraph pPr；也可用于 Style。",
       "aliases": [
         "contextualspacing"
       ],
@@ -816,7 +816,7 @@
     },
     "effective.size": {
       "type": "font-size",
-      "description": "inheritance-resolved font size (read-only) — derived from the first run's style chain → paragraph style → docDefaults.",
+      "description": "按继承关系解析的字体大小（只读）——来自首个 run 的 style chain → paragraph style → docDefaults。",
       "add": false,
       "set": false,
       "get": true,
@@ -825,7 +825,7 @@
     },
     "effective.size.src": {
       "type": "string",
-      "description": "source pointer for effective.size.",
+      "description": "effective.size 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -834,7 +834,7 @@
     },
     "effective.font.ascii": {
       "type": "string",
-      "description": "inheritance-resolved Latin/ASCII font slot (read-only).",
+      "description": "按继承关系解析的 Latin/ASCII 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -843,7 +843,7 @@
     },
     "effective.font.ascii.src": {
       "type": "string",
-      "description": "source pointer for effective.font.ascii.",
+      "description": "effective.font.ascii 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -852,7 +852,7 @@
     },
     "effective.font.eastAsia": {
       "type": "string",
-      "description": "inheritance-resolved East-Asian font slot (read-only).",
+      "description": "按继承关系解析的 East-Asian 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -861,7 +861,7 @@
     },
     "effective.font.eastAsia.src": {
       "type": "string",
-      "description": "source pointer for effective.font.eastAsia.",
+      "description": "effective.font.eastAsia 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -870,7 +870,7 @@
     },
     "effective.font.hAnsi": {
       "type": "string",
-      "description": "inheritance-resolved High-ANSI font slot (read-only).",
+      "description": "按继承关系解析的 High-ANSI 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -879,7 +879,7 @@
     },
     "effective.font.hAnsi.src": {
       "type": "string",
-      "description": "source pointer for effective.font.hAnsi.",
+      "description": "effective.font.hAnsi 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -888,7 +888,7 @@
     },
     "effective.font.cs": {
       "type": "string",
-      "description": "inheritance-resolved complex-script font slot (read-only).",
+      "description": "按继承关系解析的 complex-script 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -897,7 +897,7 @@
     },
     "effective.font.cs.src": {
       "type": "string",
-      "description": "source pointer for effective.font.cs.",
+      "description": "effective.font.cs 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -906,7 +906,7 @@
     },
     "effective.bold": {
       "type": "bool",
-      "description": "inheritance-resolved bold (read-only).",
+      "description": "按继承关系解析的粗体（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -915,7 +915,7 @@
     },
     "effective.bold.src": {
       "type": "string",
-      "description": "source pointer for effective.bold.",
+      "description": "effective.bold 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -924,7 +924,7 @@
     },
     "effective.italic": {
       "type": "bool",
-      "description": "inheritance-resolved italic (read-only).",
+      "description": "按继承关系解析的斜体（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -933,7 +933,7 @@
     },
     "effective.italic.src": {
       "type": "string",
-      "description": "source pointer for effective.italic.",
+      "description": "effective.italic 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -942,7 +942,7 @@
     },
     "effective.color": {
       "type": "color",
-      "description": "inheritance-resolved font color (read-only). #RRGGBB or scheme color name.",
+      "description": "按继承关系解析的字体颜色（只读）。可为 #RRGGBB 或 scheme color 名称。",
       "add": false,
       "set": false,
       "get": true,
@@ -951,7 +951,7 @@
     },
     "effective.color.src": {
       "type": "string",
-      "description": "source pointer for effective.color.",
+      "description": "effective.color 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -960,7 +960,7 @@
     },
     "effective.underline": {
       "type": "string",
-      "description": "inheritance-resolved underline style (read-only).",
+      "description": "按继承关系解析的下划线样式（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -969,7 +969,7 @@
     },
     "effective.underline.src": {
       "type": "string",
-      "description": "source pointer for effective.underline.",
+      "description": "effective.underline 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -978,7 +978,7 @@
     },
     "effective.rtl": {
       "type": "bool",
-      "description": "inheritance-resolved right-to-left flag (read-only). Emitted even when 'rtl' is set directly so callers can compare direct vs cascade-resolved state.",
+      "description": "按继承关系解析的从右到左标记（只读）。即使直接设置 'rtl' 也会输出，以便调用方比较直接设置与 cascade 解析后的状态。",
       "add": false,
       "set": false,
       "get": true,
@@ -987,7 +987,7 @@
     },
     "effective.rtl.src": {
       "type": "string",
-      "description": "source pointer for effective.rtl.",
+      "description": "effective.rtl 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -996,7 +996,7 @@
     },
     "numFmt": {
       "type": "string",
-      "description": "raw numbering format (e.g. bullet, decimal, lowerLetter). Emitted only when present.",
+      "description": "原始 numbering 格式（例如 bullet、decimal、lowerLetter）。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -1005,7 +1005,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "paragraph background shading (w:shd @fill). A solid background reads back as this canonical key (matching table cells and runs). Accepts a solid color — hex ('FF0000'), '#'-prefixed hex ('#FF0000'), named color ('red'), or rgb(...) notation. For a true pattern shading (pct*/stripe/cross) or a foreground pattern color, pass the legacy `shd`/`shading` triplet form 'PATTERN;FILL[;COLOR]' instead; those read back via the shading.* detail keys.",
+      "description": "paragraph 背景 shading（w:shd @fill）。纯色背景会以此标准 key 读取（与 table cell 和 run 一致）。接受纯色：hex（'FF0000'）、带 '#' 的 hex（'#FF0000'）、命名颜色（'red'）或 rgb(...)。若需真实的 pattern shading（pct*/stripe/cross）或前景 pattern color，请传入旧版 `shd`/`shading` 三段形式 'PATTERN;FILL[;COLOR]'；读取结果会通过 shading.* detail key 返回。",
       "aliases": ["shd", "shading"],
       "add": true,
       "set": true,
@@ -1016,7 +1016,7 @@
     },
     "shading.val": {
       "type": "string",
-      "description": "shading pattern value (decomposed from `shd`). Emitted on get only for a true pattern shading (pct*/stripe/cross); a solid background reads back as the canonical `fill` key. Add/Set use `fill`/`shd`/`shading`.",
+      "description": "shading pattern 值（从 `shd` 拆分）。仅真实 pattern shading（pct*/stripe/cross）在 get 时输出；纯色背景会以标准 `fill` key 返回。Add/Set 使用 `fill`/`shd`/`shading`。",
       "add": false,
       "set": true,
       "get": true,
@@ -1025,7 +1025,7 @@
     },
     "shading.fill": {
       "type": "string",
-      "description": "shading fill color hex (decomposed from `shd`). Emitted on get only for a true pattern shading; a solid background reads back as the canonical `fill` key.",
+      "description": "shading fill color hex（从 `shd` 拆分）。仅真实 pattern shading 在 get 时输出；纯色背景会以标准 `fill` key 返回。",
       "add": false,
       "set": true,
       "get": true,
@@ -1034,7 +1034,7 @@
     },
     "shading.color": {
       "type": "string",
-      "description": "shading foreground (pattern) color hex. Pattern shading only.",
+      "description": "shading 前景（pattern）颜色 hex。仅 pattern shading 支持。",
       "add": false,
       "set": true,
       "get": true,
@@ -1043,7 +1043,7 @@
     },
     "paraId": {
       "type": "string",
-      "description": "paragraph stable id (source of @paraId in stable path). Emitted only when present.",
+      "description": "paragraph 稳定 id（稳定路径中 @paraId 的来源）。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -1052,7 +1052,7 @@
     },
     "outlineLvl": {
       "type": "number",
-      "description": "outline level (0-9). Used by Word's TOC and document map.",
+      "description": "outline 级别（0–9）。供 Word 的 TOC 和 document map 使用。",
       "add": true,
       "set": true,
       "get": true,
@@ -1061,7 +1061,7 @@
     },
     "rStyle": {
       "type": "string",
-      "description": "Paragraph mark run style id (e.g. FootnoteReference, IntenseEmphasis). Inherited by runs without their own rStyle.",
+      "description": "Paragraph mark 的 run style id（例如 FootnoteReference、IntenseEmphasis）。没有自身 rStyle 的 run 会继承此项。",
       "add": true,
       "set": true,
       "get": true,
@@ -1070,7 +1070,7 @@
     },
     "tabs": {
       "type": "array",
-      "description": "tab stops array. Set accepts a comma-separated list of positions (twips, e.g. 720,1440); Get emits the stored tab stops when present.",
+      "description": "tab stop array。Set 接受以逗号分隔的位置列表（twips，例如 720,1440）；存在时 Get 输出保存的 tab stop。",
       "aliases": [
         "tabstops"
       ],
@@ -1085,7 +1085,7 @@
     },
     "pbdr.top": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1094,7 +1094,7 @@
     },
     "pbdr.bottom": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1103,7 +1103,7 @@
     },
     "pbdr.left": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1112,7 +1112,7 @@
     },
     "pbdr.right": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1121,7 +1121,7 @@
     },
     "pbdr.between": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1130,7 +1130,7 @@
     },
     "pbdr.bar": {
       "type": "string",
-      "description": "paragraph border edge descriptor. Emitted only when present.",
+      "description": "paragraph 边框边描述符。仅在存在时输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -1142,7 +1142,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "first-line indent in 1/100 character units (CT_Ind @firstLineChars). Word's chars-relative variant of firstLineIndent.",
+      "description": "以 1/100 character 为单位的首行缩进（CT_Ind @firstLineChars）。Word 的相对字符版本 firstLineIndent。",
       "readback": "integer 1/100-char units",
       "enforcement": "report"
     },
@@ -1151,13 +1151,13 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "hanging indent in 1/100 character units (CT_Ind @hangingChars). Word's chars-relative variant of hangingIndent.",
+      "description": "以 1/100 character 为单位的悬挂缩进（CT_Ind @hangingChars）。Word 的相对字符版本 hangingIndent。",
       "readback": "integer 1/100-char units",
       "enforcement": "report"
     },
     "markRPr.bold": {
       "type": "bool",
-      "description": "paragraph-mark run property — bold flag on the ¶ glyph (w:pPr/w:rPr/w:b). Distinct from per-run bold; affects how the mark itself renders and is inherited by appended runs without their own bold setting.",
+      "description": "paragraph-mark run property——¶ 字符上的粗体标记（w:pPr/w:rPr/w:b）。不同于逐 run 粗体；它影响 mark 本身的呈现，也会被后续未自行设置粗体的 run 继承。",
       "add": false,
       "set": true,
       "get": true,
@@ -1166,7 +1166,7 @@
     },
     "markRPr.italic": {
       "type": "bool",
-      "description": "paragraph-mark run italic (w:pPr/w:rPr/w:i).",
+      "description": "paragraph-mark run 斜体（w:pPr/w:rPr/w:i）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1175,7 +1175,7 @@
     },
     "markRPr.strike": {
       "type": "bool",
-      "description": "paragraph-mark run strike (w:pPr/w:rPr/w:strike).",
+      "description": "paragraph-mark run 删除线（w:pPr/w:rPr/w:strike）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1184,7 +1184,7 @@
     },
     "markRPr.rtl": {
       "type": "bool",
-      "description": "paragraph-mark run right-to-left flag (w:pPr/w:rPr/w:rtl).",
+      "description": "paragraph-mark run 从右到左标记（w:pPr/w:rPr/w:rtl）。",
       "add": true,
       "set": true,
       "get": true,
@@ -1193,7 +1193,7 @@
     },
     "markRPr.rStyle": {
       "type": "string",
-      "description": "paragraph-mark run character style (w:pPr/w:rPr/w:rStyle). Emitted on Get when the style binds the mark only; bare rStyle covers the mark+implicit-run shape.",
+      "description": "paragraph-mark run character style（w:pPr/w:rPr/w:rStyle）。当 style 仅绑定 mark 时由 Get 输出；不带子字段的 rStyle 覆盖 mark+implicit-run 形式。",
       "add": true,
       "set": true,
       "get": true,
@@ -1201,7 +1201,7 @@
     },
     "markRPr.underline": {
       "type": "string",
-      "description": "paragraph-mark run underline style (w:pPr/w:rPr/w:u @val).",
+      "description": "paragraph-mark run 下划线样式（w:pPr/w:rPr/w:u @val）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1210,7 +1210,7 @@
     },
     "markRPr.size": {
       "type": "length",
-      "description": "paragraph-mark run font size (w:pPr/w:rPr/w:sz, half-points internally).",
+      "description": "paragraph-mark run 字体大小（w:pPr/w:rPr/w:sz，内部为 half-points）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1219,7 +1219,7 @@
     },
     "markRPr.color": {
       "type": "color",
-      "description": "paragraph-mark run color (w:pPr/w:rPr/w:color). Returns scheme color name for theme refs, or #-prefixed hex.",
+      "description": "paragraph-mark run 颜色（w:pPr/w:rPr/w:color）。theme reference 返回 scheme color 名称，其他返回带 '#' 的 hex。",
       "add": false,
       "set": true,
       "get": true,
@@ -1228,7 +1228,7 @@
     },
     "markRPr.highlight": {
       "type": "string",
-      "description": "paragraph-mark run highlight color (w:pPr/w:rPr/w:highlight @val).",
+      "description": "paragraph-mark run 突出显示颜色（w:pPr/w:rPr/w:highlight @val）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1237,7 +1237,7 @@
     },
     "markRPr.font.latin": {
       "type": "string",
-      "description": "paragraph-mark run Ascii font (w:pPr/w:rPr/w:rFonts @ascii).",
+      "description": "paragraph-mark run Ascii 字体（w:pPr/w:rPr/w:rFonts @ascii）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1246,7 +1246,7 @@
     },
     "markRPr.font.ea": {
       "type": "string",
-      "description": "paragraph-mark run EastAsia font (w:pPr/w:rPr/w:rFonts @eastAsia).",
+      "description": "paragraph-mark run EastAsia 字体（w:pPr/w:rPr/w:rFonts @eastAsia）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1255,7 +1255,7 @@
     },
     "markRPr.font.cs": {
       "type": "string",
-      "description": "paragraph-mark run ComplexScript font (w:pPr/w:rPr/w:rFonts @cs).",
+      "description": "paragraph-mark run ComplexScript 字体（w:pPr/w:rPr/w:rFonts @cs）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1264,7 +1264,7 @@
     },
     "markRPr.font.hint": {
       "type": "string",
-      "description": "paragraph-mark run font slot hint (w:pPr/w:rPr/w:rFonts @hint) — eastAsia / cs / default; selects the font slot for ambiguous characters on the paragraph mark.",
+      "description": "paragraph-mark run 字体槽位 hint（w:pPr/w:rPr/w:rFonts @hint）——eastAsia / cs / default；为 paragraph mark 上的歧义字符选择字体槽位。",
       "add": false,
       "set": true,
       "get": true,
@@ -1273,7 +1273,7 @@
     },
     "markRPr.font.asciiTheme": {
       "type": "string",
-      "description": "paragraph-mark run theme font binding (w:pPr/w:rPr/w:rFonts/@w:asciiTheme), e.g. minorHAnsi.",
+      "description": "paragraph-mark run Theme font binding（w:pPr/w:rPr/w:rFonts/@w:asciiTheme），例如 minorHAnsi。",
       "add": true,
       "set": true,
       "get": true,
@@ -1281,7 +1281,7 @@
     },
     "markRPr.font.hAnsiTheme": {
       "type": "string",
-      "description": "paragraph-mark run theme font binding (w:pPr/w:rPr/w:rFonts/@w:hAnsiTheme), e.g. minorHAnsi.",
+      "description": "paragraph-mark run Theme font binding（w:pPr/w:rPr/w:rFonts/@w:hAnsiTheme），例如 minorHAnsi。",
       "add": true,
       "set": true,
       "get": true,
@@ -1289,7 +1289,7 @@
     },
     "markRPr.font.eaTheme": {
       "type": "string",
-      "description": "paragraph-mark run theme font binding (w:pPr/w:rPr/w:rFonts/@w:eastAsiaTheme), e.g. minorHAnsi.",
+      "description": "paragraph-mark run Theme font binding（w:pPr/w:rPr/w:rFonts/@w:eastAsiaTheme），例如 minorHAnsi。",
       "add": true,
       "set": true,
       "get": true,
@@ -1297,7 +1297,7 @@
     },
     "markRPr.font.csTheme": {
       "type": "string",
-      "description": "paragraph-mark run theme font binding (w:pPr/w:rPr/w:rFonts/@w:csTheme), e.g. minorHAnsi.",
+      "description": "paragraph-mark run Theme font binding（w:pPr/w:rPr/w:rFonts/@w:csTheme），例如 minorHAnsi。",
       "add": true,
       "set": true,
       "get": true,
@@ -1305,7 +1305,7 @@
     },
     "markRPr.charSpacing": {
       "type": "length",
-      "description": "paragraph-mark run character spacing (w:pPr/w:rPr/w:spacing @val, twips internally).",
+      "description": "paragraph-mark run 字符间距（w:pPr/w:rPr/w:spacing @val，内部为 twips）。",
       "add": false,
       "set": true,
       "get": true,
@@ -1314,7 +1314,7 @@
     },
     "markRPr.size.cs": {
       "type": "length",
-      "description": "paragraph-mark run complex-script font size (w:pPr/w:rPr/w:szCs, half-points internally). The CJK/RTL counterpart of markRPr.size; emitted separately so the ¶ glyph's complex-script metrics survive dump→batch.",
+      "description": "paragraph-mark run complex-script 字体大小（w:pPr/w:rPr/w:szCs，内部为 half-points）。这是 markRPr.size 的 CJK/RTL 对应项；单独输出以使 ¶ 字符的 complex-script metrics 在 dump→batch 中保留。",
       "add": false,
       "set": true,
       "get": true,
@@ -1323,7 +1323,7 @@
     },
     "markRPr.bold.cs": {
       "type": "bool",
-      "description": "paragraph-mark run complex-script bold (w:pPr/w:rPr/w:bCs). The CJK/RTL counterpart of markRPr.bold.",
+      "description": "paragraph-mark run complex-script 粗体（w:pPr/w:rPr/w:bCs）。这是 markRPr.bold 的 CJK/RTL 对应项。",
       "add": false,
       "set": true,
       "get": true,
@@ -1332,7 +1332,7 @@
     },
     "markRPr.italic.cs": {
       "type": "bool",
-      "description": "paragraph-mark run complex-script italic (w:pPr/w:rPr/w:iCs). The CJK/RTL counterpart of markRPr.italic.",
+      "description": "paragraph-mark run complex-script 斜体（w:pPr/w:rPr/w:iCs）。这是 markRPr.italic 的 CJK/RTL 对应项。",
       "add": false,
       "set": true,
       "get": true,
@@ -1341,7 +1341,7 @@
     },
     "markRPr.kern": {
       "type": "integer",
-      "description": "paragraph-mark run kerning threshold (w:pPr/w:rPr/w:kern @val, half-points). Below this font size Word disables kerning on the ¶ glyph.",
+      "description": "paragraph-mark run kerning 阈值（w:pPr/w:rPr/w:kern @val，单位为 half-points）。低于此字体大小时，Word 会禁用 ¶ 字符的 kerning。",
       "add": false,
       "set": true,
       "get": true,
@@ -1350,7 +1350,7 @@
     },
     "markRPr.font.ascii": {
       "type": "string",
-      "description": "paragraph-mark run Ascii font (w:pPr/w:rPr/w:rFonts @ascii). Emitted alongside markRPr.font.hAnsi only when the two slots diverge; the symmetric case collapses to markRPr.font.latin.",
+      "description": "paragraph-mark run Ascii 字体（w:pPr/w:rPr/w:rFonts @ascii）。仅在与 markRPr.font.hAnsi 两个槽位不同时一并输出；相同的情况会合并为 markRPr.font.latin。",
       "add": false,
       "set": true,
       "get": true,
@@ -1359,7 +1359,7 @@
     },
     "markRPr.font.hAnsi": {
       "type": "string",
-      "description": "paragraph-mark run HighAnsi font (w:pPr/w:rPr/w:rFonts @hAnsi). Emitted alongside markRPr.font.ascii only when the two slots diverge; the symmetric case collapses to markRPr.font.latin.",
+      "description": "paragraph-mark run HighAnsi 字体（w:pPr/w:rPr/w:rFonts @hAnsi）。仅在与 markRPr.font.ascii 两个槽位不同时一并输出；相同的情况会合并为 markRPr.font.latin。",
       "add": false,
       "set": true,
       "get": true,
@@ -1368,7 +1368,7 @@
     },
     "markRPr.lang.latin": {
       "type": "string",
-      "description": "paragraph-mark run Latin language tag (w:pPr/w:rPr/w:lang @val, BCP-47 e.g. en-US). Tags the ¶ glyph's language for proofing; mirrors run-level lang.latin.",
+      "description": "paragraph-mark run Latin language tag（w:pPr/w:rPr/w:lang @val，BCP-47，例如 en-US）。为 ¶ 字符标记校对语言；与 run 级 lang.latin 对应。",
       "add": false,
       "set": true,
       "get": true,
@@ -1377,7 +1377,7 @@
     },
     "markRPr.lang.ea": {
       "type": "string",
-      "description": "paragraph-mark run East-Asian language tag (w:pPr/w:rPr/w:lang @eastAsia, BCP-47 e.g. ja-JP). Mirrors run-level lang.ea.",
+      "description": "paragraph-mark run East-Asian language tag（w:pPr/w:rPr/w:lang @eastAsia，BCP-47，例如 ja-JP）。与 run 级 lang.ea 对应。",
       "add": false,
       "set": true,
       "get": true,
@@ -1386,7 +1386,7 @@
     },
     "markRPr.lang.cs": {
       "type": "string",
-      "description": "paragraph-mark run complex-script language tag (w:pPr/w:rPr/w:lang @bidi, BCP-47 e.g. ar-SA). Mirrors run-level lang.cs.",
+      "description": "paragraph-mark run complex-script language tag（w:pPr/w:rPr/w:lang @bidi，BCP-47，例如 ar-SA）。与 run 级 lang.cs 对应。",
       "add": false,
       "set": true,
       "get": true,
@@ -1395,7 +1395,7 @@
     },
     "kern": {
       "type": "integer",
-      "description": "kerning threshold on an empty paragraph's ¶-mark run (w:pPr/w:rPr/w:kern @val, half-points). Below this font size Word disables kerning. Get-side readback only — the value is applied via the generic run-formatting path (ApplyRunFormatting), not a dedicated paragraph Set case; text-bearing paragraphs surface the ¶-mark kern under markRPr.kern instead.",
+      "description": "空 paragraph 的 ¶-mark run 上的 kerning 阈值（w:pPr/w:rPr/w:kern @val，单位为 half-points）。低于此字体大小时 Word 会禁用 kerning。仅 Get 读取结果——该值通过通用 run-formatting 路径（ApplyRunFormatting）应用，而非专用 paragraph Set 分支；有文本的 paragraph 会改在 markRPr.kern 下返回 ¶-mark kern。",
       "add": false,
       "set": false,
       "get": true,

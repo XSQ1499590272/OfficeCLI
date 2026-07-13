@@ -137,8 +137,6 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
         startInfo.ArgumentList.Add("__resident-serve__");
         startInfo.ArgumentList.Add(path);
         startInfo.Environment["OFFICECLI_RESIDENT_FLUSH"] = "off";
-        startInfo.Environment["OFFICECLI_NO_AUTO_INSTALL"] = "1";
-        startInfo.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
 
         using var resident = System.Diagnostics.Process.Start(startInfo)
             ?? throw new InvalidOperationException("Failed to start resident");
@@ -198,8 +196,6 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
         foreach (var arg in args)
             startInfo.ArgumentList.Add(arg);
         startInfo.Environment["OFFICECLI_NO_AUTO_RESIDENT"] = "1";
-        startInfo.Environment["OFFICECLI_NO_AUTO_INSTALL"] = "1";
-        startInfo.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
 
         using var process = System.Diagnostics.Process.Start(startInfo)
             ?? throw new InvalidOperationException("Failed to start officecli");

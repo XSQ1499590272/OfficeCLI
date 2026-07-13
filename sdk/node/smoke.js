@@ -1,8 +1,6 @@
 'use strict';
-// CI smoke test (not shipped — excluded from package.json "files"). On a runner
-// without officecli on PATH, create() triggers auto-install (install.sh on unix,
-// install.ps1 on Windows), proving the cross-platform provisioning + the pipe
-// round-trip end to end. Exits non-zero on any failure.
+// CI smoke test (not shipped — excluded from package.json "files"). Requires
+// officecli on PATH and verifies the SDK pipe round-trip. Exits non-zero on failure.
 const os = require('os');
 const path = require('path');
 const fs = require('fs');

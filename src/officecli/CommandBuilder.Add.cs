@@ -12,16 +12,16 @@ static partial class CommandBuilder
 {
     private static Command BuildAddCommand(Option<bool> jsonOption)
     {
-        var addFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
+        var addFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
         var addParentPathArg = new Argument<string>("parent")
         {
-            Description = "Parent DOM path. Conventions per handler: docx uses /body (or /body/p[N] for nested adds); xlsx uses /Sheet1 (or any sheet name); pptx slide uses '/' (slides hang off the presentation root), pptx shape uses /slide[N]. Wrap paths containing brackets in single quotes for zsh: '/slide[1]'."
+            Description = "父 DOM 路径。各 handler 约定：docx 使用 /body（嵌套 add 使用 /body/p[N]）；xlsx 使用 /Sheet1（或任意 sheet 名）；pptx slide 使用 '/'（slide 挂在 presentation root 下），pptx shape 使用 /slide[N]。zsh 中请用单引号包住含方括号的路径，例如 '/slide[1]'。"
         };
-        var addTypeOpt = new Option<string>("--type") { Description = "Element type to add (e.g. paragraph, run, table, sheet, row, cell, slide, shape, picture, diagram/flowchart, ole, video)" };
-        var addFromOpt = new Option<string?>("--from") { Description = "Copy from an existing element path (e.g. /slide[1]/shape[2])" };
+        var addTypeOpt = new Option<string>("--type") { Description = "要添加的元素类型（例如 paragraph、run、table、sheet、row、cell、slide、shape、picture、diagram/flowchart、ole、video）" };
+        var addFromOpt = new Option<string?>("--from") { Description = "从已有元素路径复制（例如 /slide[1]/shape[2]）" };
         var addIndexOpt = new Option<int?>("--index")
         {
-            Description = "Insert position (0-based). If omitted, appends to end",
+            Description = "插入位置（0-based）。省略时追加到末尾",
             // Strict parser: reject trailing/leading whitespace so "3 " doesn't
             // silently succeed while "1.5"/"abc" cleanly error. Mirrors the
             // tight parse other invalid numeric inputs already get.
@@ -37,12 +37,12 @@ static partial class CommandBuilder
                 return v;
             }
         };
-        var addAfterOpt = new Option<string?>("--after") { Description = "Insert after the element at this path (e.g. p[@paraId=1A2B3C4D])" };
-        var addBeforeOpt = new Option<string?>("--before") { Description = "Insert before the element at this path" };
-        var addPropsOpt = new Option<string[]>("--prop") { Description = "Property to set (key=value, e.g. --prop src=image.png --prop width=6in)", AllowMultipleArgumentsPerToken = true };
-        var forceOption = new Option<bool>("--force") { Description = "Force write even if document is protected" };
+        var addAfterOpt = new Option<string?>("--after") { Description = "插入到此路径元素之后（例如 p[@paraId=1A2B3C4D]）" };
+        var addBeforeOpt = new Option<string?>("--before") { Description = "插入到此路径元素之前" };
+        var addPropsOpt = new Option<string[]>("--prop") { Description = "要设置的属性（key=value，例如 --prop src=image.png --prop width=6in）", AllowMultipleArgumentsPerToken = true };
+        var forceOption = new Option<bool>("--force") { Description = "即使文档受保护也强制写入" };
 
-        var addCommand = new Command("add", "Add a new element to the document") { TreatUnmatchedTokensAsErrors = false };
+        var addCommand = new Command("add", "向文档添加新元素") { TreatUnmatchedTokensAsErrors = false };
         addCommand.Add(addFileArg);
         addCommand.Add(addParentPathArg);
         addCommand.Add(addTypeOpt);
@@ -326,18 +326,18 @@ static partial class CommandBuilder
 
     private static Command BuildRemoveCommand(Option<bool> jsonOption)
     {
-        var removeFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var removePathArg = new Argument<string>("path") { Description = "DOM path of the element to remove" };
+        var removeFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var removePathArg = new Argument<string>("path") { Description = "要删除元素的 DOM 路径" };
         var shiftOption = new Option<string?>("--shift") {
-            Description = "(Excel cell only) Shift surrounding cells to fill the gap: left | up. " +
-                          "For full row/col delete with metadata adjustments, target the row/col path directly."
+            Description = "（仅 Excel cell）移动周围单元格以填补空缺：left | up。" +
+                          "如需删除整行/整列并调整 metadata，请直接指定 row/col 路径。"
         };
         var removePropsOpt = new Option<string[]>("--prop") {
-            Description = "Modifier property (key=value). Phase 4: --prop trackChange.author=<name> on a Word Run or Paragraph path records a w:del revision instead of physically deleting.",
+            Description = "附加属性（key=value）。在 Word Run 或 Paragraph 路径上使用 --prop trackChange.author=<name> 会记录 w:del revision，而非物理删除。",
             AllowMultipleArgumentsPerToken = true,
         };
 
-        var removeCommand = new Command("remove", "Remove an element from the document");
+        var removeCommand = new Command("remove", "从文档中删除元素");
         removeCommand.Add(removeFileArg);
         removeCommand.Add(removePathArg);
         removeCommand.Add(shiftOption);
@@ -398,18 +398,18 @@ static partial class CommandBuilder
 
     private static Command BuildMoveCommand(Option<bool> jsonOption)
     {
-        var moveFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var movePathArg = new Argument<string>("path") { Description = "DOM path of the element to move" };
-        var moveToOpt = new Option<string?>("--to") { Description = "Target parent path. If omitted, reorders within the current parent" };
-        var moveIndexOpt = new Option<int?>("--index") { Description = "Insert position (0-based). If omitted, appends to end" };
-        var moveAfterOpt = new Option<string?>("--after") { Description = "Move after the element at this path" };
-        var moveBeforeOpt = new Option<string?>("--before") { Description = "Move before the element at this path" };
+        var moveFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var movePathArg = new Argument<string>("path") { Description = "要移动元素的 DOM 路径" };
+        var moveToOpt = new Option<string?>("--to") { Description = "目标父路径。省略时在当前父元素内重排" };
+        var moveIndexOpt = new Option<int?>("--index") { Description = "插入位置（0-based）。省略时追加到末尾" };
+        var moveAfterOpt = new Option<string?>("--after") { Description = "移动到此路径元素之后" };
+        var moveBeforeOpt = new Option<string?>("--before") { Description = "移动到此路径元素之前" };
         // --prop currently carries trackChange.author/date/id for the
         // run-level move-tracking branch in WordHandler. Other handlers
         // (xlsx/pptx) accept the option for parity but ignore the values.
-        var movePropsOpt = new Option<string[]>("--prop") { Description = "Property to set on the move (e.g. --prop trackChange.author=Alice for tracked moves)", AllowMultipleArgumentsPerToken = true };
+        var movePropsOpt = new Option<string[]>("--prop") { Description = "移动时要设置的属性（例如 --prop trackChange.author=Alice 记录 tracked move）", AllowMultipleArgumentsPerToken = true };
 
-        var moveCommand = new Command("move", "Move an element to a new position or parent");
+        var moveCommand = new Command("move", "将元素移动到新位置或父元素");
         moveCommand.Add(moveFileArg);
         moveCommand.Add(movePathArg);
         moveCommand.Add(moveToOpt);
@@ -470,11 +470,11 @@ static partial class CommandBuilder
 
     private static Command BuildSwapCommand(Option<bool> jsonOption)
     {
-        var swapFileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
-        var swapPath1Arg = new Argument<string>("path1") { Description = "DOM path of the first element" };
-        var swapPath2Arg = new Argument<string>("path2") { Description = "DOM path of the second element" };
+        var swapFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
+        var swapPath1Arg = new Argument<string>("path1") { Description = "第一个元素的 DOM 路径" };
+        var swapPath2Arg = new Argument<string>("path2") { Description = "第二个元素的 DOM 路径" };
 
-        var swapCommand = new Command("swap", "Swap two elements in the document");
+        var swapCommand = new Command("swap", "交换文档中的两个元素");
         swapCommand.Add(swapFileArg);
         swapCommand.Add(swapPath1Arg);
         swapCommand.Add(swapPath2Arg);

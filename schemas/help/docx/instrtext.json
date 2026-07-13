@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/body/p[@paraId=X]/r[N]", "/header[N]/p[M]/r[K]", "/footer[N]/p[M]/r[K]"]
   },
-  "note": "Field-instruction text (w:instrText) — the body of a complex field that holds the instruction string (e.g. 'PAGE \\\\* MERGEFORMAT', 'DATE \\\\@ \"yyyy-MM-dd\"'). Atomic add is intentionally NOT supported because instrText outside a field is invalid; use --type field to insert a complete sequence. Set is supported so audit→fix workflows can rewrite a field's instruction (e.g. PAGE → DATE) without touching the surrounding fldChar markers.",
+  "note": "Field-instruction text（w:instrText）是 complex field 中保存 instruction string 的正文（例如 'PAGE \\\\* MERGEFORMAT'、'DATE \\\\@ \"yyyy-MM-dd\"'）。不支持将 instrText 单独 Add，因为 field 外的 instrText 不是有效 OOXML；请使用 --type field 插入完整序列。支持 Set，可在不改动周围 fldChar marker 的情况下，通过 audit→fix 重写 field instruction（例如将 PAGE 改为 DATE）。",
   "properties": {
     "instruction": {
       "type": "string",
-      "description": "The Word field instruction. Leading/trailing spaces inside the value are significant — they form the OOXML separator between switches. Alias: instr.",
+      "description": "Word field instruction。值内部的前导/尾随空格具有实际意义，它们构成 switches 之间的 OOXML 分隔符。Alias: instr。",
       "aliases": ["instr"],
       "add": false, "set": true, "get": true,
       "required": true,

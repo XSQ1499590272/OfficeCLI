@@ -7,7 +7,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "MIME type of the embedded part.",
+      "description": "嵌入 part 的 MIME type。",
       "readback": "MIME type string",
       "enforcement": "report"
     },
@@ -16,7 +16,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "embedded payload bytes.",
+      "description": "嵌入 payload 的字节数。",
       "readback": "integer byte count",
       "enforcement": "report"
     },
@@ -25,7 +25,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "OLE object type marker (always 'ole').",
+      "description": "OLE object type 标记（始终为 'ole'）。",
       "readback": "literal string 'ole'",
       "enforcement": "report"
     }

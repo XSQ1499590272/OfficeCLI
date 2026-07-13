@@ -14,31 +14,31 @@
   "paths": {
     "positional": ["/slidemaster[N]", "/slidemaster[N]/shape[K]"]
   },
-  "note": "Slide master definition. Children: slideLayout references + master-level shapes (logo, watermark, default text frames) that appear on every slide. The master part itself is read-only (created by templates), but its shape tree accepts add/set/remove via /slidemaster[N]/shape[K] — same property surface as slide shapes (text, fill, line, geometry, position, font). Access via path /slidemaster[N]; 'help pptx slidemaster' is the canonical lookup — 'master' is not accepted as an element alias.",
+  "note": "Slide master definition。children 包含 slideLayout references 和 master-level shape（logo、watermark、default text frame），这些 shape 会出现在每个 slide 上。master part 本身只读（由 template 创建），但其 shape tree 支持通过 /slidemaster[N]/shape[K] 执行 add/set/remove，surface 与 slide shape 相同（text、fill、line、geometry、position、font）。通过 /slidemaster[N] 访问；'help pptx slidemaster' 是 canonical lookup，'master' 不是可接受的 element alias。",
   "properties": {
     "name": {
       "type": "string",
-      "description": "master part name from CommonSlideData/@name.",
+      "description": "来自 CommonSlideData/@name 的 master part 名称。",
       "add": false, "set": true, "get": true,
       "readback": "master name string",
       "enforcement": "report"
     },
     "background": {
       "type": "color",
-      "description": "master background — propagates to every slide bound (directly or via a layout) to this master unless the slide or layout overrides. Accepts hex color (#FF6600), bare hex (FF6600), theme color (accent1/dark1/...), gradient (`C1-C2[-angle]`), image (`image:/path`), or `none` to clear.",
+      "description": "master background 会传播到所有直接或通过 layout 绑定到此 master 的 slide，除非 slide 或 layout 覆盖。接受 hex color（#FF6600）、bare hex（FF6600）、theme color（accent1/dark1/...）、gradient（`C1-C2[-angle]`）、image（`image:/path`）或 `none` 清除背景。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop background=FF6600", "--prop background=accent1", "--prop background=FF0000-0000FF-90", "--prop background=image:/path/to/bg.png", "--prop background=none"],
       "readback": "resolved background descriptor (hex, scheme name, gradient form, or `image`)",
       "enforcement": "report"
     },
-    "background.alpha":  { "type": "number", "add": false, "set": true,  "get": true, "description": "master background fill alpha as percent (0..100). Settable on an existing image background; surfaces on get when the resolved fill carries an alpha channel.", "readback": "integer percent 0..100", "enforcement": "report" },
-    "background.crop":   { "type": "string", "add": false, "set": false, "get": true, "description": "master background image crop quad in `l,t,r,b` percent units.", "readback": "comma-separated `l,t,r,b` quad", "enforcement": "report" },
-    "background.mode":   { "type": "string", "add": false, "set": true,  "get": true, "description": "master background image fill mode — `stretch` (default), `tile`, or `center`. Settable on an existing image background; emitted on get only when non-default.", "readback": "`tile` | `center`", "enforcement": "report" },
-    "background.ref":    { "type": "number", "add": false, "set": false, "get": true, "description": "theme background reference index — bgRef/@idx when the master inherits from the theme.", "readback": "integer theme bg ref id", "enforcement": "report" },
-    "background.scale":  { "type": "number", "add": false, "set": true,  "get": true, "description": "tile-fill scale percent (sx, both axes), 1..500. Settable on an existing image background with background.mode=tile; surfaces on get with background.mode=tile.", "readback": "integer percent", "enforcement": "report" },
+    "background.alpha":  { "type": "number", "add": false, "set": true,  "get": true, "description": "master background fill 的 alpha 百分比（0..100）。可在 existing image background 上设置；当 resolved fill 带有 alpha channel 时，Get 会返回该值。", "readback": "integer percent 0..100", "enforcement": "report" },
+    "background.crop":   { "type": "string", "add": false, "set": false, "get": true, "description": "master background image 的裁剪 quad，使用 `l,t,r,b` 百分比单位。", "readback": "comma-separated `l,t,r,b` quad", "enforcement": "report" },
+    "background.mode":   { "type": "string", "add": false, "set": true,  "get": true, "description": "master background image 的 fill mode：`stretch`（默认）、`tile` 或 `center`。可在 existing image background 上设置；仅非默认值会在 Get 时返回。", "readback": "`tile` | `center`", "enforcement": "report" },
+    "background.ref":    { "type": "number", "add": false, "set": false, "get": true, "description": "theme background reference index；当 master 继承 theme 时，对应 bgRef/@idx。", "readback": "integer theme bg ref id", "enforcement": "report" },
+    "background.scale":  { "type": "number", "add": false, "set": true,  "get": true, "description": "tile-fill scale 百分比（sx，两条轴相同），范围 1..500。仅可在 background.mode=tile 的 existing image background 上设置；background.mode=tile 时 Get 会返回。", "readback": "integer percent", "enforcement": "report" },
     "direction": {
       "type": "string",
-      "description": "default reading direction propagated into the master's txStyles (Level1ParagraphProperties of body/title/other) and cascaded onto existing placeholder paragraphs. Accepts `ltr`/`rtl` or boolean for the `rtl` alias.",
+      "description": "默认文字方向。会写入 master 的 txStyles（body/title/other 的 Level1ParagraphProperties），并级联到现有 placeholder paragraph。接受 `ltr`/`rtl`，也接受用于 `rtl` alias 的 boolean。",
       "add": false, "set": true, "get": false,
       "aliases": ["dir", "rtl"],
       "examples": ["--prop direction=rtl"],
@@ -46,21 +46,21 @@
     },
     "layoutCount": {
       "type": "number",
-      "description": "number of slide layouts associated with this master.",
+      "description": "与此 master 关联的 slide layout 数量。",
       "add": false, "set": false, "get": true,
       "readback": "integer count of associated slide layouts",
       "enforcement": "report"
     },
     "theme": {
       "type": "string",
-      "description": "name of the theme attached to this master, when the theme has a name.",
+      "description": "此 master 关联的 theme 名称；仅当 theme 有名称时返回。",
       "add": false, "set": false, "get": true,
       "readback": "theme name string (absent if theme has no name)",
       "enforcement": "report"
     },
     "shapeCount": {
       "type": "number",
-      "description": "count of background shapes (Shape + Picture) on the master's shape tree.",
+      "description": "master 的 shape tree 中背景 shape（Shape + Picture）的数量。",
       "add": false, "set": false, "get": true,
       "readback": "count of background shapes on the master",
       "enforcement": "report"

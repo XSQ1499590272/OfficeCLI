@@ -12,24 +12,24 @@ static partial class CommandBuilder
 {
     private static Command BuildDumpCommand(Option<bool> jsonOption)
     {
-        var dumpFileArg = new Argument<FileInfo>("file") { Description = "Office document path (.docx, .pptx, or .xlsx)" };
+        var dumpFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.docx、.pptx 或 .xlsx）" };
         var dumpPathArg = new Argument<string>("path")
         {
-            Description = "DOM path of the subtree to dump. Defaults to '/' (whole document) when omitted. "
-                        + "Supported docx subtree paths: /, /body, /body/p[N], /body/tbl[N], /theme, /settings, /numbering, /styles. "
-                        + "Supported pptx subtree paths: /, /presentation, /slide[N], /theme, /notesMaster, /slideMaster[N], /slideLayout[N], /noteSlide[N]. "
-                        + "Supported xlsx subtree paths: /, /SheetName, /sheet[N]. "
-                        + "Subtree dumps do NOT include resources at sibling paths (styles/numbering/theme; pptx: master/layout/theme; xlsx: workbook settings/named ranges); replay target must already define referenced styles/numIds/layouts.",
+            Description = "要 dump 的子树 DOM 路径。省略时默认为 '/'（整个文档）。"
+                        + "支持的 docx 子树路径：/、/body、/body/p[N]、/body/tbl[N]、/theme、/settings、/numbering、/styles。"
+                        + "支持的 pptx 子树路径：/、/presentation、/slide[N]、/theme、/notesMaster、/slideMaster[N]、/slideLayout[N]、/noteSlide[N]。"
+                        + "支持的 xlsx 子树路径：/、/SheetName、/sheet[N]。"
+                        + "子树 dump 不包含同级路径资源（styles/numbering/theme；pptx：master/layout/theme；xlsx：workbook settings/named ranges）；replay 目标必须预先定义被引用的 styles/numIds/layouts。",
             DefaultValueFactory = _ => "/"
         };
         var formatOpt = new Option<string>("--format")
         {
-            Description = "Output format (currently: batch)",
+            Description = "输出格式（当前为 batch）",
             DefaultValueFactory = _ => "batch"
         };
-        var outOpt = new Option<string?>("--out", "-o") { Description = "Write output to a file instead of stdout" };
+        var outOpt = new Option<string?>("--out", "-o") { Description = "将输出写入文件，而非 stdout" };
 
-        var dumpCommand = new Command("dump", "Serialize a document subtree into a replayable batch script (round-trip mechanism)");
+        var dumpCommand = new Command("dump", "将文档子树序列化为可重放的 batch script（round-trip 机制）");
         dumpCommand.Add(dumpFileArg);
         dumpCommand.Add(dumpPathArg);
         dumpCommand.Add(formatOpt);

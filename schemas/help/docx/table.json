@@ -18,7 +18,7 @@
       "/body/tbl[N]"
     ]
   },
-  "note": "Tables default to Single/Size=4 borders on all sides. Length props use twips (raw int) or unit-qualified. Data can be seeded via 'data' (semicolon rows, comma cells) or per-cell 'r{R}c{C}' props. cantSplit / noWrap / hideMark are row/cell-scoped, not table props — see 'help docx table-row' / 'help docx table-cell'.",
+  "note": "Table 默认所有边使用 Single/Size=4 border。Length props 接受 twips（raw int）或带单位的值。可通过 'data'（分号分隔 rows、逗号分隔 cells）或 per-cell 的 'r{R}c{C}' props 预填数据。cantSplit、noWrap、hideMark 作用于 row/cell，而不是 table props；参见 'help docx table-row' 和 'help docx table-cell'。",
   "children": [
     {
       "element": "row",
@@ -38,7 +38,7 @@
   "properties": {
     "colWidths": {
       "type": "string",
-      "description": "comma-separated per-column widths in twips. Aliases: colwidths.",
+      "description": "以逗号分隔的每列宽度，单位为 twips。别名：colwidths。",
       "aliases": [
         "colwidths"
       ],
@@ -61,7 +61,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction (Arabic / Hebrew). 'rtl' writes <w:bidiVisual/> on tblPr (mirrors column order); 'ltr' clears it. Distinct from per-cell textDirection.",
+      "description": "阅读方向（Arabic / Hebrew）。'rtl' 会在 tblPr 写入 <w:bidiVisual/>（反转列顺序）；'ltr' 清除它。不同于单元格级 textDirection。",
       "add": true,
       "set": true,
       "get": true,
@@ -92,7 +92,7 @@
     },
     "indent": {
       "type": "int",
-      "description": "table indent in twips.",
+      "description": "table 缩进，单位为 twips。",
       "add": true,
       "set": true,
       "get": true,
@@ -104,7 +104,7 @@
     },
     "cellSpacing": {
       "type": "int",
-      "description": "space between cells in twips. Alias: cellspacing.",
+      "description": "单元格之间的间距，单位为 twips。别名：cellspacing。",
       "aliases": [
         "cellspacing"
       ],
@@ -134,7 +134,7 @@
     },
     "padding": {
       "type": "int",
-      "description": "default cell padding (all four sides) in twips. Add/Set only — Get does not surface the table-default cell margin today.",
+      "description": "默认单元格内边距（四边），单位为 twips。仅 Add/Set；当前 Get 不返回 table-default cell margin。",
       "add": true,
       "set": true,
       "get": false,
@@ -146,7 +146,7 @@
     },
     "caption": {
       "type": "string",
-      "description": "accessibility caption for the table (<w:tblCaption> @w:val). Surfaced to assistive technology.",
+      "description": "table 的 accessibility caption（<w:tblCaption> @w:val）。会提供给 assistive technology。",
       "add": true,
       "set": true,
       "get": true,
@@ -158,7 +158,7 @@
     },
     "description": {
       "type": "string",
-      "description": "accessibility description / long-desc for the table (<w:tblDescription> @w:val).",
+      "description": "table 的 accessibility description / long-desc（<w:tblDescription> @w:val）。",
       "add": true,
       "set": true,
       "get": true,
@@ -170,7 +170,7 @@
     },
     "rowBandSize": {
       "type": "integer",
-      "description": "rows per band when a banded table style applies (<w:tblStyleRowBandSize> @w:val). Default 1; e.g. 2 stripes every second row.",
+      "description": "应用 banded table style 时每个 band 的行数（<w:tblStyleRowBandSize> @w:val）。默认 1；如设为 2，则每隔一行使用同一条纹。",
       "add": true,
       "set": false,
       "get": true,
@@ -182,7 +182,7 @@
     },
     "colBandSize": {
       "type": "integer",
-      "description": "columns per band when a banded table style applies (<w:tblStyleColBandSize> @w:val). Default 1. Alias: columnBandSize.",
+      "description": "应用 banded table style 时每个 band 的列数（<w:tblStyleColBandSize> @w:val）。默认 1。别名：columnBandSize。",
       "add": true,
       "set": false,
       "get": true,
@@ -194,7 +194,7 @@
     },
     "tblLook": {
       "type": "string",
-      "description": "conditional-formatting bitmask (<w:tblLook> @w:val, 4-digit hex) selecting which facets of a conditional/banded table style apply: 0x0020 firstRow, 0x0040 lastRow, 0x0080 firstColumn, 0x0100 lastColumn, 0x0200 noHBand, 0x0400 noVBand. The w:val hex is authoritative (Word also reads the decomposed boolean attributes; w:val wins). Get emits the source hex (e.g. 0620) so dump→batch round-trips every bit; the default 04A0 (firstRow+firstColumn) is only seeded when a table style is applied and no explicit tblLook is given. Decomposed facets also settable as firstRow/lastRow/firstColumn/lastColumn/bandRow/bandCol (or the tblLook.<facet> compound form).",
+      "description": "conditional-formatting bitmask（<w:tblLook> @w:val，4 位 hex），用于选择 conditional/banded table style 的生效 facet：0x0020 firstRow、0x0040 lastRow、0x0080 firstColumn、0x0100 lastColumn、0x0200 noHBand、0x0400 noVBand。w:val hex 是权威值（Word 也会读取拆分后的 boolean 属性，但以 w:val 为准）。Get 返回源 hex（如 0620），因此 dump→batch 可保留每一位；默认 04A0（firstRow+firstColumn）仅在应用 table style 且未指定 tblLook 时写入。拆分 facet 也可通过 firstRow/lastRow/firstColumn/lastColumn/bandRow/bandCol，或 tblLook.<facet> 组合形式设置。",
       "add": true,
       "set": true,
       "get": true,

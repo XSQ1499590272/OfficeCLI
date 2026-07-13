@@ -10,7 +10,7 @@
     "remove": false
   },
   "properties": {},
-  "description": "Raw OOXML access via the `raw` (read) and `raw-set` (write) commands. Use only when L2 DOM operations cannot express what you need. Two part-path forms are accepted: (1) semantic short names (recommended — stable across sheet rename/reorder) and (2) zip-internal URIs (any path ending in .xml is resolved literally against the package, e.g. /xl/worksheets/sheet1.xml).",
+  "description": "通过 `raw`（读取）和 `raw-set`（写入）命令访问 Raw OOXML。仅当 L2 DOM operations 无法表达需求时使用。支持两种 part-path 形式：（1）semantic short names（推荐，在 sheet 重命名或重新排序后仍稳定）；（2）zip-internal URIs（任何以 .xml 结尾的 path 都会按原样在 package 中解析，例如 /xl/worksheets/sheet1.xml）。",
   "parts": [
     { "name": "/workbook",      "desc": "Workbook part (sheet refs, defined names, calc properties)" },
     { "name": "/styles",        "desc": "Stylesheet (fonts, fills, borders, numFmts, cellXfs)" },

@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/body/tbl[N]/col[C]"]
   },
-  "note": "Virtual element — OOXML has no <w:col> child of <w:tbl>; the path is synthesized from <w:tblGrid>/<w:gridCol> + the per-row cell at column slot C. Same-table only for move/copy. Get/Set/Query at the column level are not supported (read width via /body/tbl[N] tblGrid or per-cell tcW). Insert is rejected when the column slot crosses a merged cell (gridSpan/vMerge) — unmerge first.",
+  "note": "Virtual element。OOXML 没有 <w:tbl> 下的 <w:col> child；path 是根据 <w:tblGrid>/<w:gridCol> 与每行在 column slot C 的 cell 合成的。move/copy 只支持同一 table。column 级别不支持 Get/Set/Query（宽度请从 /body/tbl[N] 的 tblGrid 或单个 cell 的 tcW 读取）。如果插入位置跨越 merged cell（gridSpan/vMerge），Insert 会被拒绝，请先 unmerge。",
   "properties": {
     "width": {
       "type": "length",
-      "description": "column width in twips (or any twips-parseable length).",
+      "description": "column 宽度，单位为 twips（或任意可按 twips 解析的 length）。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop width=2400", "--prop width=3cm"],
       "readback": "n/a (column-level Get not implemented; inspect tblGrid)",
@@ -26,7 +26,7 @@
     },
     "text": {
       "type": "string",
-      "description": "seed text inserted into every new cell of this column (one paragraph per cell).",
+      "description": "写入该 column 每个新 cell 的初始文本（每个 cell 一个 paragraph）。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop text=Header"],
       "readback": "not surfaced at column level",

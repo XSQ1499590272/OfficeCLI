@@ -5,7 +5,7 @@
   "properties": {
     "cols": {
       "type": "int",
-      "description": "asserts the new row's cell count matches the table grid. The row is structurally locked to the existing <a:tblGrid> — to widen, add a column first (or set gridSpan on cell 1 to merge into a wider span). Defaults to the existing grid column count when omitted.",
+      "description": "断言新行的单元格数与表格网格一致。该行在结构上受现有 <a:tblGrid> 约束；如需加宽，请先添加列（或在单元格 1 上设置 gridSpan 以合并为更宽的跨度）。省略时默认采用现有网格列数。",
       "add": true,
       "set": false,
       "get": false,
@@ -17,7 +17,7 @@
     },
     "height": {
       "type": "length",
-      "description": "row height in EMU-parseable length. Defaults to first-row height or ~1cm.",
+      "description": "行高，接受可解析为 EMU 的长度。默认使用首行高度，或约为 1cm。",
       "add": true,
       "set": true,
       "get": true,

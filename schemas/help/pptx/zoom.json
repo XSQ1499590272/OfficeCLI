@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/zoom[M]"]
   },
-  "note": "Aliases: slidezoom, slide-zoom. Creates a slide-zoom link on the source slide pointing to target slide. Default size 8cm × 4.5cm centered. Used for interactive non-linear navigation.",
+  "note": "Aliases：slidezoom、slide-zoom。在 source slide 上创建指向 target slide 的 slide-zoom link。默认尺寸为 8cm × 4.5cm，并居中。用于交互式的非线性导航。",
   "properties": {
     "target": {
       "type": "int",
-      "description": "target slide number (1-based). Required. Alias: slide.",
+      "description": "目标 slide number（从 1 开始）。必填。Alias: slide。",
       "aliases": ["slide"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop target=3"],
@@ -55,7 +55,7 @@
     },
     "name": {
       "type": "string",
-      "description": "zoom frame name. Defaults to 'Slide Zoom N'.",
+      "description": "zoom frame 名称。默认值为 'Slide Zoom N'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=\"Section 2\""],
       "readback": "name string",
@@ -63,7 +63,7 @@
     },
     "returnToParent": {
       "type": "bool",
-      "description": "return to parent slide after zoom plays.",
+      "description": "zoom 播放结束后返回 parent slide。",
       "aliases": ["returntoparent"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop returnToParent=true"],
@@ -72,7 +72,7 @@
     },
     "transitionDur": {
       "type": "int",
-      "description": "transition duration in ms. Defaults to 1000.",
+      "description": "transition 持续时间，单位为 ms。默认值为 1000。",
       "aliases": ["transitiondur"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop transitionDur=1500"],

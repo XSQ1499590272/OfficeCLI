@@ -22,7 +22,7 @@
       "/comments/comment[N]"
     ]
   },
-  "note": "Comments live in WordprocessingCommentsPart. Anchor: CommentRangeStart/End surround the target run or paragraph; CommentReference marks the inline anchor.",
+  "note": "Comment 保存在 WordprocessingCommentsPart 中。锚点由 CommentRangeStart/End 包围目标 run 或 paragraph，CommentReference 用于标记 inline anchor。",
   "extends": [
     "_shared/comment",
     "_shared/comment.docx-pptx"
@@ -30,7 +30,7 @@
   "properties": {
     "id": {
       "type": "number",
-      "description": "OOXML comment id (w:comment/@w:id). Assigned by the writer; surfaces only on Get/Query.",
+      "description": "OOXML comment id（w:comment/@w:id）。由 writer 分配；仅在 Get/Query 中返回。",
       "add": false,
       "set": false,
       "get": true,
@@ -39,7 +39,7 @@
     },
     "anchoredTo": {
       "type": "string",
-      "description": "path of the paragraph or run the comment is anchored to (resolved from CommentRangeStart).",
+      "description": "comment 所锚定的 paragraph 或 run 的 path（从 CommentRangeStart 解析）。",
       "add": false,
       "set": false,
       "get": true,
@@ -48,7 +48,7 @@
     },
     "runStart": {
       "type": "int",
-      "description": "1-based run index inside the parent paragraph where the comment range starts. N=0 (default) anchors the comment to paragraph start; N>=1 places <w:commentRangeStart/> immediately after the Nth run so dump→batch round-trip restores intra-paragraph anchor positions.",
+      "description": "comment range 在 parent paragraph 中的起始 run index，从 1 开始。N=0（默认）将 comment 锚定到 paragraph 开头；N>=1 会把 <w:commentRangeStart/> 放在第 N 个 run 之后，使 dump→batch 往返时恢复 paragraph 内的锚定位置。",
       "aliases": ["runstart"],
       "add": true,
       "set": false,
@@ -61,7 +61,7 @@
     },
     "range": {
       "type": "bool",
-      "description": "whether the comment spans a text range (default true: emits <w:commentRangeStart/> + <w:commentRangeEnd/> around the anchor plus a <w:commentReference/> run). Pass range=false for a zero-width / point-anchored comment that carries ONLY <w:commentReference/> — used by dump→batch to preserve reference-only comments without synthesizing a spurious range.",
+      "description": "comment 是否覆盖文本范围（默认 true：在锚点周围输出 <w:commentRangeStart/> + <w:commentRangeEnd/>，并添加一个 <w:commentReference/> run）。对于 zero-width / point-anchored comment，传入 range=false；此时只携带 <w:commentReference/>，供 dump→batch 保留 reference-only comment，而不生成多余的 range。",
       "aliases": ["pointRef", "pointref"],
       "add": true,
       "set": false,
@@ -75,7 +75,7 @@
     },
     "parentId": {
       "type": "number",
-      "description": "w:id of the comment this one replies to. Threads the reply under its parent in Word's review pane via word/commentsExtended.xml (w15:paraIdParent, keyed by the comment paragraphs' w14:paraId). Get returns the parent comment's w:id on replies only.",
+      "description": "要回复的 comment 的 w:id。通过 word/commentsExtended.xml（w15:paraIdParent，以 comment paragraph 的 w14:paraId 为 key）将 reply 归入 Word review pane 中的 parent。仅对 reply 返回 parent comment 的 w:id。",
       "aliases": ["parentid"],
       "add": true,
       "set": false,
@@ -88,7 +88,7 @@
     },
     "done": {
       "type": "bool",
-      "description": "resolved-state of the comment (Word's 'Resolve'), stored in word/commentsExtended.xml as w15:done. Get returns done=true|false on every comment, so 'query comment[done=false]' lists unresolved comments.",
+      "description": "comment 的 resolved 状态（Word 的 'Resolve'），存储在 word/commentsExtended.xml 的 w15:done 中。Get 会为每个 comment 返回 done=true|false，因此 'query comment[done=false]' 可列出未解决的 comment。",
       "aliases": ["resolved"],
       "add": true,
       "set": true,

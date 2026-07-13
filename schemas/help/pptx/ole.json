@@ -16,7 +16,7 @@
       "/slide[N]/ole[M]"
     ]
   },
-  "note": "Aliases: oleobject, object, embed. Binary package + preview image. Position via x/y/width/height (EMU-parseable; readback in cm).",
+  "note": "Aliases：oleobject、object、embed。包含 binary package 和 preview image。通过 x/y/width/height 定位（接受可按 EMU 解析的值，readback 使用 cm）。",
   "extends": [
     "_shared/ole",
     "_shared/ole.docx-pptx",

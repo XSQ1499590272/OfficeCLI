@@ -13,18 +13,18 @@
     "stable":     ["/<sheetName>"],
     "positional": ["/Sheet1", "/Sheet2"]
   },
-  "note": "Add accepts name, position, autoFilter, tabColor, and hidden — these forward to the same code paths Set uses, preserving Add/Set symmetry. `freeze` remains Set-only.",
+  "note": "Add 接受 name、position、autoFilter、tabColor、hidden，并转发到 Set 使用的相同 code path，以保持 Add/Set 对称。freeze 仍只支持 Set。",
   "properties": {
     "name": {
       "type": "string",
-      "description": "sheet tab name. Returned path is /<name>; readback goes through DocumentNode.Path / .Preview rather than Format[].",
+      "description": "sheet tab 名称。返回路径为 /<name>；读取结果通过 DocumentNode.Path / .Preview 返回，而不是 Format[]。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=Summary"],
       "enforcement": "report"
     },
     "autoFilter": {
       "type": "string",
-      "description": "range to apply AutoFilter on (e.g. A1:D10). `true` enables on used range.",
+      "description": "应用 AutoFilter 的范围（如 A1:D10）。传入 true 会对 used range 启用。",
       "aliases": ["autofilter"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop autoFilter=A1:D10"],
@@ -33,7 +33,7 @@
     },
     "tabColor": {
       "type": "color",
-      "description": "sheet tab color.",
+      "description": "sheet tab 颜色。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop tabColor=4472C4"],
       "readback": "#RRGGBB uppercase",
@@ -41,14 +41,14 @@
     },
     "hidden": {
       "type": "bool",
-      "description": "hide the sheet at creation or after the fact.",
+      "description": "在创建时或之后隐藏该 sheet。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop hidden=true"],
       "enforcement": "report"
     },
     "freeze": {
       "type": "string",
-      "description": "freeze panes anchor (cell ref). A2 freezes row 1; B1 freezes column A; B2 freezes row 1 + column A. `none` / `false` / empty removes the freeze. Set-only on existing sheets.",
+      "description": "冻结窗格锚点（cell ref）。A2 冻结第 1 行；B1 冻结 A 列；B2 同时冻结第 1 行和 A 列。none、false 或空值会取消冻结。仅能对现有 sheet 使用 Set。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop freeze=A2", "--prop freeze=B2", "--prop freeze=none"],
       "readback": "top-left cell ref of frozen pane (e.g. A2); absent when no freeze",
@@ -57,7 +57,7 @@
     "direction": {
       "type": "enum",
       "values": ["rtl", "ltr"],
-      "description": "RTL sheet layout (Arabic / Hebrew) — column A renders on the right, column scroll direction inverts. Maps to <sheetView rightToLeft=...>. Canonical key matches Word/PPT.",
+      "description": "RTL sheet layout（Arabic / Hebrew）：A 列显示在右侧，列滚动方向相反。映射到 <sheetView rightToLeft=...>。规范键与 Word/PPT 一致。",
       "aliases": ["rtl", "rightToLeft", "righttoleft", "sheet.direction"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop direction=rtl", "--prop rightToLeft=true"],
@@ -66,21 +66,21 @@
     },
     "zoom": {
       "type": "number",
-      "description": "sheetView zoom percentage (10-400). Emitted only when non-default (≠100).",
+      "description": "sheetView 缩放百分比（10–400）。仅在非默认值（≠100）时写入。",
       "add": false, "set": false, "get": true,
       "readback": "zoom percentage 10-400",
       "enforcement": "report"
     },
     "gridlines": {
       "type": "bool",
-      "description": "sheetView gridline visibility. Emitted only when hidden (false); default-on is omitted (CONSISTENCY(default-omission)).",
+      "description": "sheetView 网格线可见性。仅在隐藏（false）时写入；默认显示时省略（CONSISTENCY(default-omission)）。",
       "add": false, "set": false, "get": true,
       "readback": "true | false",
       "enforcement": "report"
     },
     "headings": {
       "type": "bool",
-      "description": "row/column header visibility. Emitted only when hidden (false); default-on is omitted (CONSISTENCY(default-omission)).",
+      "description": "行/列标题可见性。仅在隐藏（false）时写入；默认显示时省略（CONSISTENCY(default-omission)）。",
       "add": false, "set": false, "get": true,
       "readback": "row/column headings visible",
       "enforcement": "report"
@@ -88,21 +88,21 @@
     "visibility": {
       "type": "enum",
       "values": ["hidden", "veryHidden"],
-      "description": "workbook-level sheet state when not visible. Emitted alongside hidden=true; absent for default-visible sheets.",
+      "description": "sheet 不可见时的 workbook 级状态。会与 hidden=true 一同写入；默认可见的 sheet 不会写入此值。",
       "add": false, "set": false, "get": true,
       "readback": "if hidden",
       "enforcement": "report"
     },
     "protect": {
       "type": "bool",
-      "description": "sheet protection state. On Set: pass `true` to enable protection, `false` to disable. Use the separate `password` property to set/clear an Excel legacy password hash.",
+      "description": "sheet protection 状态。Set 时传入 true 启用保护，false 关闭保护；请用独立的 password 属性设置或清除 Excel legacy password hash。",
       "add": false, "set": true, "get": true,
       "readback": "true if sheet protection enabled",
       "enforcement": "report"
     },
     "password": {
       "type": "string",
-      "description": "Excel legacy password hash for sheet protection (ECMA-376 14.7.1). On Set: pass plaintext password to hash and apply, or `none` to clear. Implicitly enables protection if not already set.",
+      "description": "sheet protection 使用的 Excel legacy password hash（ECMA-376 14.7.1）。Set 时传入明文密码会计算 hash 并应用，传入 none 则清除；若尚未启用，会同时启用 protection。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop password=secret123", "--prop password=none"],
       "readback": "n/a (hash not exposed on Get)",
@@ -110,7 +110,7 @@
     },
     "printTitleRows": {
       "type": "string",
-      "description": "rows to repeat at top of every printed page (e.g. 1:1).",
+      "description": "每个打印页顶部重复的行（如 1:1）。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop printTitleRows=1:1"],
       "readback": "n/a (set-only)",
@@ -118,7 +118,7 @@
     },
     "printTitleCols": {
       "type": "string",
-      "description": "columns to repeat at left of every printed page (e.g. A:A).",
+      "description": "每个打印页左侧重复的列（如 A:A）。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop printTitleCols=A:A"],
       "readback": "n/a (set-only)",
@@ -126,28 +126,28 @@
     },
     "orientation": {
       "type": "string",
-      "description": "PageSetup orientation (portrait | landscape). Emitted only when set on the sheet.",
+      "description": "PageSetup 页面方向（portrait | landscape）。仅在 sheet 上设置后写入。",
       "add": false, "set": false, "get": true,
       "readback": "page orientation (portrait|landscape)",
       "enforcement": "report"
     },
     "paperSize": {
       "type": "number",
-      "description": "PageSetup paper-size code (OOXML enumeration; e.g. 1=Letter, 9=A4).",
+      "description": "PageSetup 纸张尺寸代码（OOXML 枚举；如 1=Letter、9=A4）。",
       "add": false, "set": false, "get": true,
       "readback": "OOXML paper size code",
       "enforcement": "report"
     },
     "fitToPage": {
       "type": "string",
-      "description": "PageSetup fit-to-page width x height (e.g. '1x1' = fit to one page).",
+      "description": "PageSetup 适应页面的宽度 x 高度（如 '1x1' 表示适应一页）。",
       "add": false, "set": false, "get": true,
       "readback": "WxH fit-to-page settings",
       "enforcement": "report"
     },
     "printArea": {
       "type": "string",
-      "description": "defined-name _xlnm.Print_Area for this sheet. Get returns the A1 range with the leading 'SheetName!' prefix stripped. On Set: pass an A1 range (e.g. A1:C20) or `none` to clear.",
+      "description": "当前 sheet 的 defined-name _xlnm.Print_Area。Get 返回去除 'SheetName!' 前缀后的 A1 范围；Set 时传入 A1 范围（如 A1:C20）或 none 清除。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop printArea=A1:C20", "--prop printArea=none"],
       "readback": "A1 range string",
@@ -155,63 +155,63 @@
     },
     "margin.top": {
       "type": "string",
-      "description": "PageMargins top margin in inches (e.g. '0.75in').",
+      "description": "PageMargins 上边距，单位为 inch（如 '0.75in'）。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "margin.bottom": {
       "type": "string",
-      "description": "PageMargins bottom margin in inches.",
+      "description": "PageMargins 下边距，单位为 inch。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "margin.left": {
       "type": "string",
-      "description": "PageMargins left margin in inches.",
+      "description": "PageMargins 左边距，单位为 inch。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "margin.right": {
       "type": "string",
-      "description": "PageMargins right margin in inches.",
+      "description": "PageMargins 右边距，单位为 inch。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "margin.header": {
       "type": "string",
-      "description": "PageMargins header margin in inches (distance from top edge to header).",
+      "description": "PageMargins 页眉边距，单位为 inch（从顶边到页眉的距离）。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "margin.footer": {
       "type": "string",
-      "description": "PageMargins footer margin in inches (distance from bottom edge to footer).",
+      "description": "PageMargins 页脚边距，单位为 inch（从底边到页脚的距离）。",
       "add": false, "set": false, "get": true,
       "readback": "margin in inches",
       "enforcement": "report"
     },
     "header": {
       "type": "string",
-      "description": "odd-page header text (HeaderFooter/OddHeader). Excel format codes (&L, &C, &R, &P, &D, etc.) pass through verbatim.",
+      "description": "奇数页页眉文本（HeaderFooter/OddHeader）。Excel 格式代码（&L、&C、&R、&P、&D 等）会原样传递。",
       "add": false, "set": true, "get": true,
       "readback": "raw odd-header text as stored",
       "enforcement": "report"
     },
     "footer": {
       "type": "string",
-      "description": "odd-page footer text (HeaderFooter/OddFooter). Excel format codes pass through verbatim.",
+      "description": "奇数页页脚文本（HeaderFooter/OddFooter）。Excel 格式代码会原样传递。",
       "add": false, "set": true, "get": true,
       "readback": "raw odd-footer text as stored",
       "enforcement": "report"
     },
     "sort": {
       "type": "string",
-      "description": "sort the sheet by one or more columns. Set input: comma-separated `Col [dir]` tokens, direction optional, defaults to asc (e.g. `A`, `A asc`, `A asc,B desc`). Use `none` to clear. Get readback: comma-separated `Col:dir` entries (colon-separated, e.g. `A:asc`).",
+      "description": "按一列或多列对 sheet 排序。Set 输入为逗号分隔的 Col [dir] token，方向可省略，默认 asc（如 A、A asc、A asc,B desc）；使用 none 清除。Get 返回逗号分隔的 Col:dir 条目（冒号分隔，如 A:asc）。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop sort=A", "--prop sort=\"A asc,B desc\"", "--prop sort=none"],
       "readback": "comma-separated `Col:asc|desc` list (e.g. `A:asc`)",
@@ -219,14 +219,14 @@
     },
     "rowBreaks": {
       "type": "string",
-      "description": "manual horizontal page breaks. Comma-separated row indices (1-based) where each break sits above that row.",
+      "description": "手动水平分页符。传入逗号分隔的行号（从 1 开始）；每个分页符位于对应行的上方。",
       "add": false, "set": false, "get": true,
       "readback": "comma-separated row break indices",
       "enforcement": "report"
     },
     "colBreaks": {
       "type": "string",
-      "description": "manual vertical page breaks. Comma-separated column indices (1-based) where each break sits to the left of that column.",
+      "description": "手动垂直分页符。传入逗号分隔的列号（从 1 开始）；每个分页符位于对应列的左侧。",
       "add": false, "set": false, "get": true,
       "readback": "comma-separated column break indices",
       "enforcement": "report"

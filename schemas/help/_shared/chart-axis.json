@@ -8,7 +8,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "axis text font readback.",
+      "description": "axis 文本字体的读取结果。",
       "readback": "font name string",
       "enforcement": "report"
     },
@@ -17,7 +17,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "value-axis maximum readback (also surfaced via max on axis-by-role path).",
+      "description": "value-axis 最大值的读取结果（也会通过 axis-by-role 路径上的 max 返回）。",
       "readback": "numeric value",
       "enforcement": "report"
     },
@@ -26,7 +26,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "value-axis minimum readback (also surfaced via min on axis-by-role path).",
+      "description": "value-axis 最小值的读取结果（也会通过 axis-by-role 路径上的 min 返回）。",
       "readback": "numeric value",
       "enforcement": "report"
     },
@@ -35,7 +35,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "axis number format string.",
+      "description": "axis 数字格式字符串。",
       "readback": "format code",
       "enforcement": "report"
     },
@@ -44,7 +44,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "axis scaling orientation (e.g. maxMin when reversed).",
+      "description": "axis 缩放方向（例如反向时为 maxMin）。",
       "readback": "orientation token",
       "enforcement": "report"
     },
@@ -53,13 +53,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "value-axis title readback (chart-level convenience; axis-by-role uses 'title').",
+      "description": "value-axis 标题的读取结果（chart 级快捷入口；axis-by-role 使用 'title'）。",
       "readback": "title string",
       "enforcement": "report"
     },
     "format": {
       "type": "string",
-      "description": "number format string",
+      "description": "数字格式字符串。",
       "set": true,
       "get": true,
       "examples": [
@@ -73,13 +73,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "category axis label offset (% of default 100).",
+      "description": "category axis label 偏移量（默认 100 的百分比）。",
       "readback": "integer percentage",
       "enforcement": "report"
     },
     "labelRotation": {
       "type": "number",
-      "description": "tick label rotation in degrees",
+      "description": "tick label 旋转角度，单位为度。",
       "set": true,
       "get": true,
       "examples": [
@@ -89,7 +89,7 @@
     },
     "logBase": {
       "type": "number",
-      "description": "logarithmic base for value axis scale. Only valid for role=value or role=value2; ignored on category axes.",
+      "description": "value axis 缩放的对数底数。仅 role=value 或 role=value2 有效；在 category axis 上会忽略。",
       "set": true,
       "get": true,
       "appliesWhen": {
@@ -106,7 +106,7 @@
     },
     "majorGridlines": {
       "type": "bool",
-      "description": "show or hide major gridlines. Applies to all roles.",
+      "description": "显示或隐藏 major 网格线。作用于所有 role。",
       "set": true,
       "get": true,
       "examples": [
@@ -116,7 +116,7 @@
     },
     "max": {
       "type": "number",
-      "description": "maximum scale of the value axis. Only valid for role=value or role=value2; ignored on category axes.",
+      "description": "value axis 的最大刻度。仅 role=value 或 role=value2 有效；在 category axis 上会忽略。",
       "set": true,
       "get": true,
       "appliesWhen": {
@@ -133,7 +133,7 @@
     },
     "min": {
       "type": "number",
-      "description": "minimum scale of the value axis. Only valid for role=value or role=value2; ignored on category axes.",
+      "description": "value axis 的最小刻度。仅 role=value 或 role=value2 有效；在 category axis 上会忽略。",
       "set": true,
       "get": true,
       "appliesWhen": {
@@ -149,7 +149,7 @@
     },
     "minorGridlines": {
       "type": "bool",
-      "description": "show or hide minor gridlines. Applies to all roles.",
+      "description": "显示或隐藏 minor 网格线。作用于所有 role。",
       "set": true,
       "get": true,
       "examples": [
@@ -162,13 +162,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "category axis label skip interval (>1 means tick labels are sparser).",
+      "description": "category axis label 跳过间隔（>1 表示 tick label 更稀疏）。",
       "readback": "integer interval",
       "enforcement": "report"
     },
     "title": {
       "type": "string",
-      "description": "axis title text. Applies to all roles (category, value). Pass 'none' to remove.",
+      "description": "axis 标题文本。作用于所有 role（category、value）。传入 'none' 可移除。",
       "set": true,
       "get": true,
       "examples": [
@@ -179,7 +179,7 @@
     },
     "visible": {
       "type": "bool",
-      "description": "show or hide the axis. Applies to all roles.",
+      "description": "显示或隐藏 axis。作用于所有 role。",
       "set": true,
       "get": true,
       "examples": [

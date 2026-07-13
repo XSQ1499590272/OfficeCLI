@@ -17,12 +17,12 @@
       "/SheetName/CellRef/comment"
     ]
   },
-  "note": "Aliases: note. Anchored to a cell via 'ref' (or path tail). Modern Excel also supports threaded comments; this handler emits classic comments.",
+  "note": "Aliases：note。通过 ref（或 path 尾部）将 comment 锚定到 cell。Modern Excel 也支持 threaded comment，但此 handler 输出 classic comment。",
   "extends": "_shared/comment",
   "properties": {
     "ref": {
       "type": "string",
-      "description": "target cell address (e.g. B2).",
+      "description": "目标 cell address（例如 B2）。",
       "add": true,
       "set": true,
       "get": true,

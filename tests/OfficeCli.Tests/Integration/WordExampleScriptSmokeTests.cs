@@ -65,7 +65,6 @@ public class WordExampleScriptSmokeTests
         startInfo.Environment["PATH"] = appHostDirectory + Path.PathSeparator +
             (Environment.GetEnvironmentVariable("PATH") ?? string.Empty);
         startInfo.Environment["OFFICECLI_NO_AUTO_RESIDENT"] = "1";
-        startInfo.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
 
         using var process = Process.Start(startInfo)
             ?? throw new InvalidOperationException($"Could not start {script}");

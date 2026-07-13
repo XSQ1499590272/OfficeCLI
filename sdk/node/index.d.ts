@@ -27,8 +27,6 @@ export interface OpenOptions {
   binary?: string;
   /** Command-delivery timeout in ms (connect + retries); the reply read blocks. Default 30000. */
   timeoutMs?: number;
-  /** Actively install/download the CLI if missing (bundled binary, then install.sh). Default true. */
-  autoInstall?: boolean;
 }
 
 export interface BatchOptions {
@@ -63,9 +61,6 @@ export function create(filePath: string, args?: string[], options?: OpenOptions)
 
 /** Open an existing document and return a live handle. */
 export function open(filePath: string, options?: OpenOptions): Promise<Document>;
-
-/** Install the officecli CLI via its official installer (unix only). */
-export function install(): void;
 
 /** [main, ping] pipe addresses for a document path (debug helper). */
 export function pipePaths(filePath: string): [string, string];

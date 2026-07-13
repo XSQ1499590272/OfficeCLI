@@ -13,12 +13,12 @@
   "paths": {
     "positional": ["/SheetName/sparkline[N]"]
   },
-  "note": "SparklineGroup stored under x14 extension list. Renders tiny inline chart in a target cell.",
+  "note": "SparklineGroup 存储在 x14 extension list 下，会在 target cell 中渲染小型 inline chart。",
   "properties": {
     "type": {
       "type": "enum",
       "values": ["line", "column", "stacked", "winloss", "win-loss"],
-      "description": "sparkline chart kind. 'stacked'/'winloss' both map to OOXML stacked.",
+      "description": "sparkline chart 类型。'stacked'/'winloss' 都映射到 OOXML stacked。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=line"],
       "readback": "\"line\", \"column\", or \"winLoss\" (OOXML stacked maps back as \"winLoss\")",
@@ -26,7 +26,7 @@
     },
     "dataRange": {
       "type": "string",
-      "description": "source data range (e.g. A1:A10).",
+      "description": "源 data range（如 A1:A10）。",
       "aliases": ["datarange", "range", "data"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop dataRange=A1:A10"],
@@ -35,7 +35,7 @@
     },
     "location": {
       "type": "string",
-      "description": "target cell address.",
+      "description": "目标单元格地址。",
       "aliases": ["cell", "ref"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop location=B1"],
@@ -44,7 +44,7 @@
     },
     "color": {
       "type": "color",
-      "description": "series line/column color. Defaults to #4472C4.",
+      "description": "series 线/列颜色。默认值为 #4472C4。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop color=#FF0000"],
       "readback": "#RRGGBB",
@@ -52,7 +52,7 @@
     },
     "negativeColor": {
       "type": "color",
-      "description": "color used when 'negative' flag is on (winLoss/highlight negative points).",
+      "description": "启用 'negative' 标志时使用的颜色（winLoss/高亮负值点）。",
       "aliases": ["negativecolor"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop negativeColor=#FF0000"],
@@ -61,7 +61,7 @@
     },
     "markers": {
       "type": "bool",
-      "description": "show data-point markers (line sparklines only).",
+      "description": "显示数据点 marker（仅 line sparkline）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop markers=true"],
       "readback": "true/false",
@@ -69,7 +69,7 @@
     },
     "highPoint": {
       "type": "bool",
-      "description": "highlight the maximum point.",
+      "description": "高亮最大值点。",
       "aliases": ["highpoint"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop highPoint=true"],
@@ -78,7 +78,7 @@
     },
     "lowPoint": {
       "type": "bool",
-      "description": "highlight the minimum point.",
+      "description": "高亮最小值点。",
       "aliases": ["lowpoint"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop lowPoint=true"],
@@ -87,7 +87,7 @@
     },
     "firstPoint": {
       "type": "bool",
-      "description": "highlight the first point.",
+      "description": "高亮第一个点。",
       "aliases": ["firstpoint"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop firstPoint=true"],
@@ -96,7 +96,7 @@
     },
     "lastPoint": {
       "type": "bool",
-      "description": "highlight the last point.",
+      "description": "高亮最后一个点。",
       "aliases": ["lastpoint"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop lastPoint=true"],
@@ -105,7 +105,7 @@
     },
     "negative": {
       "type": "bool",
-      "description": "highlight negative points using negativeColor.",
+      "description": "使用 negativeColor 高亮负值点。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop negative=true"],
       "readback": "true/false",
@@ -113,7 +113,7 @@
     },
     "highMarkerColor": {
       "type": "color",
-      "description": "marker color for the high point. Add-only; not modifiable via Set.",
+      "description": "最大值点的 marker 颜色。仅 Add 可设置；不能通过 Set 修改。",
       "aliases": ["highmarkercolor"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop highMarkerColor=#00B050"],
@@ -122,7 +122,7 @@
     },
     "lowMarkerColor": {
       "type": "color",
-      "description": "marker color for the low point. Add-only.",
+      "description": "最小值点的 marker 颜色。仅 Add 可设置。",
       "aliases": ["lowmarkercolor"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop lowMarkerColor=#FF0000"],
@@ -131,7 +131,7 @@
     },
     "firstMarkerColor": {
       "type": "color",
-      "description": "marker color for the first point. Add-only.",
+      "description": "第一个点的 marker 颜色。仅 Add 可设置。",
       "aliases": ["firstmarkercolor"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop firstMarkerColor=#4472C4"],
@@ -140,7 +140,7 @@
     },
     "lastMarkerColor": {
       "type": "color",
-      "description": "marker color for the last point. Add-only.",
+      "description": "最后一个点的 marker 颜色。仅 Add 可设置。",
       "aliases": ["lastmarkercolor"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop lastMarkerColor=#4472C4"],
@@ -149,7 +149,7 @@
     },
     "markersColor": {
       "type": "color",
-      "description": "marker color for all non-extreme points. Add-only.",
+      "description": "所有非极值点的 marker 颜色。仅 Add 可设置。",
       "aliases": ["markerscolor"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop markersColor=#808080"],
@@ -158,7 +158,7 @@
     },
     "lineWeight": {
       "type": "number",
-      "description": "line stroke weight in points (line sparklines only).",
+      "description": "line stroke 粗细，单位为 pt（仅 line sparkline）。",
       "aliases": ["lineweight"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop lineWeight=1.5"],
@@ -168,7 +168,7 @@
     "displayEmptyCellsAs": {
       "type": "enum",
       "values": ["gap", "zero", "span"],
-      "description": "how empty cells in the data range are plotted.",
+      "description": "如何绘制数据范围中的空单元格。",
       "aliases": ["displayemptycellsas"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop displayEmptyCellsAs=zero"],
@@ -177,7 +177,7 @@
     },
     "displayXAxis": {
       "type": "bool",
-      "description": "show the horizontal axis when data crosses zero.",
+      "description": "当数据跨越零值时显示水平 axis。",
       "aliases": ["displayxaxis"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop displayXAxis=true"],
@@ -186,7 +186,7 @@
     },
     "rightToLeft": {
       "type": "bool",
-      "description": "plot the sparkline right-to-left.",
+      "description": "从右到左绘制 sparkline。",
       "aliases": ["righttoleft"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop rightToLeft=true"],
@@ -195,7 +195,7 @@
     },
     "dateAxis": {
       "type": "bool",
-      "description": "treat the data range as a date axis (uneven spacing by date).",
+      "description": "将数据范围作为 date axis 处理（按日期使用不等间距）。",
       "aliases": ["dateaxis"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop dateAxis=true"],

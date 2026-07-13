@@ -11,29 +11,29 @@ static partial class CommandBuilder
 {
     private static Command BuildViewCommand(Option<bool> jsonOption)
     {
-        var viewFileArg = new Argument<FileInfo>("file") { Description = "Office document path (.docx, .xlsx, .pptx)" };
-        var viewModeArg = new Argument<string>("mode") { Description = "View mode: text, annotated, outline, stats, issues, html, svg, screenshot, pdf, forms. text mode (xlsx): each cell is rendered as <A1>=<value>, tab-separated; empty cells are omitted, so a sparse row lists only its populated cells (e.g. 'B2=120000\\tD2=Beijing')." };
-        var startLineOpt = new Option<int?>("--start") { Description = "Start line/paragraph number" };
-        var endLineOpt = new Option<int?>("--end") { Description = "End line/paragraph number" };
-        var maxLinesOpt = new Option<int?>("--max-lines") { Description = "Maximum number of lines/rows/slides to output (truncates with total count)" };
+        var viewFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.docx、.xlsx、.pptx）" };
+        var viewModeArg = new Argument<string>("mode") { Description = "查看模式：text、annotated、outline、stats、issues、html、svg、screenshot、forms。text mode（xlsx）：每个 cell 渲染为 <A1>=<value>，以 tab 分隔；空 cell 会省略，因此稀疏行只列出已填充 cell（例如 'B2=120000\\tD2=Beijing'）。" };
+        var startLineOpt = new Option<int?>("--start") { Description = "起始行/paragraph 编号" };
+        var endLineOpt = new Option<int?>("--end") { Description = "结束行/paragraph 编号" };
+        var maxLinesOpt = new Option<int?>("--max-lines") { Description = "最多输出的行/row/slide 数（截断时附带总数）" };
         var issueTypeOpt = new Option<string?>("--type") { Description = IssueSubtypes.TypeHelpDescription() };
-        var limitOpt = new Option<int?>("--limit") { Description = "Limit number of results" };
+        var limitOpt = new Option<int?>("--limit") { Description = "限制结果数量" };
 
-        var colsOpt = new Option<string?>("--cols") { Description = "Column filter, comma-separated (Excel only, e.g. A,B,C)" };
-        var pageOpt = new Option<string?>("--page") { Description = "Page filter (e.g. 1, 2-5, 1,3,5). html mode: default=all. screenshot mode: default=1 (use --page 1-N to capture more, or --grid N for a whole-doc thumbnail contact sheet)." };
-        var browserOpt = new Option<bool>("--browser") { Description = "Open output in browser (html / svg modes)" };
-        var outOpt = new Option<string?>("--out", "-o") { Description = "Output file path (html, screenshot, pdf modes; defaults to stdout for html, a temp file for screenshot)" };
-        var screenshotWidthOpt = new Option<int>("--screenshot-width") { Description = "Screenshot viewport width (default 1600)", DefaultValueFactory = _ => 1600 };
-        var screenshotHeightOpt = new Option<int>("--screenshot-height") { Description = "Screenshot viewport height (default 1200)", DefaultValueFactory = _ => 1200 };
+        var colsOpt = new Option<string?>("--cols") { Description = "列过滤器，使用逗号分隔（仅 Excel，例如 A,B,C）" };
+        var pageOpt = new Option<string?>("--page") { Description = "页面过滤器（例如 1、2-5、1,3,5）。html mode 默认 all；screenshot mode 默认 1（使用 --page 1-N 捕获更多页面，或使用 --grid N 生成整份文档的缩略图 contact sheet）。" };
+        var browserOpt = new Option<bool>("--browser") { Description = "在 browser 中打开输出（html / svg mode）" };
+        var outOpt = new Option<string?>("--out", "-o") { Description = "输出文件路径（html、screenshot mode；html 默认 stdout，screenshot 默认临时文件）" };
+        var screenshotWidthOpt = new Option<int>("--screenshot-width") { Description = "Screenshot viewport 宽度（默认 1600）", DefaultValueFactory = _ => 1600 };
+        var screenshotHeightOpt = new Option<int>("--screenshot-height") { Description = "Screenshot viewport 高度（默认 1200）", DefaultValueFactory = _ => 1200 };
         var gridOpt = new Option<string?>("--grid")
         {
-            Description = "Tile pages/slides into a thumbnail contact sheet (screenshot mode, pptx + docx). Bare --grid (or --grid auto) picks a column count that keeps the sheet roughly square; pass a number (e.g. --grid 3) to force columns. Omit = off.",
+            Description = "将页面/slide 排列成 thumbnail contact sheet（screenshot mode，pptx + docx）。裸 --grid（或 --grid auto）会选择让版面接近方形的列数；传入数字（例如 --grid 3）可强制列数。省略则关闭。",
             Arity = ArgumentArity.ZeroOrOne, // allow bare --grid (no value) → auto
         };
-        var renderOpt = new Option<string>("--render") { Description = "Screenshot rendering path (docx/pptx): auto (default; native on Windows w/ Word/PowerPoint, html elsewhere), native (force OS-native, error if unavailable), html", DefaultValueFactory = _ => "auto" };
-        var withPagesOpt = new Option<bool>("--page-count") { Description = "stats mode (docx only): also report total page count via Word repagination (Win + Word required; slow on long docs)" };
+        var renderOpt = new Option<string>("--render") { Description = "Screenshot 渲染路径（docx/pptx）：auto（默认；Windows 有 Word/PowerPoint 时为 native，其他环境为 html）、native（强制 OS-native；不可用时报错）、html", DefaultValueFactory = _ => "auto" };
+        var withPagesOpt = new Option<bool>("--page-count") { Description = "stats mode（仅 docx）：通过 Word repagination 同时报告总页数（需要 Windows + Word；长文档较慢）" };
 
-        var viewCommand = new Command("view", "View document in different modes");
+        var viewCommand = new Command("view", "以不同模式查看文档");
         viewCommand.Add(viewFileArg);
         viewCommand.Add(viewModeArg);
         viewCommand.Add(startLineOpt);
@@ -77,37 +77,6 @@ static partial class CommandBuilder
             if (renderMode is not ("auto" or "native" or "html"))
                 throw new OfficeCli.Core.CliException($"Invalid --render value: {renderMode}. Valid: auto, native, html") { Code = "invalid_render", ValidValues = ["auto", "native", "html"] };
             var withPages = result.GetValue(withPagesOpt);
-
-            // pdf mode runs entirely through an exporter plugin (no handler
-            // open, no resident hop — the plugin gets a snapshot of the
-            // source and writes the PDF). Handled before TryResident
-            // because exporter invocation needs the file lock released, and
-            // ExporterInvoker closes the resident itself when present.
-            if (mode.ToLowerInvariant() is "pdf")
-            {
-                var pdfPath = outArg ?? Path.ChangeExtension(file.FullName, "pdf");
-                var exp = OfficeCli.Core.Plugins.ExporterInvoker.Run(file.FullName, ".pdf", pdfPath);
-                if (json)
-                {
-                    Console.WriteLine(OutputFormatter.WrapEnvelopeText(exp.OutputPath));
-                }
-                else
-                {
-                    Console.WriteLine(Path.GetFullPath(exp.OutputPath));
-                    if (exp.ResidentClosed)
-                        Console.Error.WriteLine($"[note] resident closed to release lock; reopen with `officecli open` if needed");
-                }
-                if (browser)
-                {
-                    try
-                    {
-                        var psi = new System.Diagnostics.ProcessStartInfo(exp.OutputPath) { UseShellExecute = true };
-                        System.Diagnostics.Process.Start(psi);
-                    }
-                    catch { /* silently ignore if no default PDF viewer */ }
-                }
-                return 0;
-            }
 
             // Try resident first
             if (TryResident(file.FullName, req =>
@@ -154,9 +123,6 @@ static partial class CommandBuilder
                 else if (handler is OfficeCli.Handlers.WordHandler)
                     html = RenderViaRegistry(handler, "docx",
                         new OfficeCli.Core.Rendering.RenderOptions { PageFilter = pageFilter });
-                else if (handler is OfficeCli.Core.Plugins.FormatHandlerProxy proxy)
-                    html = proxy.ViewAsHtml(int.TryParse(pageFilter, out var p) ? p : (int?)null);
-
                 if (html != null)
                 {
                     if (outArg != null || browser)
@@ -519,35 +485,6 @@ static partial class CommandBuilder
                         Console.Write(svg);
                     }
                 }
-                else if (handler is OfficeCli.Core.Plugins.FormatHandlerProxy svgProxy)
-                {
-                    int? svgPage = null;
-                    if (!string.IsNullOrEmpty(pageFilter)
-                        && int.TryParse(pageFilter.Split(',')[0].Split('-')[0].Trim(), out var sp))
-                        svgPage = sp;
-                    var svg = svgProxy.ViewAsSvg(svgPage);
-                    if (svg is null)
-                        throw new OfficeCli.Core.CliException(
-                            $"SVG preview is not supported by the format-handler plugin for {file.Extension}.")
-                        { Code = "unsupported_type" };
-                    if (browser)
-                    {
-                        var outPath = Path.Combine(Path.GetTempPath(),
-                            $"officecli_preview_{Path.GetFileNameWithoutExtension(file.Name)}_{DateTime.Now:HHmmss}_{Guid.NewGuid():N}.svg");
-                        File.WriteAllText(outPath, svg);
-                        Console.WriteLine(outPath);
-                        try
-                        {
-                            var psi = new System.Diagnostics.ProcessStartInfo(outPath) { UseShellExecute = true };
-                            System.Diagnostics.Process.Start(psi);
-                        }
-                        catch { /* silently ignore if viewer can't be opened */ }
-                    }
-                    else
-                    {
-                        Console.Write(svg);
-                    }
-                }
                 else
                 {
                     throw new OfficeCli.Core.CliException("SVG preview is only supported for .pptx files.")
@@ -606,26 +543,18 @@ static partial class CommandBuilder
                 {
                     if (handler is OfficeCli.Handlers.WordHandler wordFormsHandler)
                         Console.WriteLine(OutputFormatter.WrapEnvelope(wordFormsHandler.ViewAsFormsJson().ToJsonString(OutputFormatter.PublicJsonOptions)));
-                    else if (handler is OfficeCli.Core.Plugins.FormatHandlerProxy formsProxy)
-                    {
-                        var formsJson = formsProxy.ViewAsFormsJson();
-                        if (formsJson is null)
-                            throw new OfficeCli.Core.CliException($"Forms view is not supported by the format-handler plugin for {file.Extension}.")
-                            { Code = "unsupported_type" };
-                        Console.WriteLine(OutputFormatter.WrapEnvelope(formsJson.ToJsonString(OutputFormatter.PublicJsonOptions)));
-                    }
                     else
                         throw new OfficeCli.Core.CliException("Forms view is only supported for .docx files.")
                         {
                             Code = "unsupported_type",
-                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                         };
                 }
                 else
                     throw new OfficeCli.Core.CliException($"Unknown mode: {mode}. Available: text, annotated, outline, stats, issues, html, svg, screenshot, forms")
                     {
                         Code = "invalid_value",
-                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                     };
             }
             else
@@ -642,20 +571,16 @@ static partial class CommandBuilder
                     "forms" or "f" => handler switch
                     {
                         OfficeCli.Handlers.WordHandler wfh => wfh.ViewAsForms(),
-                        OfficeCli.Core.Plugins.FormatHandlerProxy fp
-                            => fp.ViewAsFormsJson()?.ToJsonString(OutputFormatter.PublicJsonOptions)
-                               ?? throw new OfficeCli.Core.CliException($"Forms view is not supported by the format-handler plugin for {file.Extension}.")
-                                   { Code = "unsupported_type" },
                         _ => throw new OfficeCli.Core.CliException("Forms view is only supported for .docx files.")
                         {
                             Code = "unsupported_type",
-                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                         }
                     },
                     _ => throw new OfficeCli.Core.CliException($"Unknown mode: {mode}. Available: text, annotated, outline, stats, issues, html, svg, screenshot, forms")
                     {
                         Code = "invalid_value",
-                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                     }
                 };
                 Console.WriteLine(output);

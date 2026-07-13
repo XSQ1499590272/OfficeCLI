@@ -15,7 +15,7 @@
       "/endnote[N]"
     ]
   },
-  "note": "Endnotes live in EndnotesPart. Semantics mirror footnote.json. Parent must be a paragraph path (/body/p[N]); use --index N to control position within the paragraph. Run-level parent (/body/p[N]/r[M]) is not accepted -- the endnote reference is inserted as a new run.",
+  "note": "Endnote 保存在 EndnotesPart 中，语义与 footnote.json 相同。parent 必须是 paragraph path（/body/p[N]）；使用 --index N 控制其在 paragraph 中的位置。不接受 run-level parent（/body/p[N]/r[M]），endnote reference 会作为新 run 插入。",
   "properties": {
     "text": {
       "type": "string",
@@ -38,7 +38,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction. 'rtl' writes <w:bidi/> on the endnote content paragraph and cascades <w:rtl/> to the paragraph mark.",
+      "description": "阅读方向。'rtl' 会在 endnote content paragraph 写入 <w:bidi/>，并将 <w:rtl/> 级联到 paragraph mark。",
       "add": true,
       "set": true,
       "get": false,
@@ -57,7 +57,7 @@
         "both",
         "distribute"
       ],
-      "description": "Horizontal alignment applied to the endnote content paragraph (<w:jc/>).",
+      "description": "应用到 endnote content paragraph 的水平对齐（<w:jc/>）。",
       "aliases": [
         "alignment"
       ],
@@ -71,7 +71,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font (rFonts/cs).",
+      "description": "Complex-script font（rFonts/cs）。",
       "aliases": [
         "font.complexscript",
         "font.complex"
@@ -86,7 +86,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (rFonts/eastAsia) — Chinese / Japanese / Korean typefaces.",
+      "description": "East-Asian font slot（rFonts/eastAsia），用于 Chinese / Japanese / Korean typeface。",
       "aliases": [
         "font.eastasia",
         "font.eastasian"
@@ -101,7 +101,7 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin font slots (rFonts/ascii + hAnsi) — ASCII / Western text.",
+      "description": "Latin font slot（rFonts/ascii + hAnsi），用于 ASCII / Western text。",
       "add": true,
       "set": true,
       "get": false,
@@ -112,7 +112,7 @@
     },
     "bold.cs": {
       "type": "bool",
-      "description": "complex-script bold for the endnote's runs (<w:bCs/>). Required for Arabic / Hebrew bold rendering.",
+      "description": "endnote run 的 complex-script bold（<w:bCs/>）。Arabic / Hebrew 的 bold 渲染需要此属性。",
       "aliases": [
         "font.bold.cs",
         "boldcs"
@@ -127,7 +127,7 @@
     },
     "italic.cs": {
       "type": "bool",
-      "description": "complex-script italic (<w:iCs/>) for the endnote's runs.",
+      "description": "endnote run 的 complex-script italic（<w:iCs/>）。",
       "aliases": [
         "font.italic.cs",
         "italiccs"
@@ -142,7 +142,7 @@
     },
     "size.cs": {
       "type": "font-size",
-      "description": "complex-script font size (<w:szCs/>) for the endnote's runs.",
+      "description": "endnote run 的 complex-script font size（<w:szCs/>）。",
       "aliases": [
         "font.size.cs",
         "sizecs"
@@ -157,7 +157,7 @@
     },
     "id": {
       "type": "number",
-      "description": "OOXML endnote id; source of @endnoteId in stable path /endnote[@endnoteId=N].",
+      "description": "OOXML endnote id；稳定路径 /endnote[@endnoteId=N] 中 @endnoteId 的来源。",
       "add": false,
       "set": false,
       "get": true,

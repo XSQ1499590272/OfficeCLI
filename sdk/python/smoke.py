@@ -1,7 +1,5 @@
-"""CI smoke test (not shipped — pyproject ships only officecli.py). On a runner
-without officecli on PATH, create() triggers auto_install (install.sh on unix,
-install.ps1 on Windows), proving the cross-platform provisioning + the pipe
-round-trip end to end. Exits non-zero on any failure."""
+"""CI smoke test (not shipped — pyproject ships only officecli.py).
+Requires officecli on PATH and verifies the SDK pipe round-trip."""
 import os
 import sys
 import tempfile

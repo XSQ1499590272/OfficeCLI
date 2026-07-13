@@ -5,16 +5,16 @@
   "parent": "sheet",
   "operations": {"add": true, "get": true},
   "paths": {"positional": ["/SheetName/cf[N]"]},
-  "note": "Catch-all CF dispatch for sub-types not exposed by their own --type alias: belowAverage, containsBlanks, notContainsBlanks, containsErrors, notContainsErrors, contains, notContains, beginsWith, endsWith. Pass `--prop type=<subtype>` to select. Lookup: Add.Cf.cs:557 (AddCfExtended). Most subtypes share Query.cs readback through `cfType` (Query.cs:464+).",
+  "note": "用于分派没有独立 --type alias 的 CF subtype：belowAverage、containsBlanks、notContainsBlanks、containsErrors、notContainsErrors、contains、notContains、beginsWith、endsWith。传入 --prop type=<subtype> 选择 subtype。实现位置：Add.Cf.cs:557（AddCfExtended）；大多数 subtype 通过 Query.cs:464+ 的 cfType 统一读回。",
   "properties": {
-    "ref": { "type":"string", "aliases":["sqref","range"], "add":true, "get":true, "description":"target cell range.", "examples":["--prop ref=A1:A100"], "enforcement":"report" },
-    "type": { "type":"enum", "values":["belowAverage","containsBlanks","notContainsBlanks","containsErrors","notContainsErrors","contains","notContains","beginsWith","endsWith"], "add":true, "get":false, "description":"subtype selector. Required.", "examples":["--prop type=containsBlanks","--prop type=beginsWith"], "enforcement":"report" },
-    "text": { "type":"string", "add":true, "get":true, "description":"substring for contains/notContains/beginsWith/endsWith subtypes.", "examples":["--prop text=error"], "readback":"matched substring (when subtype emits it)", "enforcement":"report" },
-    "fill": { "type":"color", "add":true, "get":false, "description":"background fill via dxf.", "examples":["--prop fill=FFCCCC"], "enforcement":"report" },
-    "font.color": { "type":"color", "add":true, "get":false, "description":"font color via dxf.", "examples":["--prop font.color=FF0000"], "enforcement":"report" },
-    "font.bold": { "type":"bool", "add":true, "get":false, "description":"bold via dxf.", "examples":["--prop font.bold=true"], "enforcement":"report" },
-    "stopIfTrue": { "type":"bool", "add":true, "get":false, "description":"stop evaluating subsequent CF rules when this rule applies.", "examples":["--prop stopIfTrue=true"], "enforcement":"report" },
-    "type": { "type":"string", "add":false, "set":false, "get":true, "description":"canonical CF rule type token (e.g. \"dataBar\", \"colorScale\", \"iconSet\", \"formula\", \"topN\", \"cellIs\", \"containsText\", \"aboveAverage\", \"duplicateValues\", \"uniqueValues\", \"timePeriod\"). Emitted on every CF rule.", "readback":"normalized CF type token", "enforcement":"report" },
-    "dxfId": { "type":"number", "add":false, "set":false, "get":true, "description":"differential format id referencing dxf styles. Emitted only when present on the rule.", "readback":"integer", "enforcement":"report" }
+    "ref": { "type":"string", "aliases":["sqref","range"], "add":true, "get":true, "description":"目标单元格范围。", "examples":["--prop ref=A1:A100"], "enforcement":"report" },
+    "type": { "type":"enum", "values":["belowAverage","containsBlanks","notContainsBlanks","containsErrors","notContainsErrors","contains","notContains","beginsWith","endsWith"], "add":true, "get":false, "description":"subtype selector。必填。", "examples":["--prop type=containsBlanks","--prop type=beginsWith"], "enforcement":"report" },
+    "text": { "type":"string", "add":true, "get":true, "description":"contains/notContains/beginsWith/endsWith subtype 使用的子字符串。", "examples":["--prop text=error"], "readback":"matched substring (when subtype emits it)", "enforcement":"report" },
+    "fill": { "type":"color", "add":true, "get":false, "description":"通过 dxf 应用的背景 fill。", "examples":["--prop fill=FFCCCC"], "enforcement":"report" },
+    "font.color": { "type":"color", "add":true, "get":false, "description":"通过 dxf 设置的 font 颜色。", "examples":["--prop font.color=FF0000"], "enforcement":"report" },
+    "font.bold": { "type":"bool", "add":true, "get":false, "description":"通过 dxf 设置的 bold。", "examples":["--prop font.bold=true"], "enforcement":"report" },
+    "stopIfTrue": { "type":"bool", "add":true, "get":false, "description":"当前 CF rule 生效时，停止评估后续 CF rules。", "examples":["--prop stopIfTrue=true"], "enforcement":"report" },
+    "type": { "type":"string", "add":false, "set":false, "get":true, "description":"规范的 CF rule type token（如 \"dataBar\"、\"colorScale\"、\"iconSet\"、\"formula\"、\"topN\"、\"cellIs\"、\"containsText\"、\"aboveAverage\"、\"duplicateValues\"、\"uniqueValues\"、\"timePeriod\"）。每个 CF rule 都会返回。", "readback":"normalized CF type token", "enforcement":"report" },
+    "dxfId": { "type":"number", "add":false, "set":false, "get":true, "description":"引用 dxf style 的 differential format id。仅当 rule 中存在时返回。", "readback":"integer", "enforcement":"report" }
   }
 }

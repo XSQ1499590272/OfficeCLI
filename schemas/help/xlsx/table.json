@@ -16,7 +16,7 @@
       "/SheetName/table[N]"
     ]
   },
-  "note": "'ref' (alias 'range') required: cell range like 'A1:C10'. Rejects ranges that overlap existing tables. Names sanitized; style validated against built-in/custom whitelist. QUERY: `query table` returns real ListObjects (type=table) PLUS heuristically detected table-shaped blocks (type=detectedtable, stable=false, honest range path like /Sheet1/A1:D10 — never a fake /table[N]). Detection is strict/high-precision: a block qualifies only with a contiguous >=2-column non-numeric-text header row, >=1 data row below, and no overlap with a real ListObject. Use `query listobject` to get ONLY real ListObjects (no detection). add/set/get/remove operate exclusively on real ListObjects via /table[N]; detected blocks are query-only and addressed by their range path.",
+  "note": "'ref'（alias：'range'）必填，格式为 'A1:C10' 这样的 cell range。与现有 table 重叠的 range 会被拒绝。Name 会被清理，style 会按 built-in/custom whitelist 校验。QUERY：query table 返回真实 ListObject（type=table）以及启发式检测出的 table-shaped block（type=detectedtable、stable=false、使用真实 range path 如 /Sheet1/A1:D10，不会伪造 /table[N]）。检测条件严格：必须有连续的至少 2 列非 numeric-text header row、至少 1 个 data row，且不能与真实 ListObject 重叠。要只获取真实 ListObject，请使用 query listobject。add/set/get/remove 只作用于 /table[N] 下的真实 ListObject；detected block 只能 query，并通过 range path 定位。",
   "extends": [
     "_shared/table",
     "_shared/table.pptx-xlsx"
@@ -24,7 +24,7 @@
   "properties": {
     "ref": {
       "type": "string",
-      "description": "cell range reference (A1:C10). Required. Alias: range.",
+      "description": "单元格范围引用（A1:C10）。必填。别名：range。",
       "aliases": [
         "range"
       ],
@@ -39,7 +39,7 @@
     },
     "displayName": {
       "type": "string",
-      "description": "Excel UI display name. Defaults to name.",
+      "description": "Excel UI 显示名称。默认使用 name。",
       "add": true,
       "set": true,
       "get": true,
@@ -51,7 +51,7 @@
     },
     "headerRow": {
       "type": "bool",
-      "description": "show header row. Alias: showHeader.",
+      "description": "是否显示 header row。别名：showHeader。",
       "aliases": [
         "showHeader"
       ],
@@ -66,7 +66,7 @@
     },
     "totalRow": {
       "type": "bool",
-      "description": "show total row. Alias: showTotals.",
+      "description": "是否显示 total row。别名：showTotals。",
       "aliases": [
         "showTotals"
       ],
@@ -81,7 +81,7 @@
     },
     "autoExpand": {
       "type": "bool",
-      "description": "auto-expand range downward through contiguous non-empty rows at Add time.",
+      "description": "Add 时沿连续的非空行向下自动扩展 range。",
       "add": true,
       "set": false,
       "get": false,
@@ -93,7 +93,7 @@
     },
     "showFirstColumn": {
       "type": "bool",
-      "description": "highlight the first column with the table style. Alias: firstColumn.",
+      "description": "使用 table style 高亮第一列。别名：firstColumn。",
       "aliases": [
         "firstColumn"
       ],
@@ -108,7 +108,7 @@
     },
     "showLastColumn": {
       "type": "bool",
-      "description": "highlight the last column with the table style. Alias: lastColumn.",
+      "description": "使用 table style 高亮最后一列。别名：lastColumn。",
       "aliases": [
         "lastColumn"
       ],
@@ -123,7 +123,7 @@
     },
     "showRowStripes": {
       "type": "bool",
-      "description": "alternate-row banding from the table style. Default: true. Aliases: showBandedRows, bandedRows, bandRows.",
+      "description": "使用 table style 的隔行条纹。默认 true。别名：showBandedRows、bandedRows、bandRows。",
       "aliases": [
         "showBandedRows",
         "bandedRows",
@@ -140,7 +140,7 @@
     },
     "showColumnStripes": {
       "type": "bool",
-      "description": "alternate-column banding from the table style. Default: false. Aliases: showBandedColumns, bandedColumns, bandedCols, showColStripes, bandCols.",
+      "description": "使用 table style 的隔列条纹。默认 false。别名：showBandedColumns、bandedColumns、bandedCols、showColStripes、bandCols。",
       "aliases": [
         "showBandedColumns",
         "bandedColumns",
@@ -159,7 +159,7 @@
     },
     "columns": {
       "type": "string",
-      "description": "comma-separated column header names overriding A1, B1, ... defaults.",
+      "description": "以逗号分隔的列标题名称，用于覆盖 A1、B1 等默认值。",
       "add": true,
       "set": false,
       "get": true,
@@ -171,7 +171,7 @@
     },
     "totalsRowFunction": {
       "type": "string",
-      "description": "comma-separated per-column totals row functions (none|sum|average|count|countNums|max|min|stdDev|var|custom). Effective only when totalRow=true.",
+      "description": "以逗号分隔的每列 totals row function（none|sum|average|count|countNums|max|min|stdDev|var|custom）。仅 totalRow=true 时生效。",
       "add": true,
       "set": false,
       "get": false,
@@ -186,7 +186,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "per-column totals-row function readback (surfaces on the column child node).",
+      "description": "每列 totals-row function 的读取结果（在 column child node 上返回）。",
       "readback": "function token",
       "enforcement": "report"
     },
@@ -195,7 +195,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "per-column totals-row label readback (surfaces on the column child node).",
+      "description": "每列 totals-row label 的读取结果（在 column child node 上返回）。",
       "readback": "label text",
       "enforcement": "report"
     }

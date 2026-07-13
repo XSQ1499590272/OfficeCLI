@@ -17,12 +17,12 @@
       "/slide[N]/shape[N]"
     ]
   },
-  "note": "Positional /shape[N] enumerates ALL shapes on the slide including layout-inherited placeholders — new shapes typically land at the end, not at /shape[1]. `add` echoes the canonical /shape[@id=ID] path; prefer that for follow-up Set/Get. effective.* keys (direction, size, font, color, bold) are read-only inheritance-resolved values walked up the placeholder→layout→master→defaults chain; suppressed when the corresponding direct key is set. Each pairs with effective.*.src naming the writing layer. Cross-format note: `color=` on pptx shapes unambiguously sets text/run color. The same bare `color=` key is rejected on xlsx cells (ambiguous with fill) — use `font.color` for text or `fill` for background when working with xlsx cells.",
+  "note": "位置型 /shape[N] 会枚举 slide 上所有 shape，包括 layout 继承的 placeholder；新 shape 通常追加到末尾，而不是 /shape[1]。Add 会回显 canonical /shape[@id=ID] path，后续 Set/Get 应优先使用该 path。effective.*（direction、size、font、color、bold）是沿 placeholder→layout→master→defaults 链解析的只读继承值；设置对应 direct key 时不返回。每个 effective.* 都带 effective.*.src，指向实际写入层。跨格式注意：pptx shape 的 color= 明确表示 text/run color；xlsx cell 上的同名 key 因与 fill 冲突会被拒绝，处理 xlsx cell 时请使用 font.color 或 fill。",
   "extends": "_shared/shape",
   "properties": {
     "size": {
       "type": "font-size",
-      "description": "font size — Add/Set forwards to the first run; Get returns the bare size when every run shares the same explicit FontSize (non-mixed). When sizes are mixed or no run carries an explicit size, bare size is suppressed and the inheritance-resolved effective.size is emitted instead.",
+      "description": "字体大小——Add/Set 会转发到第一个 run；当所有 run 共享同一显式 FontSize（非 mixed）时，Get 返回不带子字段的 size。size mixed 或没有 run 带显式 size 时，不带子字段的 size 会被抑制，改为输出按继承关系解析的 effective.size。",
       "aliases": ["fontSize", "fontsize", "font.size"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop size=14", "--prop size=14pt", "--prop size=10.5pt"],
@@ -31,21 +31,21 @@
     },
     "evaluated": {
       "type": "bool",
-      "description": "cross-handler protocol flag — emitted on shapes whose body contains an <a:fld> dynamic field (slide number, date-time, footer, etc.). True when every dynamic field has cached text the renderer can show; false when at least one is empty (view text substitutes #OCLI_NOTEVAL!{type}; view issues emits subtype slide_field_not_evaluated). PowerPoint always re-renders fields on open, so there is no cache_stale equivalent. Read this via get --json instead of pattern-matching the sentinel.",
+      "description": "cross-handler protocol 标记——在 body 包含 <a:fld> dynamic field（slide number、date-time、footer 等）的 shape 上输出。每个 dynamic field 都有 renderer 可显示的 cached text 时为 true；至少一个为空时为 false（view 文本会替换为 #OCLI_NOTEVAL!{type}；view issues 输出 subtype slide_field_not_evaluated）。PowerPoint 打开时总会重新呈现 field，因此没有 cache_stale 对应项。请通过 get --json 读取，不要匹配 sentinel。",
       "add": false, "set": false, "get": true,
       "readback": "true|false (true ⇒ all <a:fld> shapes on this node carry display text)",
       "enforcement": "report"
     },
     "isTitle": {
       "type": "bool",
-      "description": "true when this shape is the slide title placeholder (or a content placeholder configured as title). Always emitted on every shape so query selectors like `shape[isTitle=true]` and `shape[isTitle=false]` resolve uniformly. Read-only — title-ness is determined by placeholder type at Add time, not as a settable property.",
+      "description": "当此 shape 是 slide title placeholder（或配置为 title 的 content placeholder）时为 true。每个 shape 都会输出，因此 `shape[isTitle=true]` 和 `shape[isTitle=false]` 等 query selector 可一致解析。只读——是否为 title 由 Add 时的 placeholder type 决定，不是可设置 property。",
       "add": false, "set": false, "get": true,
       "readback": "true|false (always present)",
       "enforcement": "report"
     },
     "opacity": {
       "type": "number",
-      "description": "fill opacity (0.0 - 1.0). Requires a fill to attach to — opacity alone (without fill/gradient/pattern) has no effect in OOXML.",
+      "description": "fill opacity（0.0–1.0）。需要有 fill 作为附着对象——仅设置 opacity（没有 fill/gradient/pattern）在 OOXML 中无效。",
       "requires": [
         "fill"
       ],
@@ -60,7 +60,7 @@
     },
     "geometry": {
       "type": "string",
-      "description": "Preset shape geometry (default: rect). The values list below is illustrative, not exhaustive — many more OOXML presets are accepted (handler-as-truth): pie, arc, chord, the directional arrows (leftArrow, upArrow, downArrow), star4/star6/star8/star10, hexagon/heptagon/octagon/decagon/dodecagon, cloud, plus the callout* family, etc. Any preset the handler recognizes round-trips.",
+      "description": "Preset shape geometry（默认 rect）。下方值列表仅作示例，不是穷举——还接受许多 OOXML preset（以 handler 为准）：pie、arc、chord、方向箭头（leftArrow、upArrow、downArrow）、star4/star6/star8/star10、hexagon/heptagon/octagon/decagon/dodecagon、cloud 及 callout* family 等。handler 可识别的任一 preset 都可往返。",
       "aliases": [
         "preset",
         "shape"
@@ -87,7 +87,7 @@
     },
     "adj": {
       "type": "string",
-      "description": "Preset adjust handles (a:prstGeom/a:avLst/a:gd). Controls the parametric proportions of a preset (arrow tail/head size, roundRect corner radius, star inner ratio, etc.). Format is \"name:formula\" where formula is an OOXML guide formula such as \"val 6000\". Multiple handles are comma-separated.",
+      "description": "Preset adjust handle（a:prstGeom/a:avLst/a:gd）。控制 preset 的参数化比例（arrow 尾部/头部大小、roundRect 角半径、star 内部比例等）。格式为 \"name:formula\"，其中 formula 是如 \"val 6000\" 的 OOXML guide formula。多个 handle 以逗号分隔。",
       "aliases": [],
       "add": true,
       "set": true,
@@ -102,7 +102,7 @@
     },
     "textFill": {
       "type": "string",
-      "description": "Fill applied to the text glyphs (a:rPr fill). Accepts a color (solid glyph fill) or round-trips a gradient. The legacy alias 'textGradient' canonicalizes to 'textFill' on readback.",
+      "description": "应用到文本 glyph 的 fill（a:rPr fill）。接受 color（纯色 glyph fill）或可往返的 gradient。legacy 别名 'textGradient' 在读取结果中规范为 'textFill'。",
       "aliases": [
         "textGradient"
       ],
@@ -117,7 +117,7 @@
     },
     "textWarp": {
       "type": "string",
-      "description": "WordArt text warp preset applied to the shape's text body (a:bodyPr/a:prstTxWarp @prst). Use 'none' to remove. The HTML preview surfaces the active warp as a data-textwarp attribute + a 'text-warp' marker class on the shape; real PowerPoint renders the per-glyph warp path.",
+      "description": "应用到 shape text body 的 WordArt text warp preset（a:bodyPr/a:prstTxWarp @prst）。使用 'none' 移除。HTML preview 会将活动 warp 作为 shape 上的 data-textwarp attribute 和 'text-warp' marker class 返回；实际 PowerPoint 会按每个 glyph 呈现 warp path。",
       "values": [
         "none",
         "textNoShape",
@@ -144,7 +144,7 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin-script font slot only (a:latin). Use to target ASCII/European text without overwriting CJK / complex-script slots.",
+      "description": "仅 Latin-script 字体槽位（a:latin）。用于指定 ASCII/European 文本，而不覆盖 CJK / complex-script 槽位。",
       "add": true,
       "set": true,
       "get": true,
@@ -156,7 +156,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (a:ea) — Chinese / Japanese / Korean text.",
+      "description": "East-Asian 字体槽位（a:ea）——Chinese / Japanese / Korean 文本。",
       "aliases": [
         "font.eastasia",
         "font.eastasian"
@@ -172,7 +172,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font slot (a:cs) — Arabic / Hebrew / Thai etc.",
+      "description": "complex-script 字体槽位（a:cs）——Arabic / Hebrew / Thai 等。",
       "aliases": [
         "font.complexscript",
         "font.complex"
@@ -192,7 +192,7 @@
         "ltr",
         "rtl"
       ],
-      "description": "paragraph reading direction (a:pPr rtl). Use 'rtl' for Arabic / Hebrew layouts.",
+      "description": "paragraph 阅读方向（a:pPr rtl）。Arabic / Hebrew layout 请使用 'rtl'。",
       "aliases": [
         "dir",
         "rtl"
@@ -208,7 +208,7 @@
     },
     "margin": {
       "type": "length",
-      "description": "uniform internal padding (text inset) for shape body (a:bodyPr lIns/tIns/rIns/bIns). Also accepts a 4-value 'l,t,r,b' form on Set.",
+      "description": "shape body 的统一内部 padding（text inset，a:bodyPr lIns/tIns/rIns/bIns）。Set 也接受四个值的 'l,t,r,b' 形式。",
       "add": true,
       "set": true,
       "get": true,
@@ -221,7 +221,7 @@
     },
     "textDirection": {
       "type": "string",
-      "description": "shape text rotation (a:bodyPr @vert) — works on shapes/textboxes, not just table cells. horizontal|vertical90|vertical270|eaVert|stacked. Round-trips through the same canonical vocabulary as table-cell textDirection. Note: the Get readback key is lowercase 'textdirection'.",
+      "description": "shape 文本旋转（a:bodyPr @vert）——适用于 shape/textbox，而不只是 table cell。horizontal|vertical90|vertical270|eaVert|stacked。通过与 table-cell textDirection 相同的标准词汇往返。注意：Get 的读取结果 key 为小写 'textdirection'。",
       "aliases": [
         "textdir",
         "vert"
@@ -238,7 +238,7 @@
     },
     "strike": {
       "type": "enum",
-      "description": "strikethrough on shape text. Single and double are distinct OOXML tokens (sngStrike / dblStrike); Word splits these into `strike` + `dstrike`, PowerPoint folds both into one attribute.",
+      "description": "shape 文本的 strikethrough。单线和双线是不同的 OOXML token（sngStrike / dblStrike）；Word 将其拆分为 `strike` + `dstrike`，PowerPoint 则合并为一个 attribute。",
       "values": [
         "none",
         "single",
@@ -262,7 +262,7 @@
     },
     "highlight": {
       "type": "color",
-      "description": "text highlight color behind the glyphs (a:highlight). Unlike Word's fixed named-color list, accepts any color (hex, named, rgb(), scheme names like accent1). 'none'/'false' removes the highlight.",
+      "description": "glyph 后方的文本 highlight color（a:highlight）。不同于 Word 的固定 named-color 列表，接受任意 color（hex、named、rgb()、如 accent1 的 scheme name）。'none'/'false' 移除 highlight。",
       "add": true,
       "set": true,
       "get": true,
@@ -276,7 +276,7 @@
     },
     "cap": {
       "type": "enum",
-      "description": "letter-case rendering mode for shape text (rPr/cap).",
+      "description": "shape 文本的 letter-case 呈现模式（rPr/cap）。",
       "values": [
         "none",
         "small",
@@ -300,7 +300,7 @@
     },
     "lang": {
       "type": "string",
-      "description": "BCP-47 language tag. lang lives per-run (drawingML a:rPr/@lang) — a shape has no language of its own, only an aggregate of differently-tongued runs. add/set on a shape is a convenience that writes the FIRST run's rPr; read it back at run scope (/shape[N]/paragraph[P]/run[R]). Not surfaced at shape level: a first-run projection cannot say which language each run is, and a newly added run would not inherit it.",
+      "description": "BCP-47 language tag。lang 按 run 存储（drawingML a:rPr/@lang）——shape 没有自身语言，只有不同语言 run 的聚合。shape 上的 add/set 是写入第一个 run rPr 的快捷方式；请在 run scope（/shape[N]/paragraph[P]/run[R]）读取。不会在 shape 级返回：第一个 run 的投影无法表达每个 run 的语言，且新添加的 run 不会继承它。",
       "aliases": [
         "altLang",
         "altlang"
@@ -316,7 +316,7 @@
     },
     "spacing": {
       "type": "number",
-      "description": "character spacing in 1/100 pt (drawingML rPr/@spc).",
+      "description": "字符间距，单位为 1/100 pt（drawingML rPr/@spc）。",
       "aliases": [
         "spc",
         "charspacing",
@@ -333,7 +333,7 @@
     },
     "kern": {
       "type": "number",
-      "description": "minimum kerning size in 1/100 pt (drawingML rPr/@kern). Get surfaces the raw integer via long-tail rPr attribute readback.",
+      "description": "最小 kerning size，单位为 1/100 pt（drawingML rPr/@kern）。Get 通过 long-tail rPr attribute 读取结果返回原始 integer。",
       "add": true,
       "set": true,
       "get": true,
@@ -357,7 +357,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "text body auto-fit mode. 'normal'/'shrink' shrinks text to fit (normAutofit); 'shape' resizes the shape to fit text; 'none' overflows. Aliases (Add+Set): true/shrink → normal, resize → shape, false → none.",
+      "description": "text body auto-fit 模式。'normal'/'shrink' 缩小文本以适应（normAutofit）；'shape' 调整 shape 大小以适应文本；'none' 溢出。别名（Add+Set）：true/shrink → normal，resize → shape，false → none。",
       "examples": [
         "--prop autoFit=normal",
         "--prop autoFit=shrink",
@@ -375,7 +375,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "normAutofit font-scale (shrink-to-fit text ratio). Input as a percent: bare integer 0-100 (75 → 75%) or N% form ('75%'). Stored as OOXML thousandths-of-percent (75000); readback emits the raw OOXML integer.",
+      "description": "normAutofit font-scale（shrink-to-fit 文本比例）。输入为百分比：不带单位的 integer 0–100（75 → 75%）或 N% 形式（'75%'）。以 OOXML 千分之一百分比存储（75000）；读取结果返回原始 OOXML integer。",
       "examples": [
         "--prop fontScale=75",
         "--prop fontScale=75%"
@@ -395,7 +395,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "normAutofit line-space reduction (shrink-to-fit spacing ratio). Input as a percent: bare integer 0-100 (20 → 20%) or N% form ('20%'). Stored as OOXML thousandths-of-percent (20000); readback emits the raw OOXML integer.",
+      "description": "normAutofit line-space reduction（shrink-to-fit 间距比例）。输入为百分比：不带单位的 integer 0–100（20 → 20%）或 N% 形式（'20%'）。以 OOXML 千分之一百分比存储（20000）；读取结果返回原始 OOXML integer。",
       "examples": [
         "--prop lnSpcReduction=20",
         "--prop lineSpaceReduction=20%"
@@ -405,7 +405,7 @@
     },
     "lineSpacing": {
       "type": "string",
-      "description": "line spacing for shape paragraphs (multiplier or pt).",
+      "description": "shape paragraph 的行距（倍数或 pt）。",
       "aliases": [
         "linespacing"
       ],
@@ -448,7 +448,7 @@
     },
     "gradient": {
       "type": "string",
-      "description": "gradient fill spec. Linear: 'C1-C2[-ANGLE]' or 'LINEAR;C1;C2;ANGLE'. Radial: 'radial:C1-C2[-FOCUS]' (focus: tl/tr/bl/br/center). Path: 'path:C1-C2[-FOCUS]'. Per-stop position: 'C@PCT' (e.g. 'FF0000@0-0000FF@100').",
+      "description": "gradient fill spec。Linear：'C1-C2[-ANGLE]' 或 'LINEAR;C1;C2;ANGLE'。Radial：'radial:C1-C2[-FOCUS]'（focus：tl/tr/bl/br/center）。Path：'path:C1-C2[-FOCUS]'。逐 stop 位置：'C@PCT'（例如 'FF0000@0-0000FF@100'）。",
       "add": true,
       "set": true,
       "get": true,
@@ -463,7 +463,7 @@
     },
     "pattern": {
       "type": "string",
-      "description": "pattern fill: 'preset' or 'preset:fg' or 'preset:fg:bg' (defaults: fg=000000, bg=FFFFFF).",
+      "description": "pattern fill：'preset'、'preset:fg' 或 'preset:fg:bg'（默认：fg=000000、bg=FFFFFF）。",
       "add": true,
       "set": true,
       "get": true,
@@ -475,7 +475,7 @@
     },
     "image": {
       "type": "string",
-      "description": "image (blip) fill: path to a local image file used as the shape fill.",
+      "description": "image（blip）fill：作为 shape fill 的本地 image file path。",
       "aliases": [
         "imagefill"
       ],
@@ -490,7 +490,7 @@
     },
     "fillRect": {
       "type": "string",
-      "description": "image-fill stretch insets as \"l,t,r,b\" in thousandths of a percent (perMille). Positive insets letterbox the image inside the shape; negative insets oversize it (cover-style framing). Applies to an image (blipFill) shape; consumed alongside image=.",
+      "description": "image-fill stretch inset，形式为 \"l,t,r,b\"，单位为千分之一百分比（perMille）。正 inset 会在 shape 内以 letterbox 方式放置 image；负 inset 会放大 image（cover-style framing）。适用于 image（blipFill）shape；与 image= 一起使用。",
       "aliases": [
         "fillrect"
       ],
@@ -505,7 +505,7 @@
     },
     "srcRect": {
       "type": "string",
-      "description": "image-fill source crop as \"l,t,r,b\" in thousandths of a percent (perMille) — the fraction trimmed from each edge of the source image before it fills the shape. Applies to an image (blipFill) shape; consumed alongside image=.",
+      "description": "image-fill source crop，形式为 \"l,t,r,b\"，单位为千分之一百分比（perMille）——source image 在填充 shape 前从各边裁去的比例。适用于 image（blipFill）shape；与 image= 一起使用。",
       "aliases": [
         "srcrect"
       ],
@@ -520,7 +520,7 @@
     },
     "lineWidth": {
       "type": "length",
-      "description": "outline width.",
+      "description": "outline 宽度。",
       "aliases": [
         "linewidth"
       ],
@@ -535,7 +535,7 @@
     },
     "lineDash": {
       "type": "enum",
-      "description": "outline dash pattern (drawingML prstDash). Also reachable as the third segment of the compound line='color:width:style' form.",
+      "description": "outline dash pattern（drawingML prstDash）。也可作为复合形式 line='color:width:style' 的第三段设置。",
       "aliases": [
         "linedash",
         "line.dash"
@@ -569,7 +569,7 @@
     },
     "lineGradient": {
       "type": "string",
-      "description": "gradient outline (drawingML <a:ln>/<a:gradFill>). Accepts a stop list 'color@pos,color@pos,...' (pos in percent) with an optional 'angle=Ndeg' segment, mirroring the fill gradient form. Set/Add replace any solid outline color. Get readback is emitted under the canonical key 'line.gradient'.",
+      "description": "gradient outline（drawingML <a:ln>/<a:gradFill>）。接受 stop 列表 'color@pos,color@pos,...'（pos 为百分比），并可选 'angle=Ndeg' 段，与 fill gradient 形式一致。Set/Add 会替换任意纯色 outline color。Get 的读取结果通过标准 key 'line.gradient' 输出。",
       "aliases": [
         "linegradient",
         "line.gradient"
@@ -586,7 +586,7 @@
     },
     "lineCap": {
       "type": "enum",
-      "description": "line end cap style (drawingML <a:ln @cap>). Affects how the stroke terminates at endpoints (and dash gaps for dashed strokes).",
+      "description": "line end cap 样式（drawingML <a:ln @cap>）。影响 stroke 在端点（以及 dashed stroke 的 dash gap）处的终止方式。",
       "aliases": [
         "linecap",
         "line.cap"
@@ -607,7 +607,7 @@
     },
     "lineJoin": {
       "type": "enum",
-      "description": "line join style at shape corners (drawingML <a:ln> child <a:round/> | <a:bevel/> | <a:miter/>). Accepts compound 'miter:<lim>' to also set the miter limit in one key.",
+      "description": "shape corner 处的 line join 样式（drawingML <a:ln> child <a:round/> | <a:bevel/> | <a:miter/>）。接受复合形式 'miter:<lim>'，可在一个 key 中同时设置 miter limit。",
       "aliases": [
         "linejoin",
         "line.join"
@@ -629,7 +629,7 @@
     },
     "miterLimit": {
       "type": "number",
-      "description": "miter join limit (drawingML <a:miter @lim>) in 1000ths of a percent (e.g. 800000 = 800%). Implies lineJoin=miter when set without an explicit lineJoin.",
+      "description": "miter join limit（drawingML <a:miter @lim>），单位为千分之一百分比（例如 800000 = 800%）。未显式设置 lineJoin 时，设置本项会隐含 lineJoin=miter。",
       "aliases": [
         "miterlimit",
         "miter.limit",
@@ -646,7 +646,7 @@
     },
     "cmpd": {
       "type": "enum",
-      "description": "compound line style (drawingML <a:ln @cmpd>) for double/triple/asymmetric strokes.",
+      "description": "用于 double/triple/asymmetric stroke 的 compound line 样式（drawingML <a:ln @cmpd>）。",
       "aliases": [
         "compoundLine",
         "compoundline",
@@ -671,7 +671,7 @@
     },
     "lineAlign": {
       "type": "enum",
-      "description": "stroke alignment relative to the path (drawingML <a:ln @algn>). 'ctr' centers the stroke on the path; 'in' insets it inside the shape boundary.",
+      "description": "相对 path 的 stroke 对齐（drawingML <a:ln @algn>）。'ctr' 将 stroke 居中于 path；'in' 将其内嵌到 shape boundary 内。",
       "aliases": [
         "linealign",
         "line.align"
@@ -691,7 +691,7 @@
     },
     "headEnd": {
       "type": "enum",
-      "description": "arrowhead at the line's start (drawingML <a:headEnd type=...>). Supported on any outline (shape or connector), not connector-only.",
+      "description": "line 起点的 arrowhead（drawingML <a:headEnd type=...>）。任意 outline（shape 或 connector）均支持，不限于 connector。",
       "aliases": [
         "headend",
         "arrowStart",
@@ -716,7 +716,7 @@
     },
     "tailEnd": {
       "type": "enum",
-      "description": "arrowhead at the line's end (drawingML <a:tailEnd type=...>). Supported on any outline (shape or connector).",
+      "description": "line 终点的 arrowhead（drawingML <a:tailEnd type=...>）。任意 outline（shape 或 connector）均支持。",
       "aliases": [
         "tailend",
         "arrowEnd",
@@ -741,7 +741,7 @@
     },
     "list": {
       "type": "string",
-      "description": "list style for shape paragraphs (bullet|numbered|alpha|roman|none|<char>).",
+      "description": "shape paragraph 的 list 样式（bullet|numbered|alpha|roman|none|<char>）。",
       "aliases": [
         "liststyle"
       ],
@@ -756,7 +756,7 @@
     },
     "link": {
       "type": "string",
-      "description": "click-action target for the shape. Accepts an absolute URI (https://, mailto:, tel:, …), slide[N] for an in-deck jump (1-based; the target slide must already exist), or a named navigation action (firstslide, lastslide, nextslide, previousslide, endshow). Pass 'none' or empty to clear.",
+      "description": "shape 的 click-action target。接受 absolute URI（https://、mailto:、tel: 等）、用于 deck 内跳转的 slide[N]（从 1 开始；target slide 必须已存在），或命名 navigation action（firstslide、lastslide、nextslide、previousslide、endshow）。传入 'none' 或空值清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -770,7 +770,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "tooltip / screen-tip text for hyperlink. Applied together with `link` in a single set/add call; standalone tooltip without link is not supported (no hyperlink relationship to attach to). Set-side may update an existing hyperlink's tooltip in-place without re-supplying link.",
+      "description": "hyperlink 的 tooltip / screen-tip 文本。在一次 set/add 调用中与 `link` 一起应用；不支持没有 link 的独立 tooltip（没有可附加的 hyperlink relationship）。Set 可原地更新已有 hyperlink 的 tooltip，无需重新提供 link。",
       "add": true,
       "set": true,
       "get": true,
@@ -782,7 +782,7 @@
     },
     "animation": {
       "type": "string",
-      "description": "animation effect spec.",
+      "description": "animation effect spec。",
       "aliases": [
         "animate"
       ],
@@ -801,7 +801,7 @@
         "rtl",
         "ltr"
       ],
-      "description": "resolved reading direction inherited from placeholder→layout→master→presentation defaults. Suppressed when 'direction' is set directly on the shape.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的阅读方向。shape 直接设置 'direction' 时不输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -810,7 +810,7 @@
     },
     "effective.size": {
       "type": "length",
-      "description": "resolved font size inherited from placeholder→layout→master→presentation defaults. Suppressed when 'size' is set directly on the shape.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的字体大小。shape 直接设置 'size' 时不输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -819,7 +819,7 @@
     },
     "effective.font": {
       "type": "string",
-      "description": "resolved font name inherited from placeholder→layout→master→presentation defaults. Suppressed when 'font' is set directly on the shape.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的字体名称。shape 直接设置 'font' 时不输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -828,7 +828,7 @@
     },
     "effective.color": {
       "type": "color",
-      "description": "resolved text color inherited from placeholder→layout→master→presentation defaults. Suppressed when 'color' is set directly on the shape.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的文本颜色。shape 直接设置 'color' 时不输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -837,40 +837,40 @@
     },
     "effective.bold": {
       "type": "bool",
-      "description": "resolved bold inherited from placeholder→layout→master→presentation defaults. Suppressed when 'bold' is set directly on the shape.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 bold。shape 直接设置 'bold' 时不输出。",
       "add": false,
       "set": false,
       "get": true,
       "readback": "true/false",
       "enforcement": "report"
     },
-    "effective.italic": { "type": "bool", "description": "resolved italic via cascade.", "add": false, "set": false, "get": true, "readback": "true/false", "enforcement": "report" },
-    "effective.underline": { "type": "string", "description": "resolved underline via cascade.", "add": false, "set": false, "get": true, "readback": "single/double/none", "enforcement": "report" },
-    "effective.strike": { "type": "string", "description": "resolved strike via cascade.", "add": false, "set": false, "get": true, "readback": "single/double/none", "enforcement": "report" },
-    "effective.font.latin": { "type": "string", "description": "resolved Latin font via cascade.", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
-    "effective.font.ea": { "type": "string", "description": "resolved East Asian font via cascade.", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
-    "effective.font.cs": { "type": "string", "description": "resolved complex script font via cascade.", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
-    "effective.align": { "type": "string", "description": "resolved paragraph alignment via cascade.", "add": false, "set": false, "get": true, "readback": "left/center/right/justify", "enforcement": "report" },
-    "effective.lineSpacing": { "type": "string", "description": "resolved line spacing via cascade.", "add": false, "set": false, "get": true, "readback": "multiplier (e.g. 1.5x) or fixed pt", "enforcement": "report" },
-    "effective.spaceBefore": { "type": "length", "description": "resolved spaceBefore via cascade.", "add": false, "set": false, "get": true, "readback": "unit-qualified pt", "enforcement": "report" },
-    "effective.spaceAfter": { "type": "length", "description": "resolved spaceAfter via cascade.", "add": false, "set": false, "get": true, "readback": "unit-qualified pt", "enforcement": "report" },
-    "effective.size.src": { "type": "string", "description": "path of the cascade layer that wrote effective.size.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.font.src": { "type": "string", "description": "path of the cascade layer that wrote effective.font.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.font.latin.src": { "type": "string", "description": "path of the cascade layer that wrote effective.font.latin.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.font.ea.src": { "type": "string", "description": "path of the cascade layer that wrote effective.font.ea.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.font.cs.src": { "type": "string", "description": "path of the cascade layer that wrote effective.font.cs.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.color.src": { "type": "string", "description": "path of the cascade layer that wrote effective.color.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.bold.src": { "type": "string", "description": "path of the cascade layer that wrote effective.bold.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.italic.src": { "type": "string", "description": "path of the cascade layer that wrote effective.italic.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.underline.src": { "type": "string", "description": "path of the cascade layer that wrote effective.underline.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.strike.src": { "type": "string", "description": "path of the cascade layer that wrote effective.strike.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.align.src": { "type": "string", "description": "path of the cascade layer that wrote effective.align.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.lineSpacing.src": { "type": "string", "description": "path of the cascade layer that wrote effective.lineSpacing.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.spaceBefore.src": { "type": "string", "description": "path of the cascade layer that wrote effective.spaceBefore.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
-    "effective.spaceAfter.src": { "type": "string", "description": "path of the cascade layer that wrote effective.spaceAfter.", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.italic": { "type": "bool", "description": "通过级联解析得到的 italic 值。", "add": false, "set": false, "get": true, "readback": "true/false", "enforcement": "report" },
+    "effective.underline": { "type": "string", "description": "通过级联解析得到的 underline 值。", "add": false, "set": false, "get": true, "readback": "single/double/none", "enforcement": "report" },
+    "effective.strike": { "type": "string", "description": "通过级联解析得到的 strike 值。", "add": false, "set": false, "get": true, "readback": "single/double/none", "enforcement": "report" },
+    "effective.font.latin": { "type": "string", "description": "通过级联解析得到的 Latin font。", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
+    "effective.font.ea": { "type": "string", "description": "通过级联解析得到的 East Asian font。", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
+    "effective.font.cs": { "type": "string", "description": "通过级联解析得到的 complex script font。", "add": false, "set": false, "get": true, "readback": "font name", "enforcement": "report" },
+    "effective.align": { "type": "string", "description": "通过级联解析得到的段落对齐方式。", "add": false, "set": false, "get": true, "readback": "left/center/right/justify", "enforcement": "report" },
+    "effective.lineSpacing": { "type": "string", "description": "通过级联解析得到的行距。", "add": false, "set": false, "get": true, "readback": "multiplier (e.g. 1.5x) or fixed pt", "enforcement": "report" },
+    "effective.spaceBefore": { "type": "length", "description": "通过级联解析得到的 spaceBefore 值。", "add": false, "set": false, "get": true, "readback": "unit-qualified pt", "enforcement": "report" },
+    "effective.spaceAfter": { "type": "length", "description": "通过级联解析得到的 spaceAfter 值。", "add": false, "set": false, "get": true, "readback": "unit-qualified pt", "enforcement": "report" },
+    "effective.size.src": { "type": "string", "description": "写入 effective.size 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.font.src": { "type": "string", "description": "写入 effective.font 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.font.latin.src": { "type": "string", "description": "写入 effective.font.latin 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.font.ea.src": { "type": "string", "description": "写入 effective.font.ea 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.font.cs.src": { "type": "string", "description": "写入 effective.font.cs 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.color.src": { "type": "string", "description": "写入 effective.color 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.bold.src": { "type": "string", "description": "写入 effective.bold 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.italic.src": { "type": "string", "description": "写入 effective.italic 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.underline.src": { "type": "string", "description": "写入 effective.underline 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.strike.src": { "type": "string", "description": "写入 effective.strike 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.align.src": { "type": "string", "description": "写入 effective.align 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.lineSpacing.src": { "type": "string", "description": "写入 effective.lineSpacing 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.spaceBefore.src": { "type": "string", "description": "写入 effective.spaceBefore 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
+    "effective.spaceAfter.src": { "type": "string", "description": "写入 effective.spaceAfter 的级联层路径。", "add": false, "set": false, "get": true, "readback": "path string", "enforcement": "report" },
     "id": {
       "type": "number",
-      "description": "cNvPr shape id; @id in /shape[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr shape id，即 /shape[@id=ID] 中的 @id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "add": true,
       "set": false,
       "get": true,
@@ -879,7 +879,7 @@
     },
     "zorder": {
       "type": "number",
-      "description": "1-based z-order in slide shape tree. On add/set, repositions the shape within the shape tree (1 = back).",
+      "description": "slide shape tree 中从 1 开始计数的 z-order。add/set 时会在 shape tree 内重新定位该 shape（1 表示最底层）。",
       "aliases": ["z-order", "order"],
       "add": true,
       "set": true,
@@ -893,7 +893,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3-D top bevel descriptor (sp3d.bevelT). Form: 'preset[-width[-height]]' with width/height in points; height defaults to width. Preset values: angle, artDeco, circle, convex, coolSlant, cross, divot, hardEdge, relaxedInset, riblet, slope, softRound. Example: 'circle-6-6'.",
+      "description": "3-D 顶部 bevel 配置（sp3d.bevelT）。格式为 'preset[-width[-height]]'；width/height 单位为 pt，省略 height 时与 width 相同。preset 可为 angle、artDeco、circle、convex、coolSlant、cross、divot、hardEdge、relaxedInset、riblet、slope、softRound。示例：'circle-6-6'。",
       "examples": [
         "--prop bevel=circle",
         "--prop bevel=circle-6",
@@ -907,7 +907,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3-D bottom bevel descriptor (sp3d.bevelB). Same grammar as 'bevel'. Single-size shorthand 'preset-N' sets width=height=N.",
+      "description": "3-D 底部 bevel 配置（sp3d.bevelB）。格式与 'bevel' 相同；单个尺寸简写 'preset-N' 等同于 width=height=N。",
       "examples": [
         "--prop bevelBottom=circle-4",
         "--prop bevelBottom=circle-4-4"
@@ -920,7 +920,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3-D extrusion height (sp3d @extrusionH). Accepts the canonical length input forms — bare number is points, also accepts pt/cm/in/px/emu suffix. 'none' or '0' clears.",
+      "description": "3-D 挤出高度（sp3d @extrusionH）。支持标准长度格式：裸数字按 pt 处理，也可使用 pt/cm/in/px/emu 后缀；'none' 或 '0' 会清除该效果。",
       "examples": [
         "--prop depth=10",
         "--prop depth=10pt",
@@ -935,7 +935,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3-D scene lighting rig name (scene3d.lightRig @rig). OOXML preset rig values: threePt, balanced, soft, harsh, flood, contrasting, morning, sunrise, sunset, chilly, freezing, flat, twoPt, glow, brightRoom.",
+      "description": "3-D 场景光源方案名称（scene3d.lightRig @rig）。OOXML 预设值为：threePt、balanced、soft、harsh、flood、contrasting、morning、sunrise、sunset、chilly、freezing、flat、twoPt、glow、brightRoom。",
       "examples": [
         "--prop lighting=threePt",
         "--prop lighting=balanced"
@@ -948,7 +948,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "3-D preset material (sp3d.prstMaterial). Accepted tokens (case-insensitive): clear, darkEdge (alias dkEdge), flat, matte, metal, plastic, powder, softEdge, softMetal, translucentPowder, warmMatte, wireframe (alias wire).",
+      "description": "3-D 预设材质（sp3d.prstMaterial）。不区分大小写，可用值：clear、darkEdge（别名 dkEdge）、flat、matte、metal、plastic、powder、softEdge、softMetal、translucentPowder、warmMatte、wireframe（别名 wire）。",
       "examples": [
         "--prop material=metal",
         "--prop material=plastic"
@@ -958,7 +958,7 @@
     },
     "reflection": {
       "type": "string",
-      "description": "reflection effect. Accepts 'true' / 'tight' / 'half' / 'full' to enable a reflection of varying length, or 'none' to clear.",
+      "description": "倒影效果。使用 'true'、'tight'、'half' 或 'full' 启用不同长度的倒影；使用 'none' 清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -972,7 +972,7 @@
     },
     "shadow": {
       "type": "string",
-      "description": "outer shadow. Pass a color (e.g. '000000') or 'true' (defaults to black). Routed to text-level rPr for text-only shapes.",
+      "description": "外部阴影。可传入颜色（如 '000000'）或 'true'（默认黑色）；仅含文本的 shape 会写入文本级 rPr。",
       "add": true,
       "set": true,
       "get": true,
@@ -987,7 +987,7 @@
     },
     "innerShadow": {
       "type": "string",
-      "description": "inner shadow (a:innerShdw) as `color-blur-angle-dist-opacity` (mirrors `shadow`). Input color is hex (with or without `#`, 6- or 8-digit `RRGGBBAA`) or a scheme name (with optional +lumMod/+shade transforms); blur/dist in points; angle in degrees; opacity 0-100. Rendered as a CSS inset box-shadow in the HTML preview.",
+      "description": "内部阴影（a:innerShdw），格式为 color-blur-angle-dist-opacity，与 shadow 一致。颜色可为 hex（可带 #，6 位或 8 位 RRGGBBAA）或 scheme name（可附加 +lumMod/+shade 变换）；blur/dist 单位为 pt，angle 单位为度，opacity 范围为 0–100。在 HTML 预览中会渲染为 CSS inset box-shadow。",
       "aliases": [
         "innershadow"
       ],
@@ -1003,7 +1003,7 @@
     },
     "glow": {
       "type": "string",
-      "description": "glow effect. Pass a color (e.g. '4472C4') or 'true' (defaults to accent blue).",
+      "description": "发光效果。可传入颜色（如 '4472C4'）或 'true'（默认 accent blue）。",
       "add": true,
       "set": true,
       "get": true,
@@ -1018,7 +1018,7 @@
     "flipH": {
       "type": "bool",
       "aliases": ["flipHorizontal"],
-      "description": "Flip horizontally (Office-API alias of flip=h).",
+      "description": "水平翻转（Office-API 中等同于 flip=h）。",
       "add": true,
       "set": true,
       "get": true,
@@ -1029,7 +1029,7 @@
     "flipV": {
       "type": "bool",
       "aliases": ["flipVertical"],
-      "description": "Flip vertically (Office-API alias of flip=v).",
+      "description": "垂直翻转（Office-API 中等同于 flip=v）。",
       "add": true,
       "set": true,
       "get": true,
@@ -1043,7 +1043,7 @@
       "set": true,
       "get": true,
       "requires": ["line"],
-      "description": "shape outline alpha as fraction (0..1). Requires an outline (line/lineColor) to attach to. Surfaces when the outline carries an a:alpha child.",
+      "description": "shape outline 的 alpha，取值为 0..1。需要已有 outline（line/lineColor）才能设置；outline 包含 a:alpha 子节点时会读取并返回。",
       "examples": [
         "--prop line=FF0000:2:solid --prop lineOpacity=0.5"
       ],
@@ -1052,7 +1052,7 @@
     },
     "x": {
       "type": "length",
-      "description": "x in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "x 坐标，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "aliases": [
         "left"
       ],
@@ -1070,7 +1070,7 @@
     },
     "y": {
       "type": "string",
-      "description": "y in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "y 坐标，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "add": true,
       "set": true,
       "get": true,
@@ -1086,7 +1086,7 @@
     },
     "width": {
       "type": "string",
-      "description": "width in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "宽度，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "add": true,
       "set": true,
       "get": true,
@@ -1103,7 +1103,7 @@
     },
     "height": {
       "type": "string",
-      "description": "height in EMU/length form (e.g. 2cm). pptx absolute positioning.",
+      "description": "高度，使用 EMU/长度格式（如 2cm）；用于 pptx 绝对定位。",
       "add": true,
       "set": true,
       "get": true,

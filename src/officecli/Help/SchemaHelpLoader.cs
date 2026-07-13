@@ -83,10 +83,10 @@ internal static class SchemaHelpLoader
 
         // Suggest closest format alias
         var best = ClosestMatch(input, FormatAliases.Keys);
-        var suggestion = best != null ? $" Did you mean: {best}?" : "";
+        var suggestion = best != null ? $" 你的意思是：{best}？" : "";
         throw new InvalidOperationException(
-            $"error: unknown format '{input}'.{suggestion}\n" +
-            $"Use: officecli help");
+            $"错误：未知 format “{input}”。{suggestion}\n" +
+            "使用方式：officecli help");
     }
 
     internal static IReadOnlyList<string> ListElements(string format)
@@ -187,12 +187,12 @@ internal static class SchemaHelpLoader
 
         // 2. Unknown element — suggest closest match.
         var best = ClosestMatch(element, elements);
-        var suggestion = best != null ? $"\nDid you mean: {best}?" : "";
+        var suggestion = best != null ? $"\n你的意思是：{best}？" : "";
         // CONSISTENCY(mcp-error): truncate user-supplied value in error messages to prevent
         // response amplification (caller echoes arbitrary-length input back unchanged).
         throw new InvalidOperationException(
-            $"error: unknown element '{TruncateForError(element, 64)}' for format '{canonical}'.{suggestion}\n" +
-            $"Use: officecli help {canonical}");
+            $"错误：format “{canonical}” 中不存在 element “{TruncateForError(element, 64)}”。{suggestion}\n" +
+            $"使用方式：officecli help {canonical}");
     }
 
     // Per-format alias index: alias -> canonical schema name. Built lazily

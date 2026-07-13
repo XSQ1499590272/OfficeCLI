@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/SheetName/pivottable[N]"]
   },
-  "note": "Aliases: pivot. 'source' required (e.g. Sheet1!A1:D100). External workbook refs rejected. Position auto-placed after source if omitted. Field axes (rows/cols/filters/values) take comma-separated field names; values use 'Field:agg' tuples. Query returns child nodes typed pivotfield/pivotrow/pivotcolumn/pivotdata — these are read-only structural nodes, not independently addressable elements; no Add/Set/Remove is supported on them.",
+  "note": "Alias：pivot。'source' 必填（例如 Sheet1!A1:D100）。拒绝 external workbook ref；未提供 position 时会自动放在 source 之后。Field axes（rows/cols/filters/values）接受逗号分隔的 field name，values 使用 'Field:agg' tuple。Query 返回 pivotfield/pivotrow/pivotcolumn/pivotdata 类型的 child node；这些是只读 structural node，不能独立寻址，也不支持 Add/Set/Remove。",
   "properties": {
     "source": {
       "type": "string",
-      "description": "source range. Alias: src. External workbook refs rejected.",
+      "description": "源数据范围。别名：src。不支持外部 workbook 引用。",
       "aliases": ["src"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop source=Sheet1!A1:D100"],
@@ -27,7 +27,7 @@
     },
     "position": {
       "type": "string",
-      "description": "anchor cell (e.g. H1). Alias: pos. Auto-placed after source if omitted.",
+      "description": "锚点单元格（如 H1）。别名：pos。省略时自动放置在 source 后方。",
       "aliases": ["pos"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop position=H1"],
@@ -36,7 +36,7 @@
     },
     "name": {
       "type": "string",
-      "description": "pivot table name (identifier).",
+      "description": "pivot table 名称（标识符）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=RevenueByRegion"],
       "readback": "pivot name",
@@ -44,7 +44,7 @@
     },
     "style": {
       "type": "string",
-      "description": "built-in or workbook custom pivot style name (e.g. PivotStyleMedium9).",
+      "description": "内置或 workbook 自定义的 pivot style 名称（如 PivotStyleMedium9）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop style=PivotStyleMedium9"],
       "readback": "style name",
@@ -52,7 +52,7 @@
     },
     "rows": {
       "type": "string",
-      "description": "row-axis field names, comma-separated (e.g. 'Region,Category'). Aliases: row, rowField, rowFields.",
+      "description": "row axis 字段名，使用逗号分隔（如 'Region,Category'）。别名：row、rowField、rowFields。",
       "aliases": ["row", "rowField", "rowFields"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop rows=Region,Category"],
@@ -61,7 +61,7 @@
     },
     "cols": {
       "type": "string",
-      "description": "column-axis field names, comma-separated. Aliases: col, column, columns, colField, colFields, columnField, columnFields.",
+      "description": "column axis 字段名，使用逗号分隔。别名：col、column、columns、colField、colFields、columnField、columnFields。",
       "aliases": ["col", "column", "columns", "colField", "colFields", "columnField", "columnFields"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop cols=Date"],
@@ -70,7 +70,7 @@
     },
     "filters": {
       "type": "string",
-      "description": "page/filter-axis field names, comma-separated. Aliases: filter, filterField, filterFields.",
+      "description": "page/filter axis 字段名，使用逗号分隔。别名：filter、filterField、filterFields。",
       "aliases": ["filter", "filterField", "filterFields"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop filters=Year"],
@@ -79,7 +79,7 @@
     },
     "values": {
       "type": "string",
-      "description": "value-axis fields as 'Field:agg' tuples, comma-separated (e.g. 'Sales:sum,Qty:avg'). agg one of sum, avg, count, max, min, product, stdev, stdevp, var, varp, countNums. Aliases: value, valueField, valueFields.",
+      "description": "value axis 字段，格式为逗号分隔的 'Field:agg' 元组（如 'Sales:sum,Qty:avg'）。agg 可为 sum、avg、count、max、min、product、stdev、stdevp、var、varp、countNums。别名：value、valueField、valueFields。",
       "aliases": ["value", "valueField", "valueFields"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop values=Sales:sum,Qty:avg"],
@@ -88,7 +88,7 @@
     },
     "aggregate": {
       "type": "string",
-      "description": "default aggregate for value fields when omitted from --prop values. One of sum, avg, count, max, min, product, stdev, stdevp, var, varp, countNums.",
+      "description": "当 --prop values 未指定 agg 时 value field 使用的默认聚合方式。可选 sum、avg、count、max、min、product、stdev、stdevp、var、varp、countNums。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop aggregate=avg"],
       "readback": "n/a (per-value override)",
@@ -96,7 +96,7 @@
     },
     "showDataAs": {
       "type": "string",
-      "description": "value-field display mode: normal, percentOfTotal, percentOfRow, percentOfCol, runningTotal. (percentOfParent / rankAscending / rankDescending / index / difference / percentDifference are not yet supported.)",
+      "description": "value field 的显示方式：normal、percentOfTotal、percentOfRow、percentOfCol、runningTotal。（暂不支持 percentOfParent / rankAscending / rankDescending / index / difference / percentDifference。）",
       "aliases": ["showdataas"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop showDataAs=percentOfTotal"],
@@ -105,7 +105,7 @@
     },
     "topN": {
       "type": "string",
-      "description": "keep only top-N row keys ranked by first value field's aggregate. Integer >= 1; filter applied to source rows pre-cache. Add-time only — Set ignores this key.",
+      "description": "仅保留按第一个 value field 聚合结果排序后的前 N 个 row key。N 必须是 >= 1 的整数；筛选在建立 cache 前应用于 source rows。仅 add 时生效，Set 会忽略此键。",
       "aliases": ["topn"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop topN=10"],
@@ -115,7 +115,7 @@
     "sort": {
       "type": "enum",
       "values": ["asc", "desc", "locale", "locale-desc", "none"],
-      "description": "axis-label sort. 'none' (or empty) clears sort.",
+      "description": "axis label 排序。'none'（或空值）会清除排序。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop sort=desc"],
       "readback": "n/a (label order in axis)",
@@ -124,7 +124,7 @@
     "layout": {
       "type": "enum",
       "values": ["compact", "outline", "tabular"],
-      "description": "report layout mode. Default: compact.",
+      "description": "报表布局模式。默认值：compact。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop layout=tabular"],
       "readback": "layout name",
@@ -132,7 +132,7 @@
     },
     "labelFilter": {
       "type": "string",
-      "description": "row-level pre-cache label filter as 'field:type:value' (e.g. 'Region:beginsWith:N'). Type one of equals, notEquals, beginsWith, endsWith, contains, notContains, greaterThan, greaterThanEqual, lessThan, lessThanEqual, between, notBetween. Add-time only — Set ignores this key.",
+      "description": "在建立 cache 前应用的行级 label filter，格式为 'field:type:value'（如 'Region:beginsWith:N'）。type 可为 equals、notEquals、beginsWith、endsWith、contains、notContains、greaterThan、greaterThanEqual、lessThan、lessThanEqual、between、notBetween。仅 add 时生效，Set 会忽略此键。",
       "aliases": ["labelfilter"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop labelFilter=Region:beginsWith:N"],
@@ -141,7 +141,7 @@
     },
     "calculatedField": {
       "type": "string",
-      "description": "user-defined formula field as 'Name:=Formula' (e.g. 'Margin:=Sales-Cost'). Use calculatedField1, calculatedField2, ... for multiple. Alias: calculatedFields. Add-time only — Set ignores this key.",
+      "description": "用户自定义公式字段，格式为 'Name:=Formula'（如 'Margin:=Sales-Cost'）。多个字段请使用 calculatedField1、calculatedField2 等。别名：calculatedFields。仅 add 时生效，Set 会忽略此键。",
       "aliases": ["calculatedfield", "calculatedfields"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop calculatedField=Margin:=Sales-Cost", "--prop calculatedField1=Margin:=Sales-Cost --prop calculatedField2=Tax:=Sales*0.1"],
@@ -150,7 +150,7 @@
     },
     "repeatLabels": {
       "type": "bool",
-      "description": "repeat outer-axis item labels on every row (fillDown). Aliases: repeatItemLabels, repeatAllLabels, fillDownLabels.",
+      "description": "在每一行重复 outer axis item label（fillDown）。别名：repeatItemLabels、repeatAllLabels、fillDownLabels。",
       "aliases": ["repeatlabels", "repeatItemLabels", "repeatAllLabels", "fillDownLabels"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop repeatLabels=true"],
@@ -159,7 +159,7 @@
     },
     "blankRows": {
       "type": "bool",
-      "description": "insert a blank row after each outer item group. Aliases: insertBlankRow, insertBlankRows, blankRow, blankLine, blankLines.",
+      "description": "在每个 outer item group 后插入空白行。别名：insertBlankRow、insertBlankRows、blankRow、blankLine、blankLines。",
       "aliases": ["blankrows", "insertBlankRow", "insertBlankRows", "blankRow", "blankLine", "blankLines"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop blankRows=true"],
@@ -169,7 +169,7 @@
     "grandTotals": {
       "type": "enum",
       "values": ["both", "none", "rows", "cols", "on", "off", "true", "false"],
-      "description": "grand-total visibility. 'rows' = show grand-total row only; 'cols' = show grand-total column only; 'both'/'on'/'true' = both; 'none'/'off'/'false' = neither.",
+      "description": "grand total 的显示方式。'rows' 仅显示 grand-total row；'cols' 仅显示 grand-total column；'both'/'on'/'true' 同时显示；'none'/'off'/'false' 全部隐藏。",
       "aliases": ["grandtotals"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop grandTotals=both"],
@@ -178,7 +178,7 @@
     },
     "rowGrandTotals": {
       "type": "bool",
-      "description": "show row-axis grand totals. Independent of colGrandTotals.",
+      "description": "是否显示 row axis grand total；与 colGrandTotals 相互独立。",
       "aliases": ["rowgrandtotals"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop rowGrandTotals=true"],
@@ -187,7 +187,7 @@
     },
     "colGrandTotals": {
       "type": "bool",
-      "description": "show column-axis grand totals. Alias: columnGrandTotals.",
+      "description": "是否显示 column axis grand total。别名：columnGrandTotals。",
       "aliases": ["colgrandtotals", "columnGrandTotals"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop colGrandTotals=true"],
@@ -196,7 +196,7 @@
     },
     "grandTotalCaption": {
       "type": "string",
-      "description": "label text for the Grand Total row/column (default 'Grand Total').",
+      "description": "Grand Total 行/列显示的标签文本（默认 'Grand Total'）。",
       "aliases": ["grandtotalcaption"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop grandTotalCaption=\"Total\""],
@@ -206,7 +206,7 @@
     "subtotals": {
       "type": "enum",
       "values": ["on", "off", "true", "false", "show", "hide", "yes", "no", "1", "0"],
-      "description": "show/hide outer-level subtotal rows.",
+      "description": "显示或隐藏 outer level 的 subtotal rows。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop subtotals=off"],
       "readback": "on/off",
@@ -214,7 +214,7 @@
     },
     "defaultSubtotal": {
       "type": "bool",
-      "description": "default-subtotal flag for new pivot fields (per-field <pivotField defaultSubtotal=...>).",
+      "description": "新 pivot field 的 default-subtotal 标志（每个字段对应 <pivotField defaultSubtotal=...>）。",
       "aliases": ["defaultsubtotal"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop defaultSubtotal=true"],
@@ -223,7 +223,7 @@
     },
     "showRowStripes": {
       "type": "bool",
-      "description": "banded-row striping in the pivot style. Alias: bandedRows.",
+      "description": "pivot style 的隔行条纹。别名：bandedRows。",
       "aliases": ["showrowstripes", "bandedRows"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showRowStripes=true"],
@@ -232,7 +232,7 @@
     },
     "showColStripes": {
       "type": "bool",
-      "description": "banded-column striping in the pivot style. Aliases: showColumnStripes, bandedCols, bandedColumns.",
+      "description": "pivot style 的隔列条纹。别名：showColumnStripes、bandedCols、bandedColumns。",
       "aliases": ["showcolstripes", "showColumnStripes", "bandedCols", "bandedColumns"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showColStripes=true"],
@@ -241,7 +241,7 @@
     },
     "showRowHeaders": {
       "type": "bool",
-      "description": "show row-axis header formatting (pivotTableStyleInfo).",
+      "description": "显示 row axis header 的样式（pivotTableStyleInfo）。",
       "aliases": ["showrowheaders"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showRowHeaders=true"],
@@ -250,7 +250,7 @@
     },
     "showColHeaders": {
       "type": "bool",
-      "description": "show column-axis header formatting. Alias: showColumnHeaders.",
+      "description": "显示 column axis header 的样式。别名：showColumnHeaders。",
       "aliases": ["showcolheaders", "showColumnHeaders"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showColHeaders=true"],
@@ -259,7 +259,7 @@
     },
     "showLastColumn": {
       "type": "bool",
-      "description": "highlight the last column in the pivot style.",
+      "description": "在 pivot style 中突出显示最后一列。",
       "aliases": ["showlastcolumn"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showLastColumn=true"],
@@ -268,7 +268,7 @@
     },
     "showDrill": {
       "type": "bool",
-      "description": "show expand/collapse (+/-) buttons on every pivot field. Add-time only — Set ignores this key.",
+      "description": "在每个 pivot field 上显示展开/折叠（+/-）按钮。仅 add 时生效，Set 会忽略此键。",
       "aliases": ["showdrill"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop showDrill=false"],
@@ -277,7 +277,7 @@
     },
     "mergeLabels": {
       "type": "bool",
-      "description": "merge+center repeated outer-axis item cells (<pivotTableDefinition mergeItem='1'>). Add-time only — Set ignores this key.",
+      "description": "合并并居中重复的 outer axis item 单元格（<pivotTableDefinition mergeItem='1'>）。仅 add 时生效，Set 会忽略此键。",
       "aliases": ["mergelabels"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop mergeLabels=true"],
@@ -286,28 +286,28 @@
     },
     "cacheId": {
       "type": "number",
-      "description": "pivot cache index (read-only; assigned by Excel when the pivot table is created).",
+      "description": "pivot cache 索引（只读；创建 pivot table 时由 Excel 分配）。",
       "add": false, "set": false, "get": true,
       "readback": "pivot cache index (read-only; assigned by Excel)",
       "enforcement": "report"
     },
     "fieldCount": {
       "type": "number",
-      "description": "total number of pivot fields in the source range (read-only).",
+      "description": "source range 中 pivot field 的总数（只读）。",
       "add": false, "set": false, "get": true,
       "readback": "total number of pivot fields in the source range",
       "enforcement": "report"
     },
     "dataFieldCount": {
       "type": "number",
-      "description": "number of data field aggregations (read-only; equals the count of dataField{N} entries).",
+      "description": "data field 聚合项数量（只读；等于 dataField{N} 条目的数量）。",
       "add": false, "set": false, "get": true,
       "readback": "number of data field aggregations",
       "enforcement": "report"
     },
     "dataField{N}": {
       "type": "string",
-      "description": "per-data-field readback (1-indexed: dataField1, dataField2, …) packed as 'name:aggFunc:fieldIdx'. Get also returns `dataField{N}.showAs` when ShowDataAs != normal.",
+      "description": "每个 data field 的读取结果（从 1 开始：dataField1、dataField2 等），格式为 'name:aggFunc:fieldIdx'。当 ShowDataAs != normal 时，Get 还会返回 dataField{N}.showAs。",
       "add": false, "set": false, "get": true,
       "readback": "packed as 'name:aggFunc:fieldIdx'; name reflects Excel's stored DataField/@name which includes auto-prefixes (e.g. 'Sum of Revenue:sum:1')",
       "enforcement": "report"
@@ -315,7 +315,7 @@
     "dataField{N}.showAs": {
       "type": "enum",
       "values": ["percent_of_total", "percent_of_row", "percent_of_col", "running_total", "difference", "percent_diff", "index"],
-      "description": "data field showAs token (read-only). Values are canonicalized from OOXML ShowDataAs.",
+      "description": "data field 的 showAs token（只读）。值会由 OOXML ShowDataAs 规范化而来。",
       "add": false, "set": false, "get": true,
       "readback": "showAs canonical token",
       "enforcement": "report"
@@ -323,18 +323,18 @@
     "location": {
       "type": "string",
       "add": false, "set": false, "get": true,
-      "description": "target cell range where the pivot table is rendered (e.g. D1:E4).",
+      "description": "pivot table 的渲染目标单元格范围（如 D1:E4）。",
       "readback": "A1 range string",
       "enforcement": "report"
     },
     "collapsedFields": {
       "type": "string",
       "add": false, "set": false, "get": true,
-      "description": "comma-separated names of fields with collapsed items.",
+      "description": "包含 collapsed items 的字段名称，使用逗号分隔。",
       "readback": "comma-separated field names",
       "enforcement": "report"
     },
-    "axisAsDataField":   { "type":"bool",   "add":false, "set":false, "get":true, "description":"comma-separated names of fields acting as data field on axis.", "readback":"comma-separated field names", "enforcement":"report" },
-    "sortByField":       { "type":"string", "add":false, "set":false, "get":true, "description":"comma-separated 'field:direction' sort tuples.", "readback":"comma-separated sort tuples", "enforcement":"report" }
+    "axisAsDataField":   { "type":"bool",   "add":false, "set":false, "get":true, "description":"在 axis 上作为 data field 的字段名称，使用逗号分隔。", "readback":"comma-separated field names", "enforcement":"report" },
+    "sortByField":       { "type":"string", "add":false, "set":false, "get":true, "description":"排序元组，格式为逗号分隔的 'field:direction'。", "readback":"comma-separated sort tuples", "enforcement":"report" }
   }
 }

@@ -51,123 +51,67 @@ public static class McpServer
         if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OFFICECLI_BATCH_ALLOW_STDIN_REDIRECT")))
             Environment.SetEnvironmentVariable("OFFICECLI_BATCH_ALLOW_STDIN_REDIRECT", "1");
 
-        // MCP server is a long-lived stdio process. The normal
-        // per-invocation auto-upgrade path (Program.cs:112) is
-        // short-circuited for `officecli mcp` because CheckInBackground
-        // is called AFTER the mcp branch in Program.cs — so without
-        // this hook, an MCP instance started once and left running for
-        // days/weeks would never see a new release.
-        //
-        // Run the upgrade path in the background: fire once at startup
-        // (applies any pending .update from a previous run and kicks a
-        // fresh check if >24h stale), then every hour. The hourly wake
-        // is cheap because CheckInBackground is debounced by the same
-        // 24h timestamp in ~/.officecli/config.json as the normal CLI
-        // path, so 23 of 24 wakes no-op. The actual download / verify /
-        // File.Move happens in a spawned subprocess whose stdio is
-        // redirected (see UpdateChecker.SpawnRefreshProcess), so
-        // nothing it does can corrupt our stdout JSON-RPC stream.
-        using var upgradeCts = new CancellationTokenSource();
-        var upgradeTask = RunPeriodicUpgradeCheckAsync(upgradeCts.Token);
-
-        try
+        while (true)
         {
-            while (true)
-            {
-                var line = await reader.ReadLineAsync();
-                if (line == null) break;
-                if (string.IsNullOrWhiteSpace(line)) continue;
+            var line = await reader.ReadLineAsync();
+            if (line == null) break;
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
-                JsonElement? id = null;
-                try
-                {
-                    using var doc = JsonDocument.Parse(line);
-                    var root = doc.RootElement;
-                    // The JSON-RPC root must be an Object (single request). Arrays
-                    // are valid JSON-RPC 2.0 batch requests that we don't support;
-                    // numbers/strings/bools/nulls are malformed entirely. Guard
-                    // here before TryGetProperty, which throws on non-Object.
-                    if (root.ValueKind != JsonValueKind.Object)
-                    {
-                        var msg = root.ValueKind == JsonValueKind.Array
-                            ? "Invalid Request: batch requests are not supported"
-                            : "Invalid Request: request must be a JSON object";
-                        await writer.WriteLineAsync(ErrorJson(null, -32600, msg));
-                        continue;
-                    }
-                    // Parse id BEFORE method so a malformed method ('method': 42)
-                    // can still echo the original id back per JSON-RPC 2.0 §5.
-                    id = root.TryGetProperty("id", out var idEl) ? idEl.Clone() : null;
-                    // method must be a string per spec; non-string is an
-                    // Invalid Request (-32600), not an internal error.
-                    string? method = null;
-                    if (root.TryGetProperty("method", out var m))
-                    {
-                        if (m.ValueKind != JsonValueKind.String)
-                        {
-                            await writer.WriteLineAsync(ErrorJson(id, -32600, "Invalid Request: 'method' must be a string"));
-                            continue;
-                        }
-                        method = m.GetString();
-                    }
-
-                    var response = method switch
-                    {
-                        "initialize" => HandleInitialize(id),
-                        "notifications/initialized" => null,
-                        "tools/list" => HandleToolsList(id),
-                        "tools/call" => HandleToolsCall(id, root),
-                        "ping" => WriteJson(w => { w.WriteStartObject(); Rpc(w, id); w.WriteStartObject("result"); w.WriteEndObject(); w.WriteEndObject(); }),
-                        // CONSISTENCY(mcp-error): truncate caller-supplied value to prevent
-                        // response amplification (echo arbitrary-length input back unchanged).
-                        _ => id.HasValue ? ErrorJson(id, -32601, $"Method not found: {OfficeCli.Help.SchemaHelpLoader.TruncateForError(method ?? "", 64)}") : null,
-                    };
-
-                    if (response != null)
-                        await writer.WriteLineAsync(response);
-                }
-                catch (JsonException)
-                {
-                    await writer.WriteLineAsync(ErrorJson(null, -32700, "Parse error"));
-                }
-                catch (Exception ex)
-                {
-                    await writer.WriteLineAsync(ErrorJson(id, -32603, $"Internal error: {ex.Message}"));
-                }
-            }
-        }
-        finally
-        {
-            upgradeCts.Cancel();
-            try { await upgradeTask; } catch { }
-        }
-    }
-
-    private static async Task RunPeriodicUpgradeCheckAsync(CancellationToken token)
-    {
-        // Fire once at startup — no matter what state the config is in,
-        // this applies any pending .update from a previous run and
-        // (if stale) spawns a fresh download. Does not block the main
-        // loop: this method runs on a background task.
-        try { UpdateChecker.CheckInBackground(); } catch { }
-
-        while (!token.IsCancellationRequested)
-        {
+            JsonElement? id = null;
             try
             {
-                await Task.Delay(TimeSpan.FromHours(1), token);
-                UpdateChecker.CheckInBackground();
+                using var doc = JsonDocument.Parse(line);
+                var root = doc.RootElement;
+                // The JSON-RPC root must be an Object (single request). Arrays
+                // are valid JSON-RPC 2.0 batch requests that we don't support;
+                // numbers/strings/bools/nulls are malformed entirely. Guard
+                // here before TryGetProperty, which throws on non-Object.
+                if (root.ValueKind != JsonValueKind.Object)
+                {
+                    var msg = root.ValueKind == JsonValueKind.Array
+                        ? "Invalid Request: batch requests are not supported"
+                        : "Invalid Request: request must be a JSON object";
+                    await writer.WriteLineAsync(ErrorJson(null, -32600, msg));
+                    continue;
+                }
+                // Parse id BEFORE method so a malformed method ('method': 42)
+                // can still echo the original id back per JSON-RPC 2.0 §5.
+                id = root.TryGetProperty("id", out var idEl) ? idEl.Clone() : null;
+                // method must be a string per spec; non-string is an
+                // Invalid Request (-32600), not an internal error.
+                string? method = null;
+                if (root.TryGetProperty("method", out var m))
+                {
+                    if (m.ValueKind != JsonValueKind.String)
+                    {
+                        await writer.WriteLineAsync(ErrorJson(id, -32600, "Invalid Request: 'method' must be a string"));
+                        continue;
+                    }
+                    method = m.GetString();
+                }
+
+                var response = method switch
+                {
+                    "initialize" => HandleInitialize(id),
+                    "notifications/initialized" => null,
+                    "tools/list" => HandleToolsList(id),
+                    "tools/call" => HandleToolsCall(id, root),
+                    "ping" => WriteJson(w => { w.WriteStartObject(); Rpc(w, id); w.WriteStartObject("result"); w.WriteEndObject(); w.WriteEndObject(); }),
+                    // CONSISTENCY(mcp-error): truncate caller-supplied value to prevent
+                    // response amplification (echo arbitrary-length input back unchanged).
+                    _ => id.HasValue ? ErrorJson(id, -32601, $"Method not found: {OfficeCli.Help.SchemaHelpLoader.TruncateForError(method ?? "", 64)}") : null,
+                };
+
+                if (response != null)
+                    await writer.WriteLineAsync(response);
             }
-            catch (OperationCanceledException)
+            catch (JsonException)
             {
-                break;
+                await writer.WriteLineAsync(ErrorJson(null, -32700, "Parse error"));
             }
-            catch
+            catch (Exception ex)
             {
-                // Never crash the MCP server over an update-check failure.
-                // UpdateChecker already swallows exceptions internally, so
-                // this is belt-and-braces for any future change that might
-                // leak one through.
+                await writer.WriteLineAsync(ErrorJson(id, -32603, $"Internal error: {ex.Message}"));
             }
         }
     }
@@ -286,10 +230,10 @@ public static class McpServer
         if (argv.Length == 0)
             throw new ArgumentException("Provide the officecli command line as `command`, e.g. "
                 + "command=\"help\" or command=\"add deck.pptx /slide[1] --type shape --prop text=Hi\".");
-        // load_skill / skills live in Program.cs early-dispatch, not in the
+        // load_skill lives in Program.cs early-dispatch, not in the
         // System.CommandLine root, so RunCliRaw can't reach them. Serve them
-        // here from the same SkillInstaller the CLI uses.
-        if (argv[0] is "load_skill" or "skill" or "skills")
+        // here from the same SkillCatalog the CLI uses.
+        if (argv[0] == "load_skill")
             return (new[] { new McpContent("text", Text: HandleSkillCommand(argv)) }, false);
         if (IsScreenshot(argv))
             return (RunScreenshotArgv(argv), false);
@@ -372,14 +316,13 @@ public static class McpServer
         {
             var a = argv[i];
             if (a == "--path" && i + 1 < argv.Length) { relPath = argv[++i]; continue; }
-            if (a == "list") continue;   // `skills list`
             name ??= a;
         }
         if (string.IsNullOrEmpty(name))
-            return OfficeCli.Core.SkillInstaller.BuildSkillCatalog();
+            return OfficeCli.Core.SkillCatalog.BuildSkillCatalog();
         return string.IsNullOrEmpty(relPath)
-            ? OfficeCli.Core.SkillInstaller.LoadSkillContent(name)
-            : OfficeCli.Core.SkillInstaller.LoadSkillFile(name, relPath);
+            ? OfficeCli.Core.SkillCatalog.LoadSkillContent(name)
+            : OfficeCli.Core.SkillCatalog.LoadSkillFile(name, relPath);
     }
 
     // screenshot delegates to the CLI (view <file> screenshot ... -o <tmp>) and
@@ -540,7 +483,7 @@ Delivery gate (before reporting a document finished — any failure = fix and re
         // prompted to load the right skill without the full ~1.2k of routing
         // descriptions resident in context. Detail stays lazy behind load_skill.
         w.WriteString("description", ToolDescription + "\n\n" + McpHelpStrategy + "\n"
-            + OfficeCli.Core.SkillInstaller.BuildSkillTriggerSummary());
+            + OfficeCli.Core.SkillCatalog.BuildSkillTriggerSummary());
         w.WriteStartObject("inputSchema");
         w.WriteString("type", "object");
         w.WriteStartObject("properties");

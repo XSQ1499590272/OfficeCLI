@@ -1,22 +1,13 @@
 ---
 name: officecli-xlsx
-description: "Use this skill any time a .xlsx file is involved -- as input, output, or both. This includes: creating spreadsheets, financial models, dashboards, or trackers; reading, parsing, or extracting data from any .xlsx file; editing, modifying, or updating existing workbooks; working with formulas, charts, pivot tables, or templates; importing CSV/TSV data into Excel format. Trigger whenever the user mentions 'spreadsheet', 'workbook', 'Excel', 'financial model', 'tracker', 'dashboard', or references a .xlsx/.csv filename."
+description: "任何涉及 .xlsx 文件的场景都使用此 Skill，包括创建电子表格、财务模型、仪表盘或追踪表；读取、解析或提取 .xlsx 数据；编辑、修改或更新既有工作簿；处理公式、图表、透视表或模板；将 CSV/TSV 数据导入 Excel 格式。当用户提到 'spreadsheet'、'workbook'、'Excel'、'financial model'、'tracker'、'dashboard' 或 .xlsx/.csv 文件名时触发。"
 ---
 
 # OfficeCLI XLSX Skill
 
-## Setup
+## ⚠️ Help 优先规则
 
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
-
-## ⚠️ Help-First Rule
-
-**This skill teaches what good xlsx looks like, not every command flag. When a property name, enum value, or alias is uncertain, consult help BEFORE guessing.**
+**本 Skill 说明高质量 xlsx 应达到的标准，而不是罗列每一个 command flag。遇到不确定的 property name、enum value 或 alias 时，先查 Help，切勿猜测。**
 
 ```bash
 officecli help xlsx                         # List all xlsx elements
@@ -25,81 +16,81 @@ officecli help xlsx <verb> <element>        # Verb-scoped (e.g. add chart, set c
 officecli help xlsx <element> --json        # Machine-readable schema
 ```
 
-Help reflects the installed CLI version. When this skill and help disagree, **help is authoritative**.
+Help 与已安装的 CLI 版本一致。如本 Skill 与 Help 不一致，**以 Help 为准**。
 
-## Shell & Execution Discipline
+## Shell 与执行规范
 
-**Shell quoting (zsh / bash).** Excel paths contain `[]`, and number formats contain `$`. Both are shell metacharacters. Rules:
+**Shell quoting（zsh / bash）。** Excel path 包含 `[]`，number format 可能包含 `$`；两者均为 shell 元字符。规则如下：
 
-- ALWAYS quote element paths: `"/Sheet1/row[1]"`, not `/Sheet1/row[1]`.
-- Use **single quotes** for any prop value containing `$`: `numFmt='$#,##0'`.
-- For formulas with cross-sheet `!` references, use `batch` with a `<<'EOF'` heredoc (see Known Issues).
-- `\n` and `\t` in a prop value ARE interpreted by the CLI — `\n` is a real in-cell line break (pair with `--prop wrapText=true`), `\t` a tab — consistent across xlsx / docx / pptx. Double them (`\\n`) for a literal backslash-n (rarely wanted). (`$` is the shell layer above — single-quote it.)
+- 始终引用 element paths：`"/Sheet1/row[1]"`，而不是 `/Sheet1/row[1]`。
+- 任何含 `$` 的 prop value（例如 `numFmt='$#,##0'`）都应使用**单引号**。
+- formula 含跨 sheet `!` reference 时，使用 `batch` 加 `<<'EOF'` heredoc（见“已知问题”）。
+- CLI 会解释 prop value 中的 `\n` 与 `\t`：`\n` 为真实 cell 内换行（与 `--prop wrapText=true` 配合），`\t` 为 tab。xlsx / docx / pptx 的行为一致。若需字面量反斜杠加 n，使用 `\\n`（通常不需要）。`$` 属于前述 shell 层问题，须使用单引号。
 
-**Incremental execution.** Run commands one at a time and read each exit code. `officecli` mutates the file on every call; a 50-command script that fails at command 3 will cascade silently. One command → check output → continue.
+**增量执行。** 每次只运行一条 command 并检查 exit code。`officecli` 每次调用都会修改文件；含 50 条 command 的脚本若在第 3 条失败，后续操作会静默连锁失败。正确节奏是：一条 command → 检查 output → 继续。
 
-## Requirements for Outputs
+## 输出标准
 
-Before reaching for a command, know what a good xlsx looks like. These are the deliverable standards every workbook MUST meet.
+执行 command 前，先理解高质量 xlsx 的定义。以下是每个 workbook 必须达到的交付标准。
 
-### All Excel files
+### 所有 Excel 文件
 
-**Zero formula errors.** Every delivered workbook MUST have ZERO `#REF!`, `#DIV/0!`, `#VALUE!`, `#NAME?`, `#N/A`. No exceptions — guard denominators with `IFERROR` or `IF(x=0,...)`.
+**formula error 必须为零。** 每个交付的 workbook 必须没有 `#REF!`、`#DIV/0!`、`#VALUE!`、`#NAME?`、`#N/A`。没有例外；使用 `IFERROR` 或 `IF(x=0,...)` 保护分母。
 
-**Formulas, not hardcoded values.** If a number can be computed from other cells, it is a formula. Hardcoding `5000` where `=SUM(B2:B9)` belongs breaks the contract that the workbook stays live when inputs change. This is the single most important rule in this skill.
+**应使用 formula，而非 hardcoded value。** 数字若可由其他 cell 计算得出，就应写为 formula。在应使用 `=SUM(B2:B9)` 的位置硬编码 `5000`，会破坏 workbook 随输入变化而保持 live 的约定。这是本 Skill 最重要的一条规则。
 
-**Professional font.** Use one consistent, professional font across the workbook (Arial / Calibri / Times New Roman). Don't mix four fonts because one sheet came from CSV.
+**专业 font。** workbook 中应统一使用一种专业 font（Arial / Calibri / Times New Roman）。不要因为某个 sheet 来自 CSV 就混用四种 font。
 
-**Explicit widths.** There is no auto-fit. Any column the user will read MUST have `width` set — default 8.43 chars clips everything. Sensible starts: labels 20-25, numbers 12-15, dates 12, short codes 8-10.
+**显式 column width。** 不存在 auto-fit。用户会阅读的 column 必须设置 `width`；默认 8.43 个字符会截断内容。合理起点：label 20–25、number 12–15、date 12、short code 8–10。
 
-**Preserve existing templates.** When editing a file that already has a look, match it. Existing conventions override these guidelines.
+**保留现有 template。** 编辑已有视觉样式的文件时应遵循原有约定；它们优先于本指南。
 
-### Visual delivery floor (applies to EVERY workbook)
+### 视觉交付底线（适用于每个 workbook）
 
-Before you declare done, run `officecli view "$FILE" html` and Read the returned HTML path to confirm all of these:
+声明完成前，运行 `officecli view "$FILE" html` 并读取返回的 HTML path，确认以下全部条件：
 
-- **No `###` in any cell.** `###` means a column is too narrow for its widest value. Every column the user reads needs an explicit `width`. `###` in a delivered file is unfinished work, never "a small visual nit".
-- **No truncated titles.** Sheet titles, section headers, long labels must fit. Widen the column or apply `wrapText=true` on the cell.
-- **No placeholder tokens rendered as data.** `$fy$24`, `{var}`, `<TODO>`, `xxxx` must never appear in a cell, chart title, series name, or legend. These are build-time tokens that escaped replacement.
-- **Pie / doughnut slices have distinct fill colors.** If the slices render same-colored, switch to `bar` / `column` or set `colors=...` explicitly.
-- **No empty trailing pages / empty chart anchors.** `anchor=D2:J18` over empty source cells looks like a broken chart.
+- **任何 cell 中不得出现 `###`。** `###` 表示 column 宽度不足以展示最长 value。用户会阅读的每个 column 都需要显式 `width`。交付文件中的 `###` 是未完成工作，不是“小的视觉瑕疵”。
+- **不得截断 title。** sheet title、section header、long label 都必须完整显示；加宽 column 或在 cell 上设置 `wrapText=true`。
+- **不得将 placeholder token 渲染为数据。** `$fy$24`、`{var}`、`<TODO>`、`xxxx` 不得出现在 cell、chart title、series name 或 legend 中；它们是未被替换的 build-time token。
+- **pie / doughnut slice 应使用不同 fill color。** 若 slice 渲染成同色，切换为 `bar` / `column`，或显式设置 `colors=...`。
+- **不得存在空尾页或空 chart anchor。** 例如，源 cell 为空时的 `anchor=D2:J18` 看起来像损坏的 chart。
 
-If any of the above fails, STOP and fix before declaring done.
+如果上述任何一项失败，请在宣布完成之前停止并修复。
 
-**Print layout.** Any sheet the user may print or send as a board pack needs page setup. Default portrait + no fit-to-page splits wide tables and charts mid-way. Apply per sheet:
+**Print layout。** 用户可能打印或作为 board pack 发送的任何 sheet 都需要 page setup。默认 portrait 且不 fit-to-page 会把宽 table 和 chart 拆到多页。应按 sheet 设置：
 
 ```bash
 officecli set "$FILE" "/Summary" --prop orientation=landscape --prop fitToPage=true
 ```
 
-Trigger: sheet holds a chart, or > 8 columns, or the user's ask mentions print / board / investor.
+触发条件：sheet 含 chart、超过 8 个 column，或用户需求提到 print / board / investor。
 
-### Financial models only — skip this section if you are building a template, tracker, CSV import, or operational sheet
+### 仅限 financial model：template、tracker、CSV import 或 operational sheet 可跳过
 
-Scope: budgets, forecasts, 3-statement models, valuation, any `$`-heavy analytical workbook. A customer-support tracker or onboarding template does not need this section.
+适用范围：budget、forecast、three-statement model、valuation，以及任何 `$` 密集的 analytical workbook。customer-support tracker 或 onboarding template 无需遵循本节。
 
-**Color coding — industry standard.** Five core colors used as a language, not decoration. A reviewer should tell what a cell IS by color alone — before reading the formula.
+**Color coding：行业标准。** 五种核心颜色是信息语言，不是装饰。reviewer 应在阅读 formula 前，仅凭颜色就能判断 cell 的类型。
 
-| Color | Role | Example |
+| Color | 角色 | 示例 |
 |---|---|---|
-| Blue text `0000FF` | Hardcoded inputs, scenario variables | `font.color=0000FF` |
-| Black text `000000` | ALL formulas and calculations | default |
-| Green text `008000` | Cross-sheet links inside this workbook | `font.color=008000` |
-| Red text `FF0000` | Links to external files / workbooks | `font.color=FF0000` |
-| Yellow fill `FFFF00` | Key assumptions needing review | `fill=FFFF00` |
+| Blue text `0000FF` | hardcoded input、scenario variable | `font.color=0000FF` |
+| Black text `000000` | 所有 formula 与 calculation | 默认 |
+| Green text `008000` | 当前 workbook 内的 cross-sheet link | `font.color=008000` |
+| Red text `FF0000` | 指向 external file / workbook 的 link | `font.color=FF0000` |
+| Yellow fill `FFFF00` | 需要 review 的 key assumption | `fill=FFFF00` |
 
-A reviewer should tell what a cell IS just by its color — before reading the formula. This is a communication contract, not a cosmetic preference.
+reviewer 应在读取 formula 前，仅通过 color 判断 cell 的类型。这是沟通约定，不是外观偏好。
 
-**Number formatting — standards, not preferences.**
+**Number format：标准，而非偏好。**
 
-- **Years** are text, not numbers. Format `2026` not `2,026` — use `numFmt="@"` or set `type=string`.
-- **Currency** carries its unit in the header (`Revenue ($mm)`), not in every cell.
-- **Zeros display as `-`**, not `0`. Use `$#,##0;($#,##0);"-"`.
-- **Percentages** default to one decimal: `0.0%`.
-- **Negatives use parentheses**: `(1,234)` not `-1,234`.
-- **Valuation multiples** use `0.0x` format (EV/EBITDA, P/E, etc.).
+- **年份**应为 text 而非 number：显示 `2026`，不要显示 `2,026`；使用 `numFmt="@"` 或设置 `type=string`。
+- **货币**单位写在 header 中（`Revenue ($mm)`），不要在每个 cell 中重复。
+- **零显示为 `-`**，而不是 `0`：使用 `$#,##0;($#,##0);"-"`。
+- **百分比**默认保留一位小数：`0.0%`。
+- **负数用括号**：使用 `(1,234)`，不要使用 `-1,234`。
+- **Valuation multiple** 使用 `0.0x` format（EV/EBITDA、P/E 等）。
 
-**Assumptions live in cells, not inside formulas.** `=B5*(1+$B$6)` is correct; `=B5*1.05` is a bug. Document each blue hardcoded input with an adjacent source note in the next cell or a cell comment:
+**Assumption 应存放在 cell 中，不要硬编码在 formula 内。** `=B5*(1+$B$6)` 正确；`=B5*1.05` 是 bug。每个 blue hardcoded input 均应在相邻 cell 或 cell comment 中记录 source note：
 
 ```
 Source: Company 10-K, FY2024, Page 45, Revenue Note
@@ -107,22 +98,22 @@ Source: Bloomberg, 2026-05-02, AAPL US Equity
 Source: Management guidance, Q2 2026 earnings call
 ```
 
-Any hardcoded number without a source is an undocumented assumption — a reviewer cannot audit it.
+任何没有来源的硬编码数字都是一个未记录的假设——审核者无法审核它。
 
-## Common Workflow
+## 通用工作流程
 
-Six steps. Every non-trivial build follows this shape.
+六个步骤，适用于每个非简单构建。
 
-1. **Open/save lifecycle.** Use `officecli open <file>` at the start and `officecli save <file>` at the end to flush to disk — `save` only writes and leaves the resident warm for follow-up edits; reach for `officecli close <file>` only to release the resident on a one-shot handoff. Both are always safe (never error or lose work). For many cells, use `batch`: **≤ 50 ops/block recommended; tested up to 80+ ops per block on pure value-set payloads with zero failures. Cross-sheet formula batches are the exception — run those non-resident, single heredoc (see Known Issues)**. **Flush only at the non-officecli boundary:** officecli's own reads always see your edits; run `save`/`close` only before a non-officecli program reads the file (openpyxl/pandas, Excel, a renderer, delivery).
-2. **Create or load.** `officecli create "$FILE"` (new) or `officecli view "$FILE" outline` (existing — get the lay of the land first).
-3. **Build incrementally.** One command, read the output, continue. After any structural op (new sheet, chart, named range, pivot), run `get` on it to confirm shape before stacking more on top.
-4. **Format.** Column widths, number formats, freeze panes, tab colors, header fills. Formatting is not optional polish — per "Requirements for Outputs" it is part of the deliverable.
-5. **Save, then reckon with the cache.** `officecli save <file>` writes to disk. Newly-added formulas ship without cached values; when a human opens the file in a spreadsheet app, the app recalculates and populates them. **But your downstream `INDEX/MATCH`, `SUMPRODUCT`, or any formula that references an upstream formula will cache whatever the upstream cached at write-time — often `0` or a stale value — and that cached lie survives into non-recalculating readers.** After any multi-formula build involving array formulas (`SUMPRODUCT`, `SUMIFS` with dynamic criteria) or cross-sheet chains, **re-touch every downstream cell** (run `set` again with the same formula) so the engine recomputes its cache from the freshly-cached upstream. ⚠️ Re-touch on cross-sheet chains via resident is unreliable (see Batch / resident caveats) — prefer non-resident `set` for the re-touch pass. Then `officecli get` a few downstream cells and eyeball that their `cachedValue=` is plausible. `validate` is safe with a resident open and itself flushes pending edits to disk (same as docx / pptx).
-6. **QA — assume there are problems.** See the QA section. You are not done when your last command exited 0; you are done after one fix-and-verify cycle finds zero new issues.
+1. **打开/保存生命周期。** 开始时使用 `officecli open <file>`，结束时使用 `officecli save <file>` flush 到磁盘；`save` 只写入并保留 resident 以供后续编辑。仅在需要一次性交接时使用 `officecli close <file>` 释放 resident。两者始终安全，不会报错或丢失工作。大量 cell 操作使用 `batch`：建议 **每块不超过 50 个 operation；纯 value-set payload 每块经测试可达 80+ 个 operation 且无失败。cross-sheet formula batch 是例外，应在 non-resident 的单一 heredoc 中运行（见“已知问题”）**。**只在非 officecli 边界 flush：**officecli 自身读取始终能看到编辑；仅在非 OfficeCLI 程序（openpyxl/pandas、Excel、renderer、交付流程）读取文件前运行 `save`/`close`。
+2. **创建或了解现状。** 新建使用 `officecli create "$FILE"`；已有文件先运行 `officecli view "$FILE" outline` 了解结构。
+3. **增量构建。** 每次运行一条 command，读取 output 后再继续。每次结构操作（新增 sheet、chart、named range、pivot）后，先在目标上运行 `get` 确认结构，再追加更多内容。
+4. **格式化。** 设置 column width、number format、freeze pane、tab color、header fill。根据“输出标准”，formatting 是交付内容，不是可选润色。
+5. **保存，并处理 cache。** `officecli save <file>` 会写入磁盘。新建 formula 初始没有 cached value；人工在 spreadsheet app 中打开文件时，应用会重新计算并填充它。**但下游 `INDEX/MATCH`、`SUMPRODUCT` 或任何引用上游 formula 的 formula，会缓存写入时上游 formula 的 cached value（常为 `0` 或过期值）；这个错误 cache 会保留在不重新计算的 reader 中。** 每次涉及 array formula（如带动态条件的 `SUMPRODUCT`、`SUMIFS`）或 cross-sheet chain 的多 formula 构建后，都应**重新触碰每个下游 cell**：用相同 formula 再运行一次 `set`，使 engine 基于新 cache 的上游重算其 cache。⚠️ 通过 resident 对 cross-sheet chain 重新触碰并不可靠（见 batch / resident 注意事项），更适合使用 non-resident `set` 进行该步骤。之后对几个下游 cell 执行 `officecli get`，确认 `cachedValue=` 合理。打开 resident 时使用 `validate` 是安全的，且它会自行将 pending edit flush 到磁盘（与 docx / pptx 相同）。
+6. **QA：假定存在问题。** 见 QA。最后一条 command 的 exit code 为 0 并不代表完成；必须完成一次修复与验证循环，并且没有发现新问题。
 
-## Quick Start
+## 快速入门
 
-Minimal viable xlsx: 3 months of revenue + a total formula + column widths + a currency format. Adapt, don't copy-paste — your file, your data.
+最小可行 xlsx：3 个月 revenue、一个 total formula、column width 和 currency format。请按实际文件和数据调整，不要直接复制粘贴。
 
 ```bash
 officecli create "$FILE"
@@ -143,11 +134,11 @@ officecli close "$FILE"
 officecli validate "$FILE"
 ```
 
-Verified: `validate` returns `no errors found`, `B5` resolves to `135000`. This is the shape of every build: open → set cells/formulas → format → close → validate.
+已验证：`validate` 返回 `no errors found`，`B5` 会解析为 `135000`。基本流程是：打开 → set cell/formula → format → close → validate。
 
-## CSV / bulk import
+## CSV / 批量导入
 
-**Native `import` command (preferred for CSV/TSV).** Fastest path; loads a CSV into a sheet in one call. `--header` sets AutoFilter + freeze pane on row 1. Widths and `numFmt` still need a follow-up pass (per D-12 in Dashboard skill).
+**原生 `import` command（CSV/TSV 首选）。** 这是最快的 path，一次调用即可将 CSV 加载到 sheet。`--header` 会在 row 1 设置 auto-filter 与 freeze pane。column width 与 `numFmt` 仍需后续处理（遵循 dashboard Skill 的 D-12）。
 
 ```bash
 officecli import "$FILE" /Sheet1 --file data.csv --header
@@ -155,7 +146,7 @@ officecli import "$FILE" /Sheet1 --file data.tsv --format tsv --header
 officecli import "$FILE" /Sheet1 --stdin --start-cell B2 < data.csv
 ```
 
-**Python + batch fallback** — use when you need custom type coercion, formula injection, or the CSV lives inside another data pipeline. Recipe for 600-6000+ cells:
+**Python + batch fallback**：需要自定义 type coercion、formula injection，或 CSV 位于其他 data pipeline 中时使用。适用于 600–6000+ cell：
 
 ```python
 # gen_batch.py — produces batch chunks of 80 value-set ops each
@@ -178,32 +169,34 @@ python gen_batch.py | while IFS= read -r chunk; do
 done
 ```
 
-Outcome: 648-row retail CSV (6490 cells) loads in ~30s, zero failures. Tune: start at 80 ops/chunk, drop to 40 if any chunk fails. Numeric type inference and formulas come later via targeted `set` — batch in this recipe is pure value injection.
+结果：648 行 retail CSV（6490 个 cell）约 30 秒加载完成，零失败。建议从每块 80 个 operation 开始，任一块失败则降至 40。number type inference 与 formula 可在后续通过目标 `set` 处理；本 recipe 的 batch 仅注入 value。
 
-## Reading & Analysis
+## 阅读与分析
 
-Start wide, then narrow. `outline` first tells you what sheets exist and where the data is; jump into `view` / `get` / `query` only once you know where to look.
+先宽后窄。`outline` 先展示有哪些 sheet 与数据位置；明确目标后，再使用 `view` / `get` / `query` 深入查看。
 
-**Open the rendered workbook to eyeball your own work.**
-- `officecli view $FILE html` — Read the returned HTML to audit the rendered output. Each sheet is addressable, charts render inline. Catches `###`, placeholder leakage, pivot layout, row-height clipping.
-- `officecli watch $FILE` keeps a live preview running for the human user — they open it at their own discretion. Use when the user wants to watch along; agent self-check uses `view html` above.
-Use `view html` as your **first visual check after a batch of edits** — fix at source. For final visual verification, the user opens the `.xlsx` in their Excel / WPS / Numbers viewer.
+**通过渲染后的 workbook 检查自己的结果。**
 
-**Orient.** Sheets, dimensions, formula counts.
+- `officecli view $FILE html`：读取返回 HTML，审核渲染结果。每个 sheet 都可寻址，chart 会 inline render；可发现 `###`、placeholder 泄漏、pivot layout 与 row-height clip。
+- `officecli watch $FILE`：保留 live preview，供人工用户按需打开。用户需要 watch 时使用；agent 自检使用上方的 `view html`。
+
+每次 batch edit 后，应先用 `view html` 做首次视觉检查，并立即在源头修复。最终视觉验证应由用户在 Excel / WPS / Numbers 中打开 `.xlsx` 完成。
+
+**了解概览。** 查看 sheet、尺寸与 formula 数量。
 
 ```bash
 officecli view "$FILE" outline
 ```
 
-**Extract.** Plain text dump for content QA or LLM context; scope with `--start` / `--end` / `--cols` for big files.
+**摘录。** 用于 content QA 或 LLM context 的 plain-text dump；大文件可用 `--start` / `--end` / `--cols` 限定范围。
 
 ```bash
 officecli view "$FILE" text --start 1 --end 50 --cols A,B,C
 ```
 
-Other `view` modes worth knowing: `annotated` (cell values + types/formulas + warnings), `stats` (numeric summaries), `issues` (broken formulas, empty sheets, missing refs).
+其他值得了解的 `view` 模式：`annotated`（cell 值 + 类型/formulas + 警告）、`stats`（数字摘要）、`issues`（损坏的 formulas、空 sheets、缺少引用）。
 
-**Round-trip dump.** `officecli dump "$FILE" [path]` serializes the workbook — or one worksheet (`/Sheet1`, `/sheet[N]`) — into a replayable batch JSON; `officecli batch new.xlsx --input dump.json` replays it. Use it to learn from an existing workbook's structure or clone/adapt a template instead of reading raw OOXML. Coverage per `dump --help`; subtree dumps don't carry workbook-level resources (settings, named ranges) — the replay target must already define them.
+**Round-trip dump。** `officecli dump "$FILE" [path]` 会将 workbook 或单个 sheet（`/Sheet1`、`/sheet[N]`）序列化为可 replay 的 batch JSON；`officecli batch new.xlsx --input dump.json` 可重放它。应使用它理解既有 workbook structure 或 clone/adapt template，而不是读取 raw OOXML。完整范围见 `dump --help`；subtree dump 不携带 workbook-level resource（setting、named range），replay target 必须预先定义它们。
 
 ```bash
 officecli dump "$FILE" -o blueprint.json            # whole workbook
@@ -211,7 +204,7 @@ officecli dump "$FILE" /Sheet1 -o sheet.json        # one worksheet
 officecli batch new.xlsx --input blueprint.json
 ```
 
-**Inspect one element.** Use XPath-style paths. Always quote — shells glob `[N]`.
+**检查单个 element。** 使用 XPath-style path，并始终加引号，避免 shell glob `[N]`。
 
 ```bash
 officecli get "$FILE" "/Sheet1/A1"            # one cell
@@ -221,9 +214,9 @@ officecli get "$FILE" "/Sheet1/table[1]"      # ListObject
 officecli get "$FILE" "/namedrange[1]"        # workbook-level named range
 ```
 
-Add `--depth N` to expand children; add `--json` for machine output. Full element list: `officecli help xlsx`.
+添加 `--depth N` 可展开 child；添加 `--json` 可获得 machine-readable output。完整 element list 见 `officecli help xlsx`。
 
-**Query across the workbook.** CSS-like selectors. Use for systematic checks (formula coverage, error cells, empty headers) rather than hand-walking.
+**跨 workbook 查询。** 使用 CSS-like selector 做系统检查（formula coverage、error cell、empty title），而非手动遍历。
 
 ```bash
 officecli query "$FILE" 'cell:has(formula)'       # every formula cell
@@ -232,30 +225,30 @@ officecli query "$FILE" 'cell[type=Number]'       # typed filter
 officecli query "$FILE" 'Sheet1!B[value!=0]'      # sheet-scoped
 ```
 
-Operators: `=`, `!=`, `~=` (contains), `>=`, `<=`, `[attr]` (exists).
+运算符：`=`、`!=`、`~=`（包含）、`>=`、`<=`、`[attr]`（存在）。
 
-**Merge cells shortcut.** `officecli query $FILE merge` or `mergedrange` — both are aliases for `mergeCell`. Returns every merged range in the workbook without hand-walking `<mergeCell>` entries.
+**Merged cell shortcut。** `officecli query $FILE merge` 或 `mergedrange` 都是 `mergeCell` 的 alias，可返回 workbook 中每个 merged range，无需手动遍历 `<mergeCell>` entry。
 
-**When the data is big enough that a row-walk is useless**, reach for Excel's own analytical elements:
+**当数据量过大、逐行检查不再有效时，**使用 Excel 自己的 analysis element：
 
-- Build a **pivot table** with `officecli add` (`--type pivottable`) to group/aggregate without writing 20 SUMIFs. Attach a **slicer** (`--type slicer`) to give the reader a filter UI.
-- Drop a **sparkline** (`--type sparkline`) in a row to show per-row trends — cheaper than one line chart per row and they print inline. `type` is a strict enum: **`line | column | stacked`** (plus aliases `winloss` / `win-loss` → `stacked`). Invalid `type=` values hard-fail — no silent fallback to `line` anymore.
-- Run `officecli help xlsx pivottable`, `officecli help xlsx slicer`, `officecli help xlsx sparkline` for the exact prop names.
+- 使用 `officecli add`（`--type pivottable`）构建 **pivot table** 做分组/聚合，无需编写 20 个 SUMIF；可附加 **slicer**（`--type slicer`）为读者提供 filter UI。
+- 在 row 中使用 **sparkline**（`--type sparkline`）展示每行 trend，比每 row 一个 chart 更轻量，并可 inline print。`type` 为严格 enum：**`line | column | stacked`**（`winloss` / `win-loss` 是 `stacked` 的 alias）。无效 `type=` 会 hard fail，不再静默 fallback 到 `line`。
+- 确切 prop name 见 `officecli help xlsx pivottable`、`officecli help xlsx slicer`、`officecli help xlsx sparkline`。
 
-## Creating & Editing
+## 创建和编辑
 
-Ninety percent of a build is cells, formulas, formatting, and one or two charts. The verbs: `add` (new element), `set` (change a prop), `remove`, `move`, `swap`, `batch`.
+一次构建的 90% 是 cell、formula、formatting 和一两个 chart。可用 verb：`add`（新增 element）、`set`（修改 prop）、`remove`、`move`、`swap`、`batch`。
 
-### Cells and formulas
+### Cell 与 formula
 
-Set a value and its format in one call. Never write `=` at the start of a formula — the CLI strips it.
+在一次调用中设置 value 及其 format。formula 开头不要写 `=`，CLI 会将其剥离。
 
 ```bash
 officecli set "$FILE" /Sheet1/B5 --prop formula="SUM(B2:B4)" --prop numFmt='$#,##0'
 officecli set "$FILE" /Sheet1/C5 --prop formula="B5/A5" --prop numFmt="0.0%"
 ```
 
-Structural properties (width, height, freeze, tabColor) live on row / col / sheet nodes:
+structure property（width、height、freeze、tabColor）位于 row / col / sheet node：
 
 ```bash
 officecli set "$FILE" "/Sheet1/col[A]" --prop width=20
@@ -263,9 +256,9 @@ officecli set "$FILE" "/Sheet1/row[1]" --prop height=22
 officecli set "$FILE" "/Sheet1" --prop freeze=A2 --prop tabColor=1F4E79
 ```
 
-### Named ranges
+### Named range
 
-Prefer named ranges over `$B$6` in formulas. They self-document (`GrowthRate` beats `$B$6`) and they let you move the assumption cell without breaking formulas. Because `ref` values contain both `!` and `$`, add them through a batch heredoc:
+formula 中优先使用 named range 而非 `$B$6`。它具备自说明性（`GrowthRate` 胜过 `$B$6`），也可以移动 assumption cell 而不破坏 formula。因为 `ref` value 同时包含 `!` 与 `$`，应通过 batch heredoc `add`：
 
 ```bash
 cat <<'EOF' | officecli batch "$FILE"
@@ -275,49 +268,49 @@ cat <<'EOF' | officecli batch "$FILE"
 EOF
 ```
 
-See `officecli help xlsx namedrange` for the full schema.
+完整 schema 见 `officecli help xlsx namedrange`。
 
-**Batch JSON does NOT accept shell aliases.** Inside batch `props`, always use the full dotted name — `"font.color": "FF0000"`, `"font.size": 14`, never `"color": "FF0000"` (ambiguous: text vs fill). On a bare cell, even the shell form is rejected: `--prop color=1F4E79` errors with `ambiguous in cell context — use 'font.color' (text) or 'fill' (bg)`. Rule: in any batch JSON or cell prop, write `font.color` / `fill` explicitly. `parent` should be `"/"` for workbook-level elements and `"/SheetName"` for sheet-scoped; empty string is not equivalent.
+**batch JSON 不接受 shell alias。** 在 batch `props` 中始终使用完整 dotted name：`"font.color": "FF0000"`、`"font.size": 14`；不要使用 `"color": "FF0000"`，它无法区分 text 与 fill。普通 cell 的 shell 形式也会被拒绝：`--prop color=1F4E79` 会报 `ambiguous in cell context — use 'font.color' (text) or 'fill' (bg)`。规则是：任何 batch JSON 或 cell prop 都明确写为 `font.color` / `fill`。workbook-level 的 `parent` 必须是 `"/"`，sheet-scoped 的则为 `"/SheetName"`；空字符串不等效。
 
-### Charts
+### 图表
 
-Chart types live under `officecli help xlsx chart` — the enum is long (20+). Pick the right one for the message: column for category comparison, line for time series, pie only when slices are self-evidently proportional, scatter for correlation. Avoid exotic types unless they answer a specific question.
+chart type 见 `officecli help xlsx chart`，enum 很长（20+）。应根据所传达的信息选择：`column` 用于 category comparison、`line` 用于 time series、`pie` 仅用于 slice 比例一目了然的情况、`scatter` 用于 correlation。不要使用花哨 type，除非它确实回答特定问题。
 
-**Three ways to feed chart data. Pick one per chart — mixing them at add-time is a common trap.**
+**提供 chart data 有三种方式。每个 chart 只选择一种；在 `add` 时混用是常见陷阱。**
 
-| Form | Shape | When to use |
+| 方式 | 形式 | 使用场景 |
 |---|---|---|
-| (a) inline `data` | `--prop data="Sales:100,200,300" --prop categories="Jan,Feb,Mar"` | Tiny demo charts, numbers you will not edit. Source of truth lives in the chart XML, not a cell. |
-| (b) 2D `dataRange` | `--prop dataRange="Sheet1!A1:B4"` (first col = categories, first row = header / series name) | Normal case. Must be **2-D** — single column fails with "Chart requires data". |
-| (c) dotted per-series | `--prop series1.name=Sales --prop series1.values="Sheet1!B2:B4" --prop series1.categories="Sheet1!A2:A4"` | Multi-series charts where each series points at non-contiguous ranges, or you want explicit series naming. `series1.values` alone (no `categories`) emits a chart with `1,2,3` as the x-axis. |
+| (a) inline `data` | `--prop data="Sales:100,200,300" --prop categories="Jan,Feb,Mar"` | 小型演示 chart；数字不再可编辑，source of truth 位于 chart XML 而不是 cell。 |
+| (b) 2-D `dataRange` | `--prop dataRange="Sheet1!A1:B4"`（第一 column 为 category，第一 row 为 title / series name） | 常规场景。必须是 **2-D**；单一 column 会报 “Chart requires data”。 |
+| (c) per-series point | `--prop series1.name=Sales --prop series1.values="Sheet1!B2:B4" --prop series1.categories="Sheet1!A2:A4"` | multi-series chart、每个 series 指向不连续 range，或需显式 series name。单独设置 `series1.values` 而不设置 `categories` 时，chart 的 x-axis 会显示 `1,2,3`。 |
 
-**The single-column trap.** `dataRange="Sheet1!B2:B13"` looks like "value column" but the engine rejects it with `Chart requires data`. Either widen the range to include the category column (`A2:B13`), or switch to form (c) with explicit `series1.categories`.
+**Single-column 陷阱。** `dataRange="Sheet1!B2:B13"` 看起来是“value column”，但 engine 会以 `Chart requires data` 拒绝它。应扩大 range 以包含 category column（`A2:B13`），或改用显式设置 `series1.categories` 的方式 (c)。
 
-**Move / resize a chart after create:** `set chart[N] --prop anchor="F5:N25"` (also `--prop x= --prop y= --prop width= --prop height=`). **Series are still immutable** — to add/change a series, `officecli remove` the chart and `officecli add` with the full series list. Note `remove chart[1]` shifts `chart[2] → chart[1]` and re-add **appends at the end** — to preserve chart order, remove all and rebuild in order.
+**创建后移动/调整 chart：**使用 `set chart[N] --prop anchor="F5:N25"`，也支持 `--prop x= --prop y= --prop width= --prop height=`。**series 仍不可变**；若要新增或修改 series，需要 `officecli remove` chart，再用完整 series list `officecli add`。注意 `remove chart[1]` 会导致 `chart[2] → chart[1]`，而重新添加会**附加在末尾**；要保留 chart order，应全部 remove 后按顺序重建。
 
-**Anchor sizing.** No auto-fit. A column chart with 5-6 categories + 2 series needs roughly `A5:L22` (12 cols × 18 rows) to show all labels uncut. Narrower and X-axis labels clip; wider and the chart can split across pages on print/export. If in doubt, start narrow, preview via `view html` (Read the returned HTML path), widen in increments. Page layout (below) is the other half of the fix.
+**Anchor 尺寸。** 无 auto-fit。含 5–6 个 category 与 2 个 series 的 `column` chart，大约需要 `A5:L22`（12 column × 18 row）才能完整显示 label。过窄会截断 x-axis label，过宽则可能在 print/export 时跨页拆分。拿不准时先从较小尺寸开始，通过 `view html` 读取 HTML preview 后逐步放大；下方的 layout 设置是另一半解决方案。
 
-**Chart `dataRange` — always prefix with the sheet.** Even when the chart lives on the same sheet, write `dataRange="Summary!A17:C22"`, not `A17:C22`. The sheet-less form works inconsistently; the prefixed form is 100% reliable.
+**chart `dataRange` 必须带 sheet prefix。** 即使 chart 与 data 位于同一 sheet，也写 `dataRange="Summary!A17:C22"`，不要写 `A17:C22`。无 prefix 的写法行为不稳定；带 prefix 的形式可靠。
 
-officecli adds extended chart types the classic Excel object model lacks: `boxWhisker`, `waterfall`, `funnel`, `histogram`, `treemap`, `sunburst`, `pareto`. Use them when the data calls for them.
+officecli 提供传统 Excel object model 缺少的扩展 chart type：`boxWhisker`、`waterfall`、`funnel`、`histogram`、`treemap`、`sunburst`、`pareto`。仅在 data 确有需要时使用。
 
-**NEVER put unreplaced template tokens in chart title / series name / legend / axis title.** `$fy$24`, `{var}`, `<TODO>`, `$VAR`, `{{placeholder}}` render **literally** in the legend — validate passes, but a CFO sees `$fy$24` where "FY2024" should be. Always bind to final text or a cell reference (`title="FY2024 Revenue"` or `series1.name="Sheet1!A1"`).
+**不得在 chart title / series name / legend / axis title 中保留未替换的 template token。** `$fy$24`、`{var}`、`<TODO>`、`$VAR`、`{{placeholder}}` 会在 legend 中**按字面量**渲染；即使 `validate` 通过，CFO 仍会看到本应显示 “FY2024” 的 `$fy$24`。必须绑定到最终 text 或 cell reference，例如 `title="FY2024 Revenue"` 或 `series1.name="Sheet1!A1"`。
 
-### Conditional formatting
+### 条件格式
 
-Three common flavors, each with its own prop shape (consult `officecli help xlsx cf`):
+三种常见类型，各自有不同的 prop 结构（见 `officecli help xlsx cf`）：
 
-- **Color scales**: cells shaded on a gradient by value — `type=colorscale` with `minColor` / `midColor` / `maxColor`.
-- **Data bars**: in-cell bars showing magnitude — `type=databar`. Set explicit `min` / `max` for consistent scaling across a column; defaults are valid if you omit them.
-- **Formula rules** (the `formulacf` element): highlight row when a condition is true — `type=formula` with `formula="$C2>1000"` and a fill/font.
+- **Color scale**：cell 随 value 渐变着色，使用 `type=colorscale` 与 `minColor` / `midColor` / `maxColor`。
+- **Data bar**：cell 内的 bar 展示 value 大小，使用 `type=databar`。显式设置 `min` / `max` 可使 column 内 scale 一致；省略时 default value 也有效。
+- **Formula rule**（`formulacf` element）：condition 为 true 时突出显示 row，使用 `type=formula`、`formula="$C2>1000"` 和 fill/font。
 
-Rule: apply CF sparingly. A workbook where every cell is colored tells the reader nothing.
+规则：谨慎使用 CF。每个 cell 都有颜色的 workbook 不会传达有效信息。
 
-### Data validation
+### 数据验证
 
-Input cells in trackers and templates MUST carry data validation. It's cheap and it stops entire classes of downstream bugs. **Three list-source patterns** — pick based on where the allowed values live.
+tracker 与 template 中的 input cell 必须使用 data validation。成本很低，却能阻断大量 downstream error。**列表 source 有三种模式**，按 allowed value 的位置选择。
 
-**(a) Inline list** — allowed values are short and fixed in the rule itself.
+**(a) Inline list：**allowed value 很少且固定在 rule 内。
 
 ```bash
 officecli add "$FILE" /Sheet1 --type validation \
@@ -326,7 +319,7 @@ officecli add "$FILE" /Sheet1 --type validation \
   --prop showError=true --prop errorTitle="Invalid" --prop error="Select from list"
 ```
 
-**(b) Named range (preferred for cross-sheet lookups)** — allowed values live in another sheet and may grow. Define the named range first, then reference it. Use a batch heredoc because `ref` contains `!` and `$`:
+**(b) Named range（cross-sheet lookup 首选）：**allowed value 位于其他 sheet 且可能增长。先定义 named range，再引用它。`ref` 包含 `!` 和 `$`，请使用 batch heredoc：
 
 ```bash
 cat <<'EOF' | officecli batch "$FILE"
@@ -337,7 +330,7 @@ cat <<'EOF' | officecli batch "$FILE"
 EOF
 ```
 
-**(c) Direct cross-sheet range** — no named range, raw `Lookups!$A$2:$A$4` inside `formula1`. Also needs a batch heredoc to keep `!` and `$` intact:
+**(c) Direct cross-sheet range：**在 `formula1` 中直接写 raw `Lookups!$A$2:$A$4`，不使用 named range。同样需要 batch heredoc 以保留 `!` 与 `$`：
 
 ```bash
 cat <<'EOF' | officecli batch "$FILE"
@@ -347,19 +340,19 @@ cat <<'EOF' | officecli batch "$FILE"
 EOF
 ```
 
-If you write the cross-sheet variant as `--prop formula1=...` on the shell, the `!` gets shell-mangled into `\!` and the dropdown will silently fall back to no list. Verify with `officecli get "$FILE" /Sheet1/validation[N]` — `formula1=` must show a plain `!`, no backslash.
+若在 shell 中将 cross-sheet variant 写成 `--prop formula1=...`，`!` 会被 shell 改写为 `\!`，下拉 list 会静默退化为空。使用 `officecli get "$FILE" /Sheet1/validation[N]` 验证：`formula1=` 必须显示未带反斜杠的 `!`。
 
-Other common `type` values: `decimal`, `whole`, `date`, `textLength`, `custom`. See `officecli help xlsx validation` for operators and the full prop list.
+其他常见 `type`：`decimal`、`whole`、`date`、`textLength`、`custom`。operator 与完整 prop list 见 `officecli help xlsx validation`。
 
-### Other elements (one-liners)
+### 其他 element（简表）
 
-- **Tables** (ListObjects) — `add --type table` with a range; gives auto-filter + structured refs. `officecli help xlsx table`.
-- **Comments** — `add --type comment`; use for documenting hardcoded assumptions. `officecli help xlsx comment`.
-- **Sheet reordering** — `officecli move`, not `swap`. `swap` only works on row/cell paths.
+- **Table**（ListObject）：使用带 range 的 `add --type table`，可获得 auto-filter 与 structured reference。见 `officecli help xlsx table`。
+- **Comment**：`add --type comment`，用于记录 hardcoded assumption。见 `officecli help xlsx comment`。
+- **Sheet reorder**：使用 `officecli move`，不要使用 `swap`；`swap` 仅适用于 row/cell path。
 
-## Chart Axis-by-Role
+## 按 role 操作 chart axis
 
-Editing a chart axis in place is cheaper than rebuilding the chart. Address axes by **role** (`value` = Y, `category` = X), not by index — the XML order isn't stable.
+直接编辑 chart axis 比重建 chart 更轻量。按**role**（`value` = Y，`category` = X）而非 index 访问 axis；XML order 不稳定。
 
 ```bash
 officecli get "$FILE" "/Sheet1/chart[1]/axis[@role=value]"
@@ -367,19 +360,19 @@ officecli set "$FILE" "/Sheet1/chart[1]/axis[@role=value]" --prop min=0 --prop m
 officecli set "$FILE" "/Sheet1/chart[1]/axis[@role=category]" --prop title="Month"
 ```
 
-Safe props: `title`, `min`, `max`, `majorGridlines`, `visible`, `labelRotation`.
+安全props：`title`、`min`、`max`、`majorGridlines`、`visible`、`labelRotation`。
 
-## QA (Required)
+## QA（必须执行）
 
-**Assume there are problems. Your job is to find them.**
+**假定存在问题；你的任务是找到它们。**
 
-Your first workbook is almost never correct. Treat QA as a bug hunt, not a confirmation step. If you found zero issues on first inspection, you were not looking hard enough. The formulas look fine **until** you check two of them against source cells.
+第一次生成的 workbook 几乎不会完全正确。将 QA 当作 bug hunt，而不是确认步骤；首次检查发现零问题通常表示检查不够仔细。formula 看起来正常，**直到**你用 source cell 抽查其中两个。
 
-### Minimum cycle before "done"
+### 声明“完成”前的最小循环
 
-1. `officecli view "$FILE" issues` — empty sheets, broken formulas, missing refs.
-2. `officecli view "$FILE" annotated` (sample ranges) — values + types + warnings.
-3. For every Excel error type, query it:
+1. `officecli view "$FILE" issues`：检查 empty sheet、broken formula、missing reference。
+2. `officecli view "$FILE" annotated`（sample range）：检查 value + type + warning。
+3. 对每个 Excel error type 执行 query：
    ```bash
    officecli query "$FILE" 'cell:contains("#REF!")'
    officecli query "$FILE" 'cell:contains("#DIV/0!")'
@@ -387,32 +380,32 @@ Your first workbook is almost never correct. Treat QA as a bug hunt, not a confi
    officecli query "$FILE" 'cell:contains("#NAME?")'
    officecli query "$FILE" 'cell:contains("#N/A")'
    ```
-4. `officecli validate "$FILE"` — safe with a resident open; `validate` flushes pending edits to disk itself.
-5. **Visual pass — walk every sheet via the HTML preview.** Run `officecli view "$FILE" html` and Read the returned HTML path. Each sheet renders with charts inline. Scan for `###`, truncated titles, placeholder tokens (`$fy$24`, `{var}`, `<TODO>`), sliced charts, white-slice pie charts, empty chart anchors — **STOP and fix before declaring done**. "validate pass" is not delivery; "the preview looks like a real workbook" is delivery. For human preview, run `officecli watch "$FILE"` (user opens the live preview at their own discretion) or have them open the `.xlsx` directly in Excel / WPS / Numbers.
-6. **Print layout fix (wide tables / multi-chart sheets).** When a sheet holds a chart or a wide table and the user will print it, set per-sheet page layout so it fits on one page:
+4. `officecli validate "$FILE"`：打开 resident 后的安全检查；`validate` 会自行将待写入的编辑 flush 到磁盘。
+5. **视觉检查：通过 HTML preview 检查每个 sheet。** 运行 `officecli view "$FILE" html` 并读取返回的 HTML path。每个 sheet 会将 chart inline render。检查 `###`、截断的 title、placeholder token（`$fy$24`、`{var}`、`<TODO>`）、裁切 chart、纯白 pie slice 与空 chart anchor；发现任一问题都应在声明完成前停止并修复。`validate` 通过不等于可以交付；交付目标是 preview 看起来像真实 workbook。人工预览可运行 `officecli watch "$FILE"`（用户按需打开 live preview），或直接在 Excel / WPS / Numbers 中打开 `.xlsx`。
+6. **修复 print layout（宽 table / 多 chart sheet）。** sheet 含 chart 或宽 table 且用户将打印时，应设置每页 layout 使其 fit on one page：
    ```bash
    officecli set "$FILE" "/Summary" --prop orientation=landscape --prop fitToPage=true
    ```
-   Outcome: each sheet's print layout is one page with no mid-chart splits. Apply to every sheet that holds a chart or a > 8-column table.
-7. If anything failed, fix, then **rerun the full cycle**. One fix commonly creates another problem.
+结果是：每个 sheet 的 print layout 保持在一页内，不会在 chart 中间分割。适用于含 chart 或超过 8 column table 的每个 sheet。
+7. 发现任一问题后先修复，再**重新运行完整循环**；一次修复常会引入另一个问题。
 
-`officecli view issues` + `view html` are the structural QA pair: `issues` catches broken formulas and empty sheets; `view html` (Read the returned HTML path) catches `###`, truncation, and token leakage. Chart fill colors / theme tints can vary across viewers — spot-check in the user's target viewer when color fidelity matters.
+`officecli view issues` + `view html` 构成结构 QA 组合：`issues` 捕获 broken formula 与 empty sheet，`view html`（读取返回 HTML path）捕获 `###`、截断与 token 泄漏。chart fill color / theme tint 可能因 viewer 而异；color fidelity 很重要时，应在用户的 target viewer 中 spot-check。
 
-### Formula verification checklist
+### Formula 验证清单
 
-- [ ] Pick 2-3 formulas at random. Run `officecli get` on each. Confirm the formula string is what you intended **and** `cachedValue=` is what you expect — arithmetic in your head.
-- [ ] **Cached value sanity on every summary cell.** Any cell that aggregates (COUNTA / COUNTIF / SUMPRODUCT / INDEX&MATCH) must have a plausible `cachedValue`. If a progress tracker shows `199 / 199 / 100%` on a blank template, the cache is lying — re-touch the formula via `set` (forces recompute) or manually set a correct cached value. Do NOT ship "validate passes but the numbers are fiction".
-- [ ] **Spot-check one cell per numeric column.** `%` columns showing integer `0.0%` throughout means the denominator is wrong or the numerator is cached stale — investigate one cell, fix the pattern.
-- [ ] Ranges include every row: off-by-one on `SUM(B2:B12)` when data goes to `B13` is the most common bug.
-- [ ] Cross-sheet formulas (`Sheet1!A1`) contain no `\!`. If `officecli get` shows `Sheet1\!A1`, the `!` was shell-corrupted — delete and re-enter via batch/heredoc.
-- [ ] Named ranges (`officecli get "$FILE" "/namedrange[1]"`) point at what their names claim.
-- [ ] Every `/` denominator is guarded — `IFERROR(x/y, 0)` or `IF(y=0, 0, x/y)`.
-- [ ] Chart data vs source cells: for every chart with inline data, spot-check data points against `officecli get` of the source cells.
-- [ ] Chart title / series name / legend contain **no** unreplaced tokens (`$...$`, `{var}`, `<TODO>`). Grep the chart via `officecli get /Sheet1/chart[N]`.
+- [ ] 随机选取 2–3 个 formula，并在每个上运行 `officecli get`。确认 formula string 符合预期，且 `cachedValue=` 与心算结果一致。
+- [ ] **每个 summary cell 的 cached value 合理。** 任意 aggregate cell（COUNTA / COUNTIF / SUMPRODUCT / INDEX&MATCH）都必须有合理 `cachedValue`。若 progress tracker 在空 template 上显示 `199 / 199 / 100%`，说明 cache 错误；通过 `set` 重新触碰 formula 以强制重算，或手动 `set` 为正确 cached value。不能交付“`validate` 通过但数字虚构”的文件。
+- [ ] **每个 number column 抽查一个 cell。** `%` column 总显示整数 `0.0%` 说明 denominator 错误或 numerator cache 过期；应调查该 cell 并修复模式。
+- [ ] range 必须包含每一 row：数据到达 `B13` 时仍使用 `SUM(B2:B12)` 是最常见错误。
+- [ ] cross-sheet formula（`Sheet1!A1`）不得包含 `\!`。若 `officecli get` 显示 `Sheet1\!A1`，说明 `!` 被 shell 损坏；删除后通过 batch/heredoc 重写。
+- [ ] named range（`officecli get "$FILE" "/namedrange[1]"`）必须指向其名称所表述的内容。
+- [ ] 每一个 `/` denominator 都应受到保护：`IFERROR(x/y, 0)` 或 `IF(y=0, 0, x/y)`。
+- [ ] chart data 要与 source cell 一致：每个含 inline data 的 chart 都应对照 source cell 用 `officecli get` 抽查 data point。
+- [ ] chart title / series name / legend 不得包含未替换 token（`$...$`、`{var}`、`<TODO>`）；用 `officecli get /Sheet1/chart[N]` 检查 chart。
 
 ### Template QA
 
-When editing a template, check for leftover placeholders — they look like content and slip past `validate`:
+编辑 template 时，检查残留 placeholder；它们看起来像正常内容，可能绕过 `validate`：
 
 ```bash
 officecli query "$FILE" 'cell:contains("{{")'
@@ -420,21 +413,21 @@ officecli query "$FILE" 'cell:contains("xxxx")'
 officecli query "$FILE" 'cell:contains("TBD")'
 ```
 
-### Fresh eyes
+### 新鲜视角
 
-When you finish a workbook, open it fresh. Read `view text` / HTML preview top-to-bottom as if you are a new reviewer — look for formulas, numbers that look off, formatting inconsistency, missing data.
+完成 workbook 后，应重新打开它。像新 reviewer 一样从上到下阅读 `view text` / HTML preview，寻找 formula 错误、异常数字、format 不一致与缺失数据。
 
-### Honest limit
+### 已知边界
 
-`validate` catches schema errors, not design errors. A workbook can pass `validate` with every number wrong. The checklist above — especially spot-checking formulas against source cells — is how you catch what validation can't.
+`validate` 能捕获 schema error，不能捕获 design error。即使每个数字都错误，workbook 仍可能通过 `validate`。上述 checklist，尤其是用 source cell 抽查 formula，是发现 validation 未覆盖问题的方法。
 
-## Known Issues & Pitfalls
+## 已知问题和陷阱
 
-### The cross-sheet `!` trap (short)
+### Cross-sheet `!` 陷阱（简述）
 
-Shells (bash history expansion, zsh splitting) and CLI arg parsing mangle `!` in `Sheet1!A1` into `\!`. A formula containing `\!` is silently broken — it renders as literal text and references nothing.
+Shell（bash history expansion、zsh split）与 CLI arg 可能将 `Sheet1!A1` 中的 `!` 改写为 `\!`。含 `\!` 的 formula 已被悄然破坏：它会显示为 literal text，且不再 reference 任何内容。
 
-**Fix.** Use a batch heredoc with single-quoted delimiter (`<<'EOF'`), which disables all shell expansion:
+**修复。** 使用单引号 delimiter（`<<'EOF'`）的 batch heredoc，以禁用所有 shell expansion：
 
 ```bash
 cat <<'EOF' | officecli batch "$FILE"
@@ -442,48 +435,48 @@ cat <<'EOF' | officecli batch "$FILE"
 EOF
 ```
 
-**Verify.** After writing, `officecli get` the cell; `formula=` must show a plain `!` with no backslash.
+**验证。**写入后，对该 cell 执行 `officecli get`；`formula=` 必须显示未带反斜杠的 `!`。
 
-### CLI bug backlog (short)
+### CLI bug backlog（简述）
 
-CLI constraints and gaps to work around — not defects in the output file.
+以下是 CLI 需要解决的限制与缺口，并非输出文件本身的缺陷。
 
-- **Chart series are immutable after create** — to add/change a series: `remove` + `add` with the full series list. (Position is mutable: `set chart[N] --prop anchor=` / `x/y/width/height`.) `remove chart[N]` shifts subsequent indices down; re-add appends at end.
-- **Cross-sheet formula batches run fine through a resident** — a prior "deadlocks even at 3-5 ops" caution no longer reproduces. Pure value-set batches stay reliable at 50-80+ ops too. If you ever hit a hang, fall back to a non-resident one-big-batch or individual `set`. **Multiple resident processes on the same file/machine can still contend** — expect non-deterministic hangs if another agent/session holds a resident on the same file.
-- **Conditional formatting naming asymmetry** — the element name for `--type` is `conditionalformatting`; the path suffix is `/cf[N]`. Use `officecli help xlsx conditionalformatting` for schema, `/cf[N]` for paths.
-- **Sheet `position` prop on add** — help says Add processes `position`, but the prop is often ignored. Reorder with `officecli move --index` / `--after` / `--before` after creating the sheet.
-- **`remove /sheet[N]` cascade guard** — rejects sheet remove/rename when the sheet is referenced by validation / conditional format / sparkline / hyperlink / named range on another sheet. Remove those dependent elements first, then remove the sheet.
-- **Batch JSON rejects cell `color` alias** — inside batch `props`, `"color": "FF0000"` errors `ambiguous in cell context — use 'font.color' (text) or 'fill' (bg)`. The CLI at shell level accepts `--prop color=...` / `--prop size=14` as aliases on non-cell elements, but inside batch JSON on a cell always write the full dotted name: `"font.color"`, `"font.size"`, `"font.name"`.
+- **chart series 在创建后不可变：**新增或修改 series 需要完整执行 `remove` + `add`。（position 可以修改：`set chart[N] --prop anchor=` / `x/y/width/height`。）`remove chart[N]` 会下移后续 index，重新添加则附加在末尾。
+- **跨 sheet formula batch 在 resident 中运行良好。** 之前“3–5 个操作也会死锁”的警告已不再复现。纯 value-set batch 在 50–80+ 个操作下也保持可靠。遇到问题时，请回退到非 resident 的大 batch 或单独 `set`。**同一文件/计算机上的多个 resident process 仍可能竞争：**若其他 agent/session 已持有该文件的 resident process，可能出现非确定性挂起。
+- **conditional formatting 的命名不对称：**`--type` 的 element name 是 `conditionalformatting`，path suffix 是 `/cf[N]`。schema 参见 `officecli help xlsx conditionalformatting`，path 使用 `/cf[N]`。
+- **`add` table 的 `position` prop：**Help 显示支持 `position`，但该 prop 常被忽略。创建 sheet 后使用 `officecli move --index` / `--after` / `--before` 排序。
+- **`remove /sheet[N]` 的 cascade guard：**当其他 sheet 的 validation / conditional formatting / sparkline / hyperlink / named range 引用该 sheet 时，会拒绝 remove/rename。先移除这些 dependent element，再 remove sheet。
+- **batch JSON 拒绝 cell `color` alias：**在 batch `props` 中，`"color": "FF0000"` 会报 `ambiguous in cell context — use 'font.color' (text) or 'fill' (bg)`。shell-level CLI 允许非 cell element 使用 `--prop color=...` / `--prop size=14` alias，但 cell 的 batch JSON 始终必须使用完整 dotted name：`"font.color"`、`"font.size"`、`"font.name"`。
 
-### Renderer caveats (cross-viewer color fidelity)
+### Renderer 注意事项（跨 viewer 的 color fidelity）
 
-`officecli view html` is the right tool for structural QA (overflow, truncation, placeholder leakage, layout) — Read the returned HTML path. Some chart rendering details vary across the viewer the end user opens the file in. Observed divergences:
+`officecli view html` 是处理 structure QA（overflow、truncate、placeholder leak、layout）的正确工具，应读取返回的 HTML path。部分 chart render detail 取决于最终用户使用的 viewer。已观察到的差异：
 
-- **Pie / doughnut fill colors may collapse to a single theme tint** in some viewers (slices look "all white" or "all one color"). The file may be fine in the user's target viewer.
-- **Line chart / column chart series colors may drift** from the workbook theme in some viewers.
-- **Form-control checkboxes may render as double-boxed** in some viewers.
+- **部分 viewer 中 pie / doughnut fill color 会塌缩成单一 theme tint**（slice 看起来“全白”或“全为一种颜色”）。在用户的 target viewer 中可能实际正常。
+- **部分 viewer 中，chart / column chart series color 可能偏离 workbook theme**。
+- **form-control checkbox 可能在部分 viewer 中 render 为双框**。
 
-Before calling a color or chart "broken", open the file in the user's actual target viewer. If it looks correct there, the problem is viewer rendering, not data — do not chase it. The CLI's structural checks (`###`, truncation, placeholder text, layout) remain authoritative.
+判定 color 或 chart “损坏”前，请在用户实际的 target viewer 中打开文件。若那里正常，问题属于 viewer render 而非 data，不应继续追逐。CLI 的 structure check（`###`、截断、placeholder text、layout）仍是权威依据。
 
-### Escape layers (shell quoting is above; these are the extras)
+### Escape layer（shell quoting 见上；以下为额外层）
 
-`$` is the shell layer (single-quote it, above). `\n` / `\t` in a prop value ARE interpreted by the CLI into a real newline / tab. Two more layers:
+`$` 属于 shell layer（使用单引号，见上）。prop value 中的 `\n` / `\t` 会被 CLI 解释为真实 newline / tab。另有两层：
 
-- **JSON level (batch).** Standard JSON escapes — `"\n"`, `"\t"`, `"\""`. A real backslash in the final string is `"\\\\"`.
-- **Excel level.** `\n` in a cell is a real line break — pair with `--prop wrapText=true` so Excel shows the wrap. Works in a shell-quoted prop directly (`--prop value='a\nb'`); `"\n"` inside batch JSON gives the same. When in doubt, `officecli get` the cell and compare character-for-character.
+- **JSON layer（batch）。** 使用标准 JSON escape：`"\n"`、`"\t"`、`"\""`。最终 string 中的真实反斜杠写为 `"\\\\"`。
+- **Excel layer。** cell 内的 `\n` 是实际 newline，应配合 `--prop wrapText=true`，使 Excel 显示换行。在 shell-quoted prop 中可直接写入（`--prop value='a\nb'`）；batch JSON 中的 `"\n"` 效果相同。拿不准时，用 `officecli get` 与 cell 逐字符比较。
 
-### Other common pitfalls
+### 其他常见陷阱
 
-| Pitfall | Fix |
+| 陷阱 | 修复 |
 |---|---|
-| `--name "foo"` | All attrs go through `--prop`: `--prop name="foo"` |
-| Guessing a prop name | `officecli help xlsx <element>` — don't improvise |
-| `--prop color=...` on a cell | Ambiguous — use `font.color` (text) or `fill` (bg). Also applies inside batch JSON: always use full dotted names, never shell aliases |
-| `#FF0000` hex colors | Drop the `#`: `FF0000` |
-| `--index` vs `[N]` | `--index` is 0-based (array); `[N]` paths are 1-based (XPath) |
-| Unquoted `[N]` in zsh/bash | Quote every path: `"/Sheet1/row[1]"` |
-| Sheet name with spaces | Quote full path: `"/My Sheet/A1"` |
-| Year showing as `2,026` | `--prop type=string` or `numFmt="@"` |
-| Modifying a file open in Excel | Close it in Excel first |
-| `swap` not reordering sheets | `swap` is for rows/cells. Use `move --after` / `--before` / `--index` for sheets |
-| Cached values missing after write | New formulas get cached values when a human opens the file; `validate` accepts them either way |
+| `--name "foo"` | 所有 property 都通过 `--prop`：`--prop name="foo"` |
+| 猜测 prop name | 使用 `officecli help xlsx <element>`，不要即兴猜测 |
+| cell 上的 `--prop color=...` | 有歧义；使用 `font.color`（text）或 `fill`（background）。batch JSON 也一样：始终使用完整 dotted name，不使用 shell alias |
+| hex color `#FF0000` | 去掉 `#`：`FF0000` |
+| `--index` 与 `[N]` | `--index` 从 0 开始（array）；`[N]` path 从 1 开始（XPath） |
+| zsh/bash 中未加引号的 `[N]` | 每个 path 都加引号：`"/Sheet1/row[1]"` |
+| 含空格的 sheet name | 为完整 path 加引号：`"/My Sheet/A1"` |
+| 年份显示为 `2,026` | 使用 `--prop type=string` 或 `numFmt="@"` |
+| 修改仍在 Excel 中打开的文件 | 先关闭 Excel |
+| `swap` 不会重新排序 sheet | `swap` 适用于 row/cell；使用 `move --after` / `--before` / `--index` 排序 sheet |
+| 写入后 cached value 缺失 | 人工在 spreadsheet app 中打开后，新的 formula 才会获得 cached value；`validate` 接受这种状态 |

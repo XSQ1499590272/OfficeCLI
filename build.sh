@@ -59,6 +59,15 @@ build_config() {
         echo "[$CONFIG] Building $RID -> $NAME"
         dotnet publish "$PROJECT" -c "$CONFIG" -r "$RID" -o "$TMPDIR" --nologo -v quiet
 
+        # Release artifacts must be portable beyond this build machine. A local
+        # Homebrew .NET host, for example, can embed /opt/homebrew dylib paths.
+        if [ "$CONFIG" = "Release" ] && [ "$(uname -s)" = "Darwin" ] && [[ "$RID" == osx-* ]]; then
+            if ! build/verify-macos-portability.sh "$TMPDIR/officecli"; then
+                rm -rf "$TMPDIR"
+                exit 1
+            fi
+        fi
+
         # Atomic replace: stage as .new alongside the target, sign there, then rename.
         # Overwriting the binary in place would trash the text segment of any
         # running officecli process that happens to be mmap'd on this path

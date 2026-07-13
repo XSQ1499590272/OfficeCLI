@@ -18,31 +18,31 @@
       "/body/textbox[N]"
     ]
   },
-  "note": "Floating text box — a DrawingML anchored shape (wps:wsp) that carries a text body, added inside a run+paragraph. Created via `add --type textbox`; Get returns the raw drawing tree and Remove deletes the host paragraph. Set supports the spPr surface (fill / line.* / width / height / geometry) in place; position/anchor/wrap/inset/text/rotation/shadow props are add-only (use Remove + re-Add, or the raw-set path, to change those). For an empty graphic shape with no text body use `shape`; for inline pictures use `picture`.",
+  "note": "Floating text box，即携带 text body 的 DrawingML anchored shape（wps:wsp），添加在 run+paragraph 内。通过 add --type textbox 创建；Get 返回 raw drawing tree，Remove 删除宿主 paragraph。Set 可原地修改 spPr surface（fill、line.*、width、height、geometry）；position/anchor/wrap/inset/text/rotation/shadow 只支持 Add，修改时请 Remove 后重新 Add，或使用 raw-set path。没有 text body 的空 graphic shape 请使用 shape，inline picture 请使用 picture。",
   "properties": {
     "text": {
       "type": "string",
-      "description": "initial text placed in the text box body.",
+      "description": "放入 text box body 的初始文本。",
       "add": true,
       "examples": ["--prop text=\"Sidebar note\""]
     },
     "width": {
       "type": "length",
-      "description": "box width (cm/in/pt/EMU). Default ~6cm.",
+      "description": "box 宽度（cm/in/pt/EMU）。默认约 6cm。",
       "add": true,
       "set": true,
       "examples": ["--prop width=6cm"]
     },
     "height": {
       "type": "length",
-      "description": "box height (cm/in/pt/EMU). Default ~2.4cm.",
+      "description": "box 高度（cm/in/pt/EMU）。默认约 2.4cm。",
       "add": true,
       "set": true,
       "examples": ["--prop height=3cm"]
     },
     "geometry": {
       "type": "string",
-      "description": "preset shape outline of the box (rect, roundRect, ellipse, ...). Aliases: shape.",
+      "description": "box 的预设 shape 外轮廓（rect、roundRect、ellipse 等）。别名：shape。",
       "aliases": ["shape"],
       "add": true,
       "set": true,
@@ -50,7 +50,7 @@
     },
     "wrap": {
       "type": "enum",
-      "description": "text-wrap mode of surrounding body text around the box.",
+      "description": "box 周围 body text 的环绕方式。",
       "values": ["square", "tight", "through", "topAndBottom", "behind", "front", "none"],
       "default": "square",
       "add": true,
@@ -58,7 +58,7 @@
     },
     "hAlign": {
       "type": "enum",
-      "description": "relative horizontal alignment (emits <wp:align>, replaces a positional offset on the X axis). Aliases: halign.",
+      "description": "相对水平对齐方式（写入 <wp:align>，会替代 X 轴位置偏移）。别名：halign。",
       "values": ["left", "center", "right", "inside", "outside"],
       "aliases": ["halign"],
       "add": true,
@@ -66,7 +66,7 @@
     },
     "vAlign": {
       "type": "enum",
-      "description": "relative vertical alignment (emits <wp:align> on the Y axis). Aliases: valign.",
+      "description": "相对垂直对齐方式（在 Y 轴写入 <wp:align>）。别名：valign。",
       "values": ["top", "center", "bottom", "inside", "outside"],
       "aliases": ["valign"],
       "add": true,
@@ -74,7 +74,7 @@
     },
     "hRelative": {
       "type": "enum",
-      "description": "what the horizontal position/alignment is measured from. Aliases: hrelative.",
+      "description": "水平位置/对齐的参照对象。别名：hrelative。",
       "values": ["margin", "page", "column", "character", "leftMargin", "rightMargin", "insideMargin", "outsideMargin"],
       "aliases": ["hrelative"],
       "add": true,
@@ -82,7 +82,7 @@
     },
     "vRelative": {
       "type": "enum",
-      "description": "what the vertical position/alignment is measured from. Aliases: vrelative.",
+      "description": "垂直位置/对齐的参照对象。别名：vrelative。",
       "values": ["margin", "page", "paragraph", "line", "topMargin", "bottomMargin", "insideMargin", "outsideMargin"],
       "aliases": ["vrelative"],
       "add": true,
@@ -90,21 +90,21 @@
     },
     "anchor.x": {
       "type": "length",
-      "description": "horizontal position offset from hRelative origin. Alias: hposition. Ignored when hAlign is set.",
+      "description": "相对于 hRelative 起点的水平位置偏移。别名：hposition；设置 hAlign 时会忽略此值。",
       "aliases": ["hposition"],
       "add": true,
       "examples": ["--prop anchor.x=2cm"]
     },
     "anchor.y": {
       "type": "length",
-      "description": "vertical position offset from vRelative origin. Alias: vposition. Ignored when vAlign is set.",
+      "description": "相对于 vRelative 起点的垂直位置偏移。别名：vposition；设置 vAlign 时会忽略此值。",
       "aliases": ["vposition"],
       "add": true,
       "examples": ["--prop anchor.y=1cm"]
     },
     "fill": {
       "type": "color",
-      "description": "fill color (hex/name), or 'none' for no fill. Alias: fillcolor.",
+      "description": "fill 颜色（hex/name），或使用 'none' 表示无填充。别名：fillcolor。",
       "aliases": ["fillcolor"],
       "add": true,
       "set": true,
@@ -112,20 +112,20 @@
     },
     "fill.gradient": {
       "type": "string",
-      "description": "gradient fill spec (overrides solid fill). Alias: gradient.",
+      "description": "gradient fill 配置（会覆盖 solid fill）。别名：gradient。",
       "aliases": ["gradient"],
       "add": true
     },
     "fill.opacity": {
       "type": "string",
-      "description": "fill opacity percentage. Alias: opacity.",
+      "description": "fill 透明度百分比。别名：opacity。",
       "aliases": ["opacity"],
       "add": true,
       "examples": ["--prop fill.opacity=50"]
     },
     "line.color": {
       "type": "color",
-      "description": "outline color. Alias: linecolor.",
+      "description": "outline 颜色。别名：linecolor。",
       "aliases": ["linecolor"],
       "add": true,
       "set": true,
@@ -133,7 +133,7 @@
     },
     "line.width": {
       "type": "length",
-      "description": "outline width. Alias: linewidth.",
+      "description": "outline 宽度。别名：linewidth。",
       "aliases": ["linewidth"],
       "add": true,
       "set": true,
@@ -141,63 +141,63 @@
     },
     "line.style": {
       "type": "string",
-      "description": "outline dash style. Alias: linestyle.",
+      "description": "outline dash 样式。别名：linestyle。",
       "aliases": ["linestyle"],
       "add": true,
       "set": true
     },
     "inset.left": {
       "type": "length",
-      "description": "internal left padding between the box edge and its text. Default 0.1in.",
+      "description": "box 边缘与文本之间的左内边距。默认 0.1in。",
       "add": true
     },
     "inset.top": {
       "type": "length",
-      "description": "internal top padding. Default 0.05in.",
+      "description": "上内边距。默认 0.05in。",
       "add": true
     },
     "inset.right": {
       "type": "length",
-      "description": "internal right padding. Default 0.1in.",
+      "description": "右内边距。默认 0.1in。",
       "add": true
     },
     "inset.bottom": {
       "type": "length",
-      "description": "internal bottom padding. Default 0.05in.",
+      "description": "下内边距。默认 0.05in。",
       "add": true
     },
     "textDirection": {
       "type": "string",
-      "description": "text flow direction inside the box (e.g. vertical). Alias: vert.",
+      "description": "box 内部的文本流向（如 vertical）。别名：vert。",
       "aliases": ["vert"],
       "add": true
     },
     "textAnchor": {
       "type": "string",
-      "description": "vertical anchoring of text within the box (top/center/bottom).",
+      "description": "文本在 box 内的垂直锚点（top/center/bottom）。",
       "add": true
     },
     "autoFit": {
       "type": "bool",
-      "description": "resize the box to fit its text (<a:spAutoFit/>).",
+      "description": "调整 box 尺寸以容纳其文本（<a:spAutoFit/>）。",
       "add": true,
       "examples": ["--prop autoFit=true"]
     },
     "rotation": {
       "type": "string",
-      "description": "rotation in degrees. Alias: rot.",
+      "description": "旋转角度。别名：rot。",
       "aliases": ["rot"],
       "add": true,
       "examples": ["--prop rotation=90"]
     },
     "shadow": {
       "type": "string",
-      "description": "drop-shadow preset.",
+      "description": "drop-shadow 预设。",
       "add": true
     },
     "alt": {
       "type": "string",
-      "description": "accessibility / object name (docPr name). Alias: name. Default 'Text Box'.",
+      "description": "accessibility / object 名称（docPr name）。别名：name。默认值：'Text Box'。",
       "aliases": ["name"],
       "add": true,
       "examples": ["--prop alt=\"Callout\""]

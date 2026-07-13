@@ -18,12 +18,12 @@
       "/body/tbl[N]/tr[R]"
     ]
   },
-  "note": "Row column count defaults to the parent table grid. height uses AtLeast rule; height.exact forces Exact rule.",
+  "note": "Row 的 column count 默认取 parent table grid。height 使用 AtLeast rule；height.exact 会强制使用 Exact rule。",
   "extends": "_shared/table-row",
   "properties": {
     "height.exact": {
       "type": "length",
-      "description": "row height in twips (Exact rule, cannot grow). Add/Set only — Get does not surface a separate exact-height key; inspect `height.rule=exact` paired with `height` instead.",
+      "description": "row 高度，单位为 twips（Exact rule，不可增长）。仅 Add/Set；Get 不会返回独立的 exact-height key，请结合 height.rule=exact 与 height 判断。",
       "add": true,
       "set": true,
       "get": false,
@@ -35,7 +35,7 @@
     },
     "header": {
       "type": "bool",
-      "description": "repeat row as table header on every page.",
+      "description": "在每页将该 row 重复为 table header。",
       "add": true,
       "set": true,
       "get": true,
@@ -47,7 +47,7 @@
     },
     "cantSplit": {
       "type": "bool",
-      "description": "w:cantSplit — keep the row on one page (no break across pages). Row-scoped: apply per row, not on the table (Word stores it per-row too).",
+      "description": "w:cantSplit：将 row 保持在同一页（不跨页断开）。作用域为 row，请逐行设置，而不是设置在 table 上（Word 也按 row 存储）。",
       "add": true,
       "set": true,
       "get": true,
@@ -62,13 +62,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "row height rule readback — `exact` when the row enforces a fixed height, otherwise absent (auto/atLeast).",
+      "description": "row height rule 的读取结果：row 强制固定高度时为 exact，否则不返回（auto/atLeast）。",
       "readback": "`exact` when set",
       "enforcement": "report"
     },
     "cnfStyle": {
       "type": "string",
-      "description": "conditional-formatting bitmask (ST_Cnf @val) on the row (trPr). A 12-digit binary string — each '0'/'1' flags one region in order: firstRow, lastRow, firstColumn, lastColumn, oddVBand, evenVBand, oddHBand, evenHBand, firstRowFirstColumn, firstRowLastColumn, lastRowFirstColumn, lastRowLastColumn. Short binary input is right-padded to 12. Not a hex number.",
+      "description": "row（trPr）上的 conditional-formatting bitmask（ST_Cnf @val）。为 12 位二进制字符串，每个 '0'/'1' 按顺序标记 firstRow、lastRow、firstColumn、lastColumn、oddVBand、evenVBand、oddHBand、evenHBand、firstRowFirstColumn、firstRowLastColumn、lastRowFirstColumn、lastRowLastColumn。较短输入会在右侧补齐到 12 位；不是 hex number。",
       "add": false,
       "set": true,
       "get": true,
@@ -80,7 +80,7 @@
     },
     "gridBefore": {
       "type": "int",
-      "description": "number of leading grid columns this row skips (w:gridBefore @val). Pairs with wBefore (the preferred width reserved for the skipped span) to indent the row's left edge — produces a ragged/indented table edge.",
+      "description": "该 row 跳过的前置 grid column 数量（w:gridBefore @val）。与 wBefore（为跳过跨度预留的首选宽度）配合，使 row 左边缘缩进，形成不齐/缩进的 table edge。",
       "add": true,
       "set": true,
       "get": true,
@@ -92,7 +92,7 @@
     },
     "wBefore": {
       "type": "string",
-      "description": "preferred width of the leading skipped-column span (w:wBefore w:w/w:type). Same unit-qualified form as cell width: 'Ndxa', 'N%', 'auto', or 'nil'.",
+      "description": "前置跳过列跨度的首选宽度（w:wBefore w:w/w:type）。与 cell width 使用相同的带单位格式：'Ndxa'、'N%'、'auto' 或 'nil'。",
       "add": true,
       "set": true,
       "get": true,
@@ -104,7 +104,7 @@
     },
     "gridAfter": {
       "type": "int",
-      "description": "number of trailing grid columns this row skips (w:gridAfter @val). Pairs with wAfter (the preferred width reserved for the skipped span) to shorten the row's right edge — produces a ragged/indented table edge.",
+      "description": "该 row 跳过的末尾 grid column 数量（w:gridAfter @val）。与 wAfter（为跳过跨度预留的首选宽度）配合，使 row 右边缘缩短，形成不齐/缩进的 table edge。",
       "add": true,
       "set": true,
       "get": true,
@@ -116,7 +116,7 @@
     },
     "wAfter": {
       "type": "string",
-      "description": "preferred width of the trailing skipped-column span (w:wAfter w:w/w:type). Same unit-qualified form as cell width: 'Ndxa', 'N%', 'auto', or 'nil'.",
+      "description": "末尾跳过列跨度的首选宽度（w:wAfter w:w/w:type）。与 cell width 使用相同的带单位格式：'Ndxa'、'N%'、'auto' 或 'nil'。",
       "add": true,
       "set": true,
       "get": true,

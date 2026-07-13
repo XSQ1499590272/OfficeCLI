@@ -15,11 +15,11 @@
     "stable":     ["/body/p[N]/permStart[@id=ID]"],
     "positional": ["/body/p[N]/permStart[M]"]
   },
-  "note": "Ranged editing-permission markers. <w:permStart>/<w:permEnd> delimit a region a group (edGrp) or specific user (ed) may edit inside a protected document. Positioned paragraph children like bookmark markers: permStart opens the region, permEnd (type=permEnd, id only) closes the matching id. Use a shared id to pair them. colFirst/colLast scope the permission to a table-column range.",
+  "note": "Ranged editing-permission marker。<w:permStart>/<w:permEnd> 在受保护文档中界定一个区域，允许某个 group（edGrp）或特定用户（ed）编辑。它们像 bookmark marker 一样作为 paragraph child 定位：permStart 打开区域，permEnd（type=permEnd，仅带 id）关闭匹配的 id。两者使用同一个 id 配对；colFirst/colLast 可将权限限定到 table-column range。",
   "properties": {
     "id": {
       "type": "number",
-      "description": "marker id (required). permStart and its matching permEnd share the same id.",
+      "description": "marker id（必填）。permStart 与匹配的 permEnd 共用同一个 id。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop id=5"],
       "readback": "w:id",
@@ -27,7 +27,7 @@
     },
     "edGrp": {
       "type": "enum",
-      "description": "editing group allowed in the region (ST_EdGrp).",
+      "description": "允许编辑该区域的 editing group（ST_EdGrp）。",
       "values": ["none", "everyone", "administrators", "contributors", "editors", "owners", "current"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop edGrp=everyone"],
@@ -36,7 +36,7 @@
     },
     "ed": {
       "type": "string",
-      "description": "specific user (e.g. domain\\user or email) allowed to edit the region.",
+      "description": "允许编辑该区域的特定用户（例如 domain\\user 或 email）。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop ed=jane@example.com"],
       "readback": "w:ed",
@@ -44,7 +44,7 @@
     },
     "colFirst": {
       "type": "number",
-      "description": "first table column (0-based) the permission applies to, for a table-column range.",
+      "description": "table-column range 中权限适用的首列，使用 0-based index。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop colFirst=0"],
       "readback": "w:colFirst",
@@ -52,7 +52,7 @@
     },
     "colLast": {
       "type": "number",
-      "description": "last table column (0-based) the permission applies to, for a table-column range.",
+      "description": "table-column range 中权限适用的末列，使用 0-based index。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop colLast=2"],
       "readback": "w:colLast",

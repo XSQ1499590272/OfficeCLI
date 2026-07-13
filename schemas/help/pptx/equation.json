@@ -16,12 +16,12 @@
       "/slide[N]/shape[M]/oMath[K]"
     ]
   },
-  "note": "Aliases: formula, math. FormulaParser parses LaTeX-ish input. Adding a 'shape' or 'textbox' with 'formula' prop also routes here.",
+  "note": "Aliases：formula、math。FormulaParser 解析 LaTeX-like input。对 shape 或 textbox 使用 formula prop Add 时，也会路由到这里。",
   "extends": "_shared/equation",
   "properties": {
     "id": {
       "type": "number",
-      "description": "cNvPr equation id. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr equation id。Add 会保留调用方提供的 id，使 dump-replay 中的 spTgt animation refs 保持稳定；创建后不可修改。",
       "add": true,
       "set": false,
       "get": true,
@@ -30,7 +30,7 @@
     },
     "formula": {
       "type": "string",
-      "description": "math expression. Aliases: text.",
+      "description": "数学表达式。Aliases: text。",
       "aliases": [
         "text"
       ],

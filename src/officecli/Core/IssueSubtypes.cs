@@ -80,17 +80,17 @@ public static class IssueSubtypes
     public static string TypeHelpDescription()
     {
         var defaults = ValidSubtypes.Where(s => !OptInSubtypes.Contains(s));
-        return "Issue type filter. Broad buckets: "
+        return "问题类型过滤器。宽泛分类："
             + string.Join(", ", BucketNames)
-            + " (alias " + string.Join(", ", BucketAliases) + "). "
-            + "Subtypes (Content bucket, returned by default and via --type content): "
-            + string.Join(", ", defaults) + ". "
-            + "Opt-in only (request by exact name; not included in --type content): "
-            + string.Join(", ", OptInSubtypes) + ". "
-            + "Subtypes are format-specific — formula_* / chart_* / definedname_* apply to xlsx, "
-            + "field_* to docx, slide_field_* / notes_unresolved_rid / broken_part_ref / low_contrast to pptx; requesting a subtype that does not apply to "
-            + "the queried file returns count=0 (not an error). "
-            + "All values are case-insensitive and surrounding whitespace is trimmed.";
+            + "（别名：" + string.Join(", ", BucketAliases) + "）。"
+            + "子类型（Content 分类；默认返回，也可通过 --type content 获取）："
+            + string.Join(", ", defaults) + "。"
+            + "仅显式启用（按准确名称请求；不包含在 --type content 中）："
+            + string.Join(", ", OptInSubtypes) + "。"
+            + "子类型与格式相关：formula_* / chart_* / definedname_* 适用于 xlsx，"
+            + "field_* 适用于 docx，slide_field_* / notes_unresolved_rid / broken_part_ref / low_contrast 适用于 pptx；请求不适用于"
+            + "当前文件的子类型会返回 count=0（不是错误）。"
+            + "所有值均不区分大小写，并会去除首尾空白。";
     }
 
     /// <summary>

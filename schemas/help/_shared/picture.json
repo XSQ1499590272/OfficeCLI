@@ -5,7 +5,7 @@
   "properties": {
     "alt": {
       "type": "string",
-      "description": "alternative text (DocProperties.Description). When omitted, no description is written (intentional: an auto-filled filename is worse than none for screen readers). Aliases: alttext, description.",
+      "description": "替代文本（DocProperties.Description）。省略时不会写入 description；这是有意设计，因为对 screen reader 而言，自动填入的文件名不如不填。别名：alttext、description。",
       "aliases": [
         "altText",
         "alttext",
@@ -23,7 +23,7 @@
     },
     "contentType": {
       "type": "string",
-      "description": "OOXML content-type of the embedded image part (e.g. `image/png`, `image/jpeg`). Read from the package part referenced by the BlipFill embed relationship.",
+      "description": "嵌入图片 part 的 OOXML content-type（例如 image/png、image/jpeg）。从 BlipFill embed relationship 引用的 package part 读取。",
       "add": false,
       "set": false,
       "get": true,
@@ -32,7 +32,7 @@
     },
     "fileSize": {
       "type": "number",
-      "description": "embedded image file size in bytes (length of the image part stream).",
+      "description": "嵌入图片文件大小，单位为 bytes（图片 part stream 的长度）。",
       "add": false,
       "set": false,
       "get": true,
@@ -41,7 +41,7 @@
     },
     "relId": {
       "type": "string",
-      "description": "relationship id of the embedded image part (rId-style token). Required input for `get --save <path>` binary extraction.",
+      "description": "嵌入图片 part 的 relationship id（rId 形式的 token）。执行 `get --save <path>` 导出二进制内容时必填。",
       "add": false,
       "set": false,
       "get": true,
@@ -50,7 +50,7 @@
     },
     "src": {
       "type": "string",
-      "description": "image source (file path, URL, data-URI); accepted on add/set only. Get does NOT surface this key; the embedded relationship id is exposed under a separate Format[\"relId\"] key.",
+      "description": "图片来源（文件路径、URL、data-URI）；仅 add/set 接受。Get 不会返回此 key；嵌入图片的 relationship id 会以独立的 Format[\"relId\"] key 返回。",
       "aliases": [
         "path"
       ],

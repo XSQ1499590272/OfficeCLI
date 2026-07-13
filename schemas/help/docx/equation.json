@@ -17,7 +17,7 @@
       "/body/p[N]/oMath[M]"
     ]
   },
-  "note": "Aliases: formula, math. formula input is parsed by FormulaParser (LaTeX-ish). Display mode wraps in oMathPara; inline mode appends oMath to the parent paragraph. Get returns only `mode` (display|inline) in Format[]; the formula source itself is in DocumentNode.Text.",
+  "note": "Aliases：formula、math。formula input 会由 FormulaParser 解析（LaTeX-like）。display mode 会包装为 oMathPara；inline mode 会将 oMath 追加到 parent paragraph。Get 只在 Format[] 中返回 mode（display|inline）；formula source 位于 DocumentNode.Text。",
   "extends": "_shared/equation",
   "properties": {
     "mode": {

@@ -15,12 +15,12 @@
       "/SheetName/CellRef"
     ]
   },
-  "note": "In Excel, hyperlinks are a cell-level property, not a standalone addressable element. To create or modify one, use `officecli xlsx add cell` / `set` on the owning cell with `--prop link=URL` (optionally `tooltip=`, `display=`). Query returns discoverable hyperlink nodes whose `Path` points at the owning cell (e.g. `/Sheet1/A1`) so agents can Get/Set from there. Removal: Set the cell's `link=none`. Aliases on cell input: link, href.",
+  "note": "在 Excel 中，hyperlink 是 cell-level property，不是可独立寻址的 element。创建或修改 hyperlink 时，对所属 cell 使用 officecli xlsx add cell / set，并传 --prop link=URL（可选 tooltip=、display=）。Query 会返回可发现的 hyperlink node，其 Path 指向所属 cell（例如 /Sheet1/A1），便于从该 path 执行 Get/Set。移除时对 cell 执行 Set link=none。cell input 的 alias：link、href。",
   "extends": "_shared/hyperlink",
   "properties": {
     "url": {
       "type": "string",
-      "description": "external URL readback (read-only at this element). For cell-level Set use cell `link=URL`.",
+      "description": "外部 URL 的读回值（此 element 只读）。要对 cell 执行 Set，请使用 cell 的 `link=URL`。",
       "add": false,
       "set": false,
       "get": true,
@@ -29,7 +29,7 @@
     },
     "ref": {
       "type": "string",
-      "description": "target cell range. Readback only (from <hyperlink ref=.../>).",
+      "description": "目标单元格范围。仅支持读回（来自 <hyperlink ref=.../>）。",
       "add": false,
       "set": false,
       "get": true,
@@ -38,7 +38,7 @@
     },
     "location": {
       "type": "string",
-      "description": "internal sheet/cell target (Sheet1!A1). Readback only here; create via cell `link=` property.",
+      "description": "内部 sheet/cell 目标（Sheet1!A1）。此处仅支持读回；通过 cell 的 `link=` property 创建。",
       "add": false,
       "set": false,
       "get": true,
@@ -47,7 +47,7 @@
     },
     "display": {
       "type": "string",
-      "description": "display text. Readback only here; set via cell `display=` property.",
+      "description": "显示文本。此处仅支持读回；通过 cell 的 `display=` property 设置。",
       "add": false,
       "set": false,
       "get": true,
@@ -56,7 +56,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "hover tooltip. Readback only here; set via cell `tooltip=` property.",
+      "description": "悬停时显示的 tooltip。此处仅支持读回；通过 cell 的 `tooltip=` property 设置。",
       "add": false,
       "set": false,
       "get": true,

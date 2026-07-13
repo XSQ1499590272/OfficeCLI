@@ -14,7 +14,7 @@
   "paths": {
     "positional": ["/SheetName/dataValidation[N]"]
   },
-  "note": "Aliases: datavalidation. Target cell range via 'ref'. Type determines which of formula1/formula2 are used. Alias 'validation' accepted in path segments by query/set/remove (e.g. /SheetName/validation[N]); Add and Get echo back the canonical 'dataValidation[N]' form.",
+  "note": "Aliases：datavalidation。通过 ref 指定目标 cell range。Type 决定使用 formula1 还是 formula2。query/set/remove 的 path segment 接受 alias 'validation'（例如 /SheetName/validation[N]）；Add 和 Get 会回显 canonical 的 'dataValidation[N]' form。",
   "properties": {
     "type": {
       "type": "enum",
@@ -26,7 +26,7 @@
     },
     "ref": {
       "type": "string",
-      "description": "target cell range. Aliases: sqref.",
+      "description": "目标单元格范围。别名：sqref。",
       "aliases": ["sqref"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop ref=A1:A10", "--prop sqref=A1:A10"],
@@ -35,7 +35,7 @@
     },
     "allowBlank": {
       "type": "bool",
-      "description": "allow blank cells. Default: true.",
+      "description": "是否允许空单元格。默认 true。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop allowBlank=false"],
       "readback": "true/false",
@@ -43,7 +43,7 @@
     },
     "showError": {
       "type": "bool",
-      "description": "show error message on invalid input. Default: true.",
+      "description": "无效输入时是否显示 error message。默认 true。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop showError=true"],
       "readback": "true/false",
@@ -51,7 +51,7 @@
     },
     "showInput": {
       "type": "bool",
-      "description": "show input prompt when cell selected. Default: true.",
+      "description": "选择单元格时是否显示 input prompt。默认 true。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop showInput=true"],
       "readback": "true/false",
@@ -59,7 +59,7 @@
     },
     "errorTitle": {
       "type": "string",
-      "description": "title of the error popup.",
+      "description": "error popup 的标题。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop errorTitle=\"Bad value\""],
       "readback": "title text",
@@ -67,7 +67,7 @@
     },
     "promptTitle": {
       "type": "string",
-      "description": "title of the input prompt popup.",
+      "description": "input prompt popup 的标题。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop promptTitle=\"Hint\""],
       "readback": "title text",
@@ -76,7 +76,7 @@
     "errorStyle": {
       "type": "enum",
       "values": ["stop", "warning", "information"],
-      "description": "severity of error popup. Default: stop. Aliases: warn=warning, info=information.",
+      "description": "error popup 的严重级别。默认 stop。别名：warn=warning、info=information。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop errorStyle=warning"],
       "readback": "stop|warning|information",
@@ -84,7 +84,7 @@
     },
     "inCellDropdown": {
       "type": "bool",
-      "description": "show in-cell dropdown arrow for type=list. Default: true. Inverse of OOXML showDropDown.",
+      "description": "type=list 时是否显示单元格内 dropdown arrow。默认 true。与 OOXML showDropDown 的含义相反。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop inCellDropdown=false"],
       "readback": "true/false",
@@ -92,7 +92,7 @@
     },
     "showDropDown": {
       "type": "bool",
-      "description": "raw OOXML showDropDown flag (INVERTED: true = HIDE arrow). Prefer inCellDropdown for clarity.",
+      "description": "原始 OOXML showDropDown flag（含义反转：true = 隐藏 arrow）。为清晰起见，优先使用 inCellDropdown。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop showDropDown=true"],
       "readback": "raw OOXML flag",
@@ -122,7 +122,7 @@
     },
     "prompt": {
       "type": "string",
-      "description": "message shown when cell selected.",
+      "description": "选择单元格时显示的消息。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop prompt=\"Enter 1-100\""],
       "readback": "prompt text",
@@ -130,7 +130,7 @@
     },
     "error": {
       "type": "string",
-      "description": "error message on invalid input.",
+      "description": "无效输入时显示的 error message。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop error=\"Invalid value\""],
       "readback": "error text",

@@ -1,37 +1,11 @@
 ---
 name: officecli-word-form
-description: "Use this skill to create fillable Word forms (.docx) with real Content Controls (SDT) + legacy FormField checkboxes + MERGEFIELD mail-merge placeholders + document protection. Trigger on: 'fillable form', 'form fields', 'content controls', 'SDT', 'word form', 'fill in', 'only editable fields', 'protect document', 'onboarding form', 'HR intake', 'survey template', 'contract / SOW template', 'mail-merge template', 'compliance checklist', 'medical intake questionnaire'. Output is a single .docx where specific fields are editable and the rest is locked. This skill is INDEPENDENT, not a scene layer on docx — payload is `<w:sdt>` + `<w:ffData>` + `<w:fldChar>` + `documentProtection`, none of which docx base skill covers. Do NOT trigger for regular reports, letters, memos, academic papers, pitch decks, or any document with no user-fillable fields — route those to officecli-docx or its scene layers."
+description: "使用此 Skill 创建可填写的 Word 表单（.docx），支持真实 Content Controls（SDT）、legacy FormField checkbox、MERGEFIELD mail-merge 占位符和 document protection。触发词包括：'fillable form'、'form fields'、'content controls'、'SDT'、'word form'、'fill in'、'only editable fields'、'protect document'、'onboarding form'、'HR intake'、'survey template'、'contract / SOW template'、'mail-merge template'、'compliance checklist'、'medical intake questionnaire'。输出为仅指定字段可编辑、其他内容锁定的单个 .docx。此 Skill 独立于 docx scene layer，处理 `<w:sdt>`、`<w:ffData>`、`<w:fldChar>` 与 `documentProtection`；常规报告、信函、备忘录、学术论文、pitch deck 或没有可填写字段的文档不应触发，应转到 officecli-docx 或其 scene layer。"
 ---
 
 # OfficeCLI Word-Form Skill
 
 **This skill is INDEPENDENT, not a scene layer on docx.** A form's payload — `<w:sdt>` controls, `<w:ffData>` legacy fields, `<w:fldChar>` mail-merge, `documentProtection` — is a distinct element class from docx's paragraph/heading/style primitives. Its QA is different too: docx's Delivery Gate cares about visual layout and live PAGE fields, this skill's cares about data plumbing (protection enforced / alias+tag / items injected / name ≤ 20 / no underscore anti-pattern). **Reverse handoff:** if the user's document has no fillable fields (report, letter, memo, thesis, proposal), route to `officecli-docx` or a docx scene skill — don't use this one.
-
-## BEFORE YOU START (CRITICAL)
-
-**If `officecli` is not installed:**
-
-`macOS / Linux`
-
-```bash
-if ! command -v officecli >/dev/null 2>&1; then
-    curl -fsSL https://d.officecli.ai/install.sh | bash
-fi
-```
-
-`Windows (PowerShell)`
-
-```powershell
-if (-not (Get-Command officecli -ErrorAction SilentlyContinue)) {
-    irm https://d.officecli.ai/install.ps1 | iex
-}
-```
-
-Verify: `officecli --version`
-
-If `officecli` is still not found after first install, open a new terminal and run the verify command again.
-
-If the install command above fails (e.g. blocked by security policy, no network access, or insufficient permissions), install manually — download the binary for your platform from https://github.com/iOfficeAI/OfficeCLI/releases — then re-run the verify command.
 
 ## Help-First Rule
 

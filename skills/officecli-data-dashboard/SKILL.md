@@ -1,20 +1,11 @@
 ---
 name: officecli-data-dashboard
-description: "Use this skill to build a multi-element Excel dashboard — Dashboard sheet on open, multiple formula-driven KPI cards, multiple charts, sparklines, and conditional formatting — from CSV or tabular input. Trigger on: 'dashboard', 'KPI dashboard', 'analytics dashboard', 'executive dashboard', 'metrics dashboard', 'CSV to dashboard', 'data visualization'. Output is a single .xlsx. Scene-layer on officecli-xlsx: inherits every xlsx hard rule. DO NOT invoke for: a single budget tracker / one-sheet CSV-with-formatting (use xlsx), a 3-statement / DCF / LBO financial model (use financial-model), a weekly report with ≤ 1 chart and < 10 rows (use xlsx)."
+description: "使用此 Skill 从 CSV 或表格输入创建多元素 Excel dashboard：打开即展示的 Dashboard sheet、多个公式驱动的 KPI card、多个图表、sparkline 和 conditional formatting。触发词包括：'dashboard'、'KPI dashboard'、'analytics dashboard'、'executive dashboard'、'metrics dashboard'、'CSV to dashboard'、'data visualization'。输出为单个 .xlsx。它是 officecli-xlsx 的 scene layer，继承 xlsx 的硬性规则。单个 budget tracker / 单 Sheet 的格式化 CSV、3-statement / DCF / LBO financial model，或图表不超过 1 个且少于 10 行的 weekly report 不应触发。"
 ---
 
 # Data Dashboard (scene-layer on officecli-xlsx)
 
 A dashboard is not "a spreadsheet with charts". It is a composition: **one Dashboard sheet the user lands on** with formula-driven KPI cards, cell-range-linked charts, sparklines, and semantic conditional formatting. Everything else (raw data, aggregations) is upstream infrastructure the user should never need to open. This skill teaches the composition pattern. Everything about the xlsx engine — cells, formulas, batch JSON, shell quoting, validate, HTML preview — comes from `officecli-xlsx` and is not re-taught here.
-
-## Setup
-
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
 
 ## ⚠️ Help-First Rule
 

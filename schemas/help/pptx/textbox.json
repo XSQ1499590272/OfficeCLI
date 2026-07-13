@@ -13,7 +13,7 @@
   "paths": {
     "positional": ["/slide[N]/shape[M]"]
   },
-  "note": "Alias for shape — both route to AddShape (with --prop formula → AddEquation). Common text/position/size/font props inlined below; full surface (geometry, rotation, effects, …) in pptx/shape.json. effective.* keys behave as documented in pptx/shape.json.",
+  "note": "Textbox 是 shape 的 alias，两者都路由到 AddShape（带 --prop formula 时路由到 AddEquation）。常见 text/position/size/font props 在此内联；完整 surface（geometry、rotation、effects 等）参见 pptx/shape.json。effective.* 行为同样参见 pptx/shape.json。",
   "properties": {
     "text": {
       "type": "string",
@@ -24,7 +24,7 @@
     },
     "font": {
       "type": "string",
-      "description": "font family. Bare 'font' targets Latin + EastAsian; for per-script control (Japanese / Korean / Arabic) use font.latin, font.ea, or font.cs.",
+      "description": "font family。裸 'font' 同时作用于 Latin + EastAsian；需要按文字脚本分别控制（Japanese / Korean / Arabic）时，请使用 font.latin、font.ea 或 font.cs。",
       "aliases": ["fontname", "fontFamily"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop font=Calibri"],
@@ -33,14 +33,14 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin-script font slot (a:latin) only.",
+      "description": "仅设置 Latin-script font slot（a:latin）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop font.latin=Calibri"],
       "enforcement": "report"
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (a:ea) — Chinese / Japanese / Korean text.",
+      "description": "East-Asian font slot（a:ea），用于 Chinese / Japanese / Korean 文本。",
       "aliases": ["font.eastasia", "font.eastasian"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop font.ea=\"メイリオ\""],
@@ -48,7 +48,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font slot (a:cs) — Arabic / Hebrew / Thai etc.",
+      "description": "Complex-script font slot（a:cs），用于 Arabic / Hebrew / Thai 等文本。",
       "aliases": ["font.complexscript", "font.complex"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop font.cs=\"Arabic Typesetting\""],
@@ -57,7 +57,7 @@
     "direction": {
       "type": "enum",
       "values": ["ltr", "rtl"],
-      "description": "paragraph reading direction (a:pPr rtl). Use 'rtl' for Arabic / Hebrew layouts.",
+      "description": "段落阅读方向（a:pPr rtl）。Arabic / Hebrew 布局请使用 'rtl'。",
       "aliases": ["dir", "rtl"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop direction=rtl"],
@@ -65,7 +65,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size — Add/Set forwards to the first run; Get exposes the inheritance-resolved value as effective.size, not bare size.",
+      "description": "font size：Add/Set 会转发给第一个 run；Get 返回的是继承解析后的 effective.size，而非裸 size。",
       "aliases": ["fontsize"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop size=14", "--prop size=14pt", "--prop size=10.5pt"],
@@ -74,7 +74,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "Add/Set forwards to the first run; Get does not surface bold at the shape level.",
+      "description": "Add/Set 会转发给第一个 run；Get 不会在 shape level 返回 bold。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop bold=true"],
       "readback": "n/a at shape level — read bold on the inner run",
@@ -82,7 +82,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "Add/Set forwards to the first run; Get does not surface italic at the shape level.",
+      "description": "Add/Set 会转发给第一个 run；Get 不会在 shape level 返回 italic。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop italic=true"],
       "readback": "n/a at shape level — read italic on the inner run",
@@ -90,7 +90,7 @@
     },
     "color": {
       "type": "color",
-      "description": "text color — Add/Set forwards to the first run; Get exposes the inheritance-resolved value as effective.color, not bare color.",
+      "description": "text color：Add/Set 会转发给第一个 run；Get 返回的是继承解析后的 effective.color，而非裸 color。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop color=0000FF", "--prop color=#0000FF"],
       "readback": "n/a at shape level — read effective.color on the shape, or color on the inner run",
@@ -98,7 +98,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "textbox background fill",
+      "description": "textbox 背景 fill。",
       "aliases": ["background"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop fill=FFFF00", "--prop fill=accent1"],
@@ -108,7 +108,7 @@
     "align": {
       "type": "enum",
       "values": ["left", "center", "right", "justify"],
-      "description": "text horizontal alignment",
+      "description": "文本水平对齐方式。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop align=center"],
       "readback": "one of: left | center | right | justify",
@@ -130,7 +130,7 @@
     },
     "x": {
       "type": "length",
-      "description": "horizontal position of the textbox",
+      "description": "textbox 的水平位置。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop x=2cm", "--prop x=1in", "--prop x=72pt"],
       "readback": "length in cm (e.g. \"2cm\")",
@@ -138,7 +138,7 @@
     },
     "y": {
       "type": "length",
-      "description": "vertical position of the textbox",
+      "description": "textbox 的垂直位置。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop y=3cm"],
       "readback": "length in cm (e.g. \"3cm\")",
@@ -147,42 +147,42 @@
     "effective.direction": {
       "type": "enum",
       "values": ["rtl", "ltr"],
-      "description": "resolved reading direction inherited from placeholder→layout→master→presentation defaults. Suppressed when 'direction' is set directly on the textbox.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的阅读方向。textbox 直接设置 'direction' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "rtl | ltr",
       "enforcement": "report"
     },
     "effective.size": {
       "type": "length",
-      "description": "resolved font size inherited from placeholder→layout→master→presentation defaults. Suppressed when 'size' is set directly on the textbox.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 font size。textbox 直接设置 'size' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "unit-qualified pt (e.g. \"18pt\")",
       "enforcement": "report"
     },
     "effective.font": {
       "type": "string",
-      "description": "resolved font name inherited from placeholder→layout→master→presentation defaults. Suppressed when 'font' is set directly on the textbox.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 font name。textbox 直接设置 'font' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "font name",
       "enforcement": "report"
     },
     "effective.color": {
       "type": "color",
-      "description": "resolved text color inherited from placeholder→layout→master→presentation defaults. Suppressed when 'color' is set directly on the textbox.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 text color。textbox 直接设置 'color' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "#-prefixed uppercase hex (scheme colors pass through)",
       "enforcement": "report"
     },
     "effective.bold": {
       "type": "bool",
-      "description": "resolved bold inherited from placeholder→layout→master→presentation defaults. Suppressed when 'bold' is set directly on the textbox.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析的 bold。textbox 直接设置 'bold' 时不会返回。",
       "add": false, "set": false, "get": true,
       "readback": "true/false",
       "enforcement": "report"
     },
     "autoFit": {
       "type": "enum",
-      "description": "auto-fit mode for the textbox text body. Alias: autofit.",
+      "description": "textbox text body 的 auto-fit 模式。别名：autofit。",
       "values": ["none", "normal", "shape", "noAutofit", "spAutoFit"],
       "aliases": ["autofit"],
       "add": true, "set": true, "get": true,
@@ -193,7 +193,7 @@
     "valign": {
       "type": "enum",
       "values": ["top", "center", "middle", "bottom"],
-      "description": "text vertical anchoring inside the textbox (a:bodyPr anchor). 'middle' is an input alias for 'center' — Get always reads back 'center'.",
+      "description": "文本在 textbox 内的垂直锚点（a:bodyPr anchor）。'middle' 是 'center' 的输入别名；Get 始终返回 'center'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop valign=middle", "--prop valign=bottom"],
       "readback": "one of: top | center | bottom",
@@ -201,7 +201,7 @@
     },
     "margin": {
       "type": "length",
-      "description": "text body insets (a:bodyPr lIns/tIns/rIns/bIns). Single value applies to all four sides; CSS-style 4-value form is 'lIns,tIns,rIns,bIns'. '0' / '0cm' is a valid round-trip and is preserved (not collapsed to default).",
+      "description": "text body 内边距（a:bodyPr lIns/tIns/rIns/bIns）。单个值会应用到四边；CSS 风格的四值格式为 'lIns,tIns,rIns,bIns'。'0' / '0cm' 是有效的 round-trip 值，会被保留而不折叠为默认值。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop margin=0.25cm", "--prop margin=0.2cm,0.5cm,0.2cm,0.5cm", "--prop margin=0"],
       "readback": "single length (e.g. \"0.25cm\") when all four sides match, otherwise comma-separated 4-tuple",
@@ -209,14 +209,14 @@
     },
     "id": {
       "type": "number",
-      "description": "cNvPr shape id; @id in /shape[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr shape id，即 /shape[@id=ID] 中的 @id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "add": true, "set": false, "get": true,
       "readback": "integer shape id",
       "enforcement": "report"
     },
     "zorder": {
       "type": "number",
-      "description": "1-based z-order in slide shape tree. On add/set, repositions the shape within the shape tree (1 = back).",
+      "description": "slide shape tree 中从 1 开始计数的 z-order。add/set 时会在 shape tree 内重新定位该 shape（1 表示最底层）。",
       "aliases": ["z-order", "order"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop zorder=1"],
@@ -225,7 +225,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Override the auto-generated 'TextBox {N}' label on cNvPr @name.",
+      "description": "覆盖 cNvPr @name 自动生成的 'TextBox {N}' 标签。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=\"banner\""],
       "readback": "shape name string (cNvPr @name)",
@@ -233,7 +233,7 @@
     },
     "lang": {
       "type": "string",
-      "description": "BCP-47 language tag. lang lives per-run (drawingML a:rPr/@lang) — a textbox has no language of its own. add/set is a convenience that writes the FIRST run's rPr; read it back at run scope (/shape[N]/paragraph[P]/run[R]). Not surfaced at shape level (first-run projection is lossy and a new run would not inherit it).",
+      "description": "BCP-47 language tag。lang 属于每个 run（drawingML a:rPr/@lang），textbox 本身没有独立的语言属性。add/set 是便捷写法，会写入第一个 run 的 rPr；请在 run scope 读取（/shape[N]/paragraph[P]/run[R]）。不会在 shape level 返回，因为第一个 run 的投影会丢失信息，新 run 也不会继承它。",
       "aliases": ["altLang", "altlang"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop lang=en-US"],

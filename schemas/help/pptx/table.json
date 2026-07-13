@@ -19,7 +19,7 @@
       "/slide[N]/table[M]"
     ]
   },
-  "note": "GraphicFrame wrapping Drawing.Table. Seed data inline via `data` (semicolons split rows, commas split cells) or per-cell via `r{R}c{C}` props. `get /slide[N]/table[K]` defaults to --depth=1 (table + row stubs only; large tables at depth=2 dominate the response). Use --depth 2 or address cells directly via `/slide[N]/table[K]/row[R]/cell[C]`. A table-level `fill=COLOR` fans the fill out to every cell (there is no separate table-level fill readback — read the per-cell fill).",
+  "note": "GraphicFrame 包装 Drawing.Table。可通过 data inline 预填数据（分号分隔 rows，逗号分隔 cells），也可使用 per-cell 的 r{R}c{C} props。get /slide[N]/table[K] 默认使用 --depth=1（只返回 table 和 row stub；大 table 在 depth=2 时会显著增大响应）。需要更多内容时使用 --depth 2，或直接访问 /slide[N]/table[K]/row[R]/cell[C]。table-level 的 fill=COLOR 会分发到每个 cell；table-level 没有单独的 fill readback，请读取每个 cell 的 fill。",
   "children": [
     {
       "element": "row",
@@ -43,13 +43,13 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "cNvPr graphic-frame id; @id in /table[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr graphic-frame id，即 /table[@id=ID] 中的 @id。add 支持指定 id，以便 dump-replay 保持 spTgt 动画引用稳定；创建后不可修改。",
       "readback": "integer (cNvPr graphic frame id)",
       "enforcement": "report"
     },
     "zorder": {
       "type": "number",
-      "description": "z-order in slide shape tree. On add, positions the table (1 = back). On set, re-stacks it: front/back/forward/backward, +1/-1, or a 1-based absolute index.",
+      "description": "slide shape tree 中的 z-order。add 时确定 table 位置（1 表示最底层）；set 时重新堆叠，可用 front/back/forward/backward、+1/-1 或从 1 开始的绝对索引。",
       "aliases": ["z-order", "order"],
       "add": true,
       "set": true,
@@ -60,7 +60,7 @@
     },
     "x": {
       "type": "length",
-      "description": "left offset in EMU-parseable length.",
+      "description": "左偏移量，使用可解析为 EMU 的长度。",
       "add": true,
       "set": true,
       "get": true,
@@ -94,7 +94,7 @@
     },
     "rowHeight": {
       "type": "length",
-      "description": "uniform row height (EMU). On add, if unspecified it's derived from 'height' / rows. On set, applies the given height to EVERY row (a convenience for `tr[R] --prop height` on each); read individual heights back per-row via `tr[R]`.",
+      "description": "统一的行高（EMU）。add 时如未指定，会由 'height' / rows 推导；set 时将给定高度应用到每一行（等同于逐个使用 tr[R] --prop height 的便捷写法）。单行高度请通过 tr[R] 读取。",
       "aliases": [
         "rowheight"
       ],
@@ -109,7 +109,7 @@
     },
     "colWidths": {
       "type": "string",
-      "description": "per-column widths as comma- or semicolon-separated lengths (EMU/cm/in/pt). Length must match 'cols'; extra/missing entries fall back to the uniform default. Get readback is comma-separated FormatEmu output.",
+      "description": "每列宽度，使用逗号或分号分隔的长度（EMU/cm/in/pt）。数量必须与 'cols' 一致；多余或缺少的项回退到统一默认值。Get 返回逗号分隔的 FormatEmu 输出。",
       "aliases": [
         "colwidths"
       ],
@@ -125,7 +125,7 @@
     },
     "headerFill": {
       "type": "color",
-      "description": "solid fill color applied to row 0 (header).",
+      "description": "应用到第 0 行（header）的纯色 fill。",
       "aliases": [
         "headerfill"
       ],
@@ -140,7 +140,7 @@
     },
     "bodyFill": {
       "type": "color",
-      "description": "solid fill color applied to rows 1..N (body).",
+      "description": "应用到第 1..N 行（body）的纯色 fill。",
       "aliases": [
         "bodyfill"
       ],
@@ -158,7 +158,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @firstRow flag — header-row styling enabled.",
+      "description": "tblPr @firstRow 标记：启用 header-row 样式。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -167,7 +167,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @lastRow flag — total-row styling enabled.",
+      "description": "tblPr @lastRow 标记：启用 total-row 样式。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -176,7 +176,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @firstCol flag — first-column styling enabled.",
+      "description": "tblPr @firstCol 标记：启用 first-column 样式。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -185,7 +185,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @lastCol flag — last-column styling enabled.",
+      "description": "tblPr @lastCol 标记：启用 last-column 样式。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -194,7 +194,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @bandRow flag — alternating row banding from the table style.",
+      "description": "tblPr @bandRow 标记：使用 table style 的隔行条纹。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -203,13 +203,13 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "tblPr @bandCol flag — alternating column banding from the table style.",
+      "description": "tblPr @bandCol 标记：使用 table style 的隔列条纹。",
       "readback": "true|false",
       "enforcement": "report"
     },
     "border.all": {
       "type": "string",
-      "description": "shorthand: applies the border to every edge of every cell. PPT OOXML has no table-level border element — this fans out to per-cell a:lnL/lnR/lnT/lnB. Format: 'WIDTH[ DASH][ COLOR]' space-separated (e.g. '1pt solid FF0000') or 'STYLE;WIDTH;COLOR[;DASH]' semicolon form (style is ignored — kept for docx parity). DASH ∈ solid|dot|dash|lgDash|dashDot|sysDot|sysDash. Use 'none' to clear. Alias: border. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "简写：将 border 应用于每个单元格的所有边。PPT OOXML 没有 table-level border 元素，因此会展开为各单元格的 a:lnL/lnR/lnT/lnB。格式为 'WIDTH[ DASH][ COLOR]'（空格分隔，如 '1pt solid FF0000'）或 'STYLE;WIDTH;COLOR[;DASH]'（分号格式；style 会被忽略，仅为与 docx 保持一致）。DASH 可为 solid|dot|dash|lgDash|dashDot|sysDot|sysDash；使用 'none' 清除。别名：border。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "aliases": [
         "border"
       ],
@@ -227,7 +227,7 @@
     },
     "border.bottom": {
       "type": "string",
-      "description": "outer bottom border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR'. Add/Set only — read per-cell.",
+      "description": "外侧底边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'。仅 Add/Set 可用；请按单元格读取。",
       "add": true,
       "set": true,
       "get": true,
@@ -240,7 +240,7 @@
     },
     "border.horizontal": {
       "type": "string",
-      "description": "inside-horizontal dividers (between rows). Fans out to bottom of rows 1..N-1 plus top of rows 2..N. PPT has no native inside-border element. Alias: border.insideH. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "内部水平分隔线（行之间）。会展开为第 1..N-1 行的底边和第 2..N 行的顶边。PPT 没有原生 inside-border 元素。别名：border.insideH。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "aliases": [
         "border.insideh",
         "border.insideH"
@@ -257,7 +257,7 @@
     },
     "border.left": {
       "type": "string",
-      "description": "outer left edge: applies to the left of column-1 cells in every row only. Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "外侧左边：仅应用到每行第 1 列单元格的左边。格式同 border.all。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "add": true,
       "set": true,
       "get": true,
@@ -270,7 +270,7 @@
     },
     "border.right": {
       "type": "string",
-      "description": "outer right edge: applies to the right of last-column cells in every row only. Format same as border.all. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "外侧右边：仅应用到每行最后一列单元格的右边。格式同 border.all。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "add": true,
       "set": true,
       "get": true,
@@ -283,7 +283,7 @@
     },
     "border.top": {
       "type": "string",
-      "description": "outer top border. Format: STYLE[;SIZE[;COLOR[;SPACE]]]. Cross-format note: pptx accepts a space-separated 'WIDTH DASH COLOR' form; docx only accepts the semicolon form 'STYLE;SIZE;COLOR' (SIZE is in 1/8 pt units). Add/Set only — table-level border readback is not surfaced today; inspect per-cell border.top instead.",
+      "description": "外侧顶边框。格式：STYLE[;SIZE[;COLOR[;SPACE]]]。跨格式说明：pptx 也接受空格分隔的 'WIDTH DASH COLOR'；docx 仅接受分号格式 'STYLE;SIZE;COLOR'（SIZE 单位为 1/8 pt）。仅 Add/Set 可用；当前不会返回 table-level border，请改查每个单元格的 border.top。",
       "add": true,
       "set": true,
       "get": true,
@@ -296,7 +296,7 @@
     },
     "border.vertical": {
       "type": "string",
-      "description": "inside-vertical dividers (between columns). Fans out to right of cols 1..M-1 plus left of cols 2..M. Alias: border.insideV. Cross-format note: docx only accepts the semicolon form 'STYLE;SIZE;COLOR' — pptx is more lenient.",
+      "description": "内部垂直分隔线（列之间）。会展开为第 1..M-1 列的右边和第 2..M 列的左边。别名：border.insideV。跨格式说明：docx 仅接受分号格式 'STYLE;SIZE;COLOR'，pptx 更宽松。",
       "aliases": [
         "border.insidev",
         "border.insideV"

@@ -16,7 +16,7 @@
       "/header[N]"
     ]
   },
-  "note": "Headers are stored in HeaderParts and referenced by the last sectPr. Duplicate type rejected at Add. 'first' type auto-enables TitlePage. Field insertion uses complex fldChar (begin/instr/separate/result/end). A single Add supports at most one text + one field pair; composite headers like 'Page X of Y' must be built in steps by adding additional runs/fields to the header's paragraph (/header[N]/p[1]) after creation — see examples.",
+  "note": "Header 存储在 HeaderParts 中，并由最后的 sectPr 引用。每个 section 的重复 type 会在 Add 时被拒绝；'first' type 会自动启用 TitlePage。Field 插入使用 complex fldChar（begin/instr/separate/result/end）。单次 Add 最多支持一个 text + 一个 field pair；对于 'Page X of Y' 这类组合 header，创建后需逐步向 header 的 paragraph（/header[N]/p[1]）Add 额外的 run/field。",
   "examples": [
     "Simple page-number header: officecli add file.docx / --type header --prop field=page --prop align=right",
     "'Page X of Y' — build in steps after creating the header:",
@@ -28,7 +28,7 @@
   "properties": {
     "type": {
       "type": "enum",
-      "description": "header scope.",
+      "description": "header 作用范围。",
       "values": [
         "default",
         "first",
@@ -49,7 +49,7 @@
     },
     "text": {
       "type": "string",
-      "description": "header text (single run).",
+      "description": "header 文本（单个 run）。",
       "add": true,
       "set": true,
       "get": true,
@@ -91,7 +91,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction. 'rtl' writes <w:bidi/> on the header paragraph, <w:rtl/> on the paragraph mark, and <w:rtl/> on every run (text + field runs alike) so Arabic / Hebrew character order reverses end-to-end. 'ltr' clears all three.",
+      "description": "文字方向。'rtl' 会在 header paragraph 上写入 <w:bidi/>，在 paragraph mark 上写入 <w:rtl/>，并在所有 run（包括 text 和 field run）上写入 <w:rtl/>，使 Arabic / Hebrew 的字符顺序全程反转。'ltr' 会清除这三项。",
       "add": true,
       "set": true,
       "get": false,
@@ -113,7 +113,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size. Accepts bare number or pt-suffixed.",
+      "description": "font size。接受不带单位的数字或带 pt 后缀的值。",
       "add": true,
       "set": true,
       "get": true,
@@ -147,7 +147,7 @@
     },
     "color": {
       "type": "color",
-      "description": "font color. Accepts #RRGGBB, RRGGBB, named colors (red, blue…), rgb(r,g,b), or 3-char shorthand (F00).",
+      "description": "font color。接受 #RRGGBB、RRGGBB、named colors（red、blue…）、rgb(r,g,b) 或 3-char shorthand（F00）。",
       "add": true,
       "set": true,
       "get": true,
@@ -159,7 +159,7 @@
     },
     "field": {
       "type": "enum",
-      "description": "complex field to insert (page/numpages/date/author/title/time/filename, or an arbitrary field name).",
+      "description": "要插入的 complex field（page/numpages/date/author/title/time/filename，或任意 field name）。",
       "values": [
         "page",
         "pagenum",

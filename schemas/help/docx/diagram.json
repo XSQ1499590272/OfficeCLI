@@ -16,11 +16,11 @@
       "/body"
     ]
   },
-  "note": "Renders a mermaid diagram into native, editable drawing shapes + connectors in the body. Aliases: flowchart. ADD-ONLY synthesizer (like 'equation'): there is no persistent 'diagram' node, but the whole diagram is wrapped in ONE group (wpg:wgp) and Add returns its path (/body/group[N]), so it stays adjustable as a unit. get /body/group[N] reads the group back (type=group with x/y/width/height); set /body/group[N] --prop width=… --prop height=… resizes the whole diagram — child font sizes re-bake with the resize so text stays proportional; give ONE of width/height to scale proportionally (aspect preserved), or BOTH for an exact box. set /body/group[N] --prop x=… --prop y=… moves the whole diagram (rewrites the floating anchor offset; a single axis leaves the other in place). remove /body/group[N] deletes it (the group and every child, no husk). Non-positive sizes are rejected. A human can instead drag the single group object in Word (note: an interactive drag scales the geometry but Word does not re-bake the absolute font size — use the CLI set for text to scale too). Individual node text is still reachable at /body/textbox[K]. (docx has no drawing 'query' — address the group by index.) The mermaid header selects the layout engine; supported: flowchart / graph, sequenceDiagram. Other mermaid types (gantt, pie, classDiagram, stateDiagram, erDiagram, ...) are rejected with a clear message until implemented. SIZING: docx has no slide to resize (no pptx-style poster) — the diagram always scales into the available space. Give width/height for an explicit box (may enlarge, aspect ratio preserved, like picture/chart); with neither it fits the section's text-area width and is never enlarged. Placed as floating shapes anchored to the page margin. The parse + layout engine is shared with the pptx 'diagram' emitter; only the docx drawing output differs.",
+  "note": "将 mermaid diagram 渲染为 body 中可编辑的 native drawing shapes 和 connectors。Alias：flowchart。此 element 仅支持 ADD：不会保留独立的 diagram node，而是将整个 diagram 包装在一个 group（wpg:wgp）中，Add 返回 /body/group[N]，便于整体调整。可对该 group 执行 get、set width/height 缩放、set x/y 移动和 remove；只设置 width 或 height 时保持比例，同时设置两者则使用精确 box。docx 没有 drawing query，需按 group index 定位。header 支持 flowchart/graph 和 sequenceDiagram；其他 mermaid type 在实现前会被拒绝。没有 width/height 时，diagram 只缩小到 section text-area width，不会放大；设置显式尺寸可放大。diagram 使用浮动 shape 锚定到 page margin，解析和 layout engine 与 pptx diagram 共用，但 drawing 输出不同。",
   "properties": {
     "mermaid": {
       "type": "string",
-      "description": "Mermaid diagram source. Canonical (mirrors equation's 'formula'). Aliases: text, dsl. The first line's header (flowchart TD / sequenceDiagram / ...) selects the diagram kind.",
+      "description": "Mermaid diagram source。规范字段（对应 equation 的 'formula'）。Aliases: text、dsl。首行 header（flowchart TD / sequenceDiagram / ...）决定 diagram 类型。",
       "aliases": ["text", "dsl"],
       "add": true,
       "set": false,
@@ -33,7 +33,7 @@
     },
     "src": {
       "type": "string",
-      "description": "Path to a .mmd file to load the mermaid source from (used when no inline mermaid/text/dsl is given). Consistent with picture 'src' = a file path. Alias: path.",
+      "description": "用于加载 mermaid source 的 .mmd 文件 path（未提供 inline mermaid/text/dsl 时使用）。与 picture 的 'src' 一致，表示 file path。Alias: path。",
       "aliases": ["path"],
       "add": true,
       "set": false,
@@ -45,7 +45,7 @@
     },
     "width": {
       "type": "length",
-      "description": "Width of the box the diagram is scaled to fit (cm/in/pt/EMU). Aspect ratio is preserved. May enlarge past the text width. Default: the section text-area width (shrink-only). Mirrors picture/chart 'width'.",
+      "description": "diagram 要缩放适配的 box 宽度（cm/in/pt/EMU）。保持 aspect ratio；允许超过 text width 放大。默认使用 section text-area width（仅缩小，不放大）。对应 picture/chart 的 'width'。",
       "add": true,
       "set": false,
       "get": false,
@@ -56,7 +56,7 @@
     },
     "height": {
       "type": "length",
-      "description": "Height of the box the diagram is scaled to fit (cm/in/pt/EMU). Aspect ratio is preserved. Default: unbounded (width governs).",
+      "description": "diagram 要缩放适配的 box 高度（cm/in/pt/EMU）。保持 aspect ratio。默认不设上限（由 width 决定）。",
       "add": true,
       "set": false,
       "get": false,
@@ -67,7 +67,7 @@
     },
     "render": {
       "type": "string",
-      "description": "How to render. auto (default): use real mermaid.js via a headless browser (Chrome/Chromium/Edge) when available — covers EVERY mermaid type (gantt/pie/class/state/er/…) at full fidelity, embedded as a PNG with the mermaid source stamped into alt-text (regenerable); falls back to the native synthesizer when no browser is present. native: always the built-in editable-shape synthesizer (no browser; supported subset only; fully editable in Word). image: force the browser path (errors if no browser). mermaid.js is fetched once to a local cache (mirror d.officecli.ai, CDN fallback).",
+      "description": "渲染方式。auto（默认）：有可用的 headless browser（Chrome/Chromium/Edge）时，通过真实 mermaid.js 渲染，支持所有 mermaid 类型（gantt/pie/class/state/er/…），以完整保真度嵌入 PNG，并将 mermaid source 写入 alt-text（可重新生成）；没有 browser 时回退到 native synthesizer。native：始终使用内置的可编辑 shape synthesizer（不使用 browser；仅支持已实现的子集；在 Word 中可完全编辑）。image：强制使用 browser 路径（没有 browser 时报告错误）。mermaid.js 只会下载一次并缓存到本地（mirror 为 d.officecli.ai，CDN 作为 fallback）。",
       "enum": ["auto", "native", "image"],
       "add": true,
       "set": false,

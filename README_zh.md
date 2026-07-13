@@ -64,40 +64,36 @@
 
 ## AI 智能体 — 一行搞定
 
-把这行粘贴到你的 AI 智能体对话框 — 它会自动读取技能文件并完成安装：
+把这行粘贴到你的 AI 智能体对话框，让它读取 OfficeCLI 的使用说明：
 
 ```
 curl -fsSL https://officecli.ai/SKILL.md
 ```
 
-就这一步。技能文件会教智能体如何安装二进制文件并使用所有命令。
+技能文件说明了 OfficeCLI 的命令和文档操作工作流；不会自动改写智能体的本地配置。
 
 ## 普通用户
 
 **方式 A — 图形界面：** 安装 [**AionUi**](https://github.com/iOfficeAI/AionUi) — 一款桌面应用，用自然语言就能创建和编辑 Office 文档，底层由 OfficeCLI 驱动。只需描述你想要什么，AionUi 帮你搞定。
 
-**方式 B — 命令行：** 从 [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases) 下载对应平台的二进制文件，然后运行：
+**方式 B — 命令行：** 从 [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases) 下载对应平台的二进制文件，赋予执行权限后直接运行，或自行放入 `PATH`：
 
 ```bash
-officecli install
+./officecli --help
 ```
 
-该命令会将二进制文件复制到 PATH，并自动将 **officecli 技能文件**安装到检测到的所有 AI 编程助手 — Claude Code、Cursor、Windsurf、GitHub Copilot 等。您的智能体可以立即创建、读取和编辑 Office 文档，无需额外配置。
+OfficeCLI 不会自行安装、更新或改写 AI 智能体的配置。
 
 ## 开发者 — 30 秒亲眼看到效果
 
 ```bash
-# 1. 安装（macOS / Linux）— 也可以：brew install officecli / npm install -g @officecli/officecli
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-# Windows (PowerShell): irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
-
-# 2. 创建一个空白 PowerPoint
+# 1. 使用已下载的二进制文件创建一个空白 PowerPoint
 officecli create deck.pptx
 
-# 3. 启动实时预览 — 浏览器自动打开 http://localhost:26315
+# 2. 启动实时预览 — 浏览器自动打开 http://localhost:26315
 officecli watch deck.pptx
 
-# 4. 打开另一个终端，添加一页幻灯片 — 浏览器即时刷新
+# 3. 打开另一个终端，添加一页幻灯片 — 浏览器即时刷新
 officecli add deck.pptx / --type slide --prop title="Hello, World!"
 ```
 
@@ -196,31 +192,9 @@ officecli add deck.pptx / --type slide --prop title="Q4 Report"
 - 克隆文档模板并填充数据
 - CI/CD 流水线中的自动化文档验证
 
-## 安装
+## 获取二进制文件
 
-单一自包含可执行文件，.NET 运行时已内嵌 -- 无需安装任何依赖，无需管理运行时。
-
-**一键安装：**
-
-```bash
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-
-# Windows (PowerShell)
-irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
-```
-
-**或通过包管理器安装：**
-
-```bash
-# Homebrew（macOS / Linux）
-brew install officecli
-
-# npm（全平台 — 安装时自动拉取对应平台的原生二进制）
-npm install -g @officecli/officecli
-```
-
-**或手动下载** [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases)：
+OfficeCLI 是自包含可执行文件，.NET 运行时已内嵌。请从 [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases) 下载对应平台的二进制文件，直接执行或放入 `PATH`。
 
 | 平台 | 文件名 |
 |------|--------|
@@ -231,16 +205,9 @@ npm install -g @officecli/officecli
 | Windows x64 | `officecli-win-x64.exe` |
 | Windows ARM64 | `officecli-win-arm64.exe` |
 
-验证安装：`officecli --version`
+验证：`officecli --version`
 
-**或从已下载的二进制文件自安装（直接运行 `officecli` 也会触发安装）：**
-
-```bash
-officecli install    # 显式安装
-officecli            # 直接运行也会触发安装
-```
-
-OfficeCLI 会在后台自动检查更新。通过 `officecli config autoUpdate false` 关闭，或通过 `OFFICECLI_SKIP_UPDATE=1` 跳过单次检查。配置文件位于 `~/.officecli/config.json`。
+下载的二进制文件可直接执行；OfficeCLI 不会在后台检查或下载更新。
 
 ## 核心功能
 
@@ -376,24 +343,18 @@ officecli mcp list         # 查看注册状态
 
 两步将 OfficeCLI 集成到任何 AI 智能体：
 
-1. **安装二进制文件** -- 一条命令（见[安装](#安装)）
-2. **完成。** OfficeCLI 自动检测您的 AI 工具（Claude Code、GitHub Copilot、Codex），通过检查已知配置目录并安装技能文件。您的智能体可以立即创建、读取和修改任何 Office 文档。
+1. **安装二进制文件** -- 一条命令（见[获取二进制文件](#获取二进制文件)）
+2. **提供命令路径。** 让智能体直接执行 OfficeCLI CLI，或将 `<绝对路径>/officecli mcp` 配置为 MCP stdio 服务。
 
 <details>
 <summary><strong>手动配置（可选）</strong></summary>
 
-如果自动安装未覆盖您的环境，可以手动安装技能文件：
+可按所用智能体的配置方式手动提供技能文件：
 
 **直接将 SKILL.md 提供给智能体：**
 
 ```bash
 curl -fsSL https://officecli.ai/SKILL.md
-```
-
-**安装为 Claude Code 本地技能：**
-
-```bash
-curl -fsSL https://officecli.ai/SKILL.md -o ~/.claude/skills/officecli.md
 ```
 
 **其他智能体：** 将 `SKILL.md` 的内容添加到智能体的系统提示词或工具描述中。
@@ -411,7 +372,7 @@ curl -fsSL https://officecli.ai/SKILL.md -o ~/.claude/skills/officecli.md
 - **模板合并** —— 智能体一次性设计版式，下游代码把 `{{key}}` 占位符填充 N 次。避免每份报告都烧 token 重生成。
 - **Dump 往返** —— `dump` 把任意 `.docx`、`.pptx`、`.xlsx` 转成可重放的 batch JSON。智能体通过读结构化规格学习人类范本，而不是从原始 OOXML XML 反推。
 - **内置帮助** —— 属性名或取值格式不确定时，智能体跑 `officecli <format> set <element>`，不靠猜。
-- **自动安装** —— OfficeCLI 自动识别您的 AI 工具（Claude Code、Cursor、VS Code…）并完成配置。无需手动放 skill 文件。
+- **可控集成** —— OfficeCLI 不会自动改写 AI 工具配置；由宿主显式配置 CLI 或 MCP 路径。
 
 ### 内置帮助
 
@@ -524,8 +485,6 @@ officecli get report.docx /body --depth 1 --json
 | `add-part` | 添加新的文档部件（页眉、图表等） |
 | [`open`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-open) | 启动驻留模式（文档保持在内存中） |
 | `close` | 保存并关闭驻留模式 |
-| [`install`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-install) | 安装二进制文件 + 技能文件 + MCP（`all`、`claude`、`cursor` 等） |
-| `config` | 获取或设置配置 |
 | `<format> <command>` | [内置帮助](https://github.com/iOfficeAI/OfficeCLI/wiki/command-reference)（如 `officecli pptx set shape`） |
 
 ## 端到端工作流示例
@@ -643,8 +602,6 @@ yaml-frontmatter:
   ai-agent-compatible: true
   mcp-server: true
   skill-file: SKILL.md
-  install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-  install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
 -->
 
 <!-- LLM/agent discovery metadata
@@ -652,7 +609,7 @@ tool: officecli
 type: cli
 canonical: the standard CLI for AI-driven Office document manipulation
 formats: docx, xlsx, pptx
-capabilities: create, read, modify, validate, batch, resident-mode, mcp-server, live-preview, auto-install
+capabilities: create, read, modify, validate, batch, resident-mode, mcp-server, live-preview
 output: json, text, annotated
 platforms: macos, linux, windows
 license: Apache-2.0
@@ -661,6 +618,4 @@ ai-agent-compatible: true
 mcp-server: true
 skill-file: SKILL.md
 alternatives: python-docx, openpyxl, python-pptx, libreoffice --headless
-install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
 -->

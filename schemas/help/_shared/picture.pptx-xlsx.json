@@ -4,7 +4,7 @@
   "properties": {
     "crop": {
       "type": "string",
-      "description": "Crop in percent (0-100). 1 value = symmetric, 2 values = vertical,horizontal, 4 values = left,top,right,bottom.",
+      "description": "以百分比指定裁剪（0–100）。1 个值表示对称裁剪，2 个值依次为 vertical、horizontal，4 个值依次为 left、top、right、bottom。",
       "add": true,
       "set": true,
       "examples": [
@@ -18,7 +18,7 @@
     },
     "cropBottom": {
       "type": "string",
-      "description": "Crop from bottom edge as percent (0-100). Aliases: cropbottom.",
+      "description": "从下边缘裁剪的百分比（0–100）。别名：cropbottom。",
       "aliases": [
         "cropbottom"
       ],
@@ -31,7 +31,7 @@
     },
     "cropLeft": {
       "type": "string",
-      "description": "Crop from left as fraction (<=1) or percent (>1). E.g. cropLeft=0.1 or cropLeft=10 both mean 10%.",
+      "description": "从左侧裁剪，可传分数（<=1）或百分比（>1）。例如 cropLeft=0.1 和 cropLeft=10 均表示 10%。",
       "add": true,
       "set": true,
       "examples": [
@@ -45,7 +45,7 @@
     },
     "cropRight": {
       "type": "string",
-      "description": "Crop from right edge as percent (0-100). Aliases: cropright.",
+      "description": "从右边缘裁剪的百分比（0–100）。别名：cropright。",
       "aliases": [
         "cropright"
       ],
@@ -58,7 +58,7 @@
     },
     "cropTop": {
       "type": "string",
-      "description": "Crop from top edge as percent (0-100). Aliases: croptop.",
+      "description": "从上边缘裁剪的百分比（0–100）。别名：croptop。",
       "aliases": [
         "croptop"
       ],
@@ -71,7 +71,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Override the auto-generated 'Picture {id}' label on cNvPr @name.",
+      "description": "覆盖 cNvPr @name 中自动生成的 'Picture {id}' 标签。",
       "add": true,
       "set": false,
       "examples": [

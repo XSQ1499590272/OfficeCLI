@@ -4,7 +4,7 @@
   "properties": {
     "effective.bold": {
       "type": "bool",
-      "description": "resolved bold inherited from placeholder→layout→master→presentation defaults. Suppressed when 'bold' is set directly on the run.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析得到的粗体设置。run 直接设置 'bold' 时不显示此项。",
       "add": false,
       "set": false,
       "get": true,
@@ -13,7 +13,7 @@
     },
     "effective.color": {
       "type": "color",
-      "description": "resolved text color inherited from placeholder→layout→master→presentation defaults. Suppressed when 'color' is set directly on the run.",
+      "description": "从 placeholder→layout→master→presentation 默认值继承并解析得到的文本颜色。run 直接设置 'color' 时不显示此项。",
       "add": false,
       "set": false,
       "get": true,
@@ -22,7 +22,7 @@
     },
     "effective.size": {
       "type": "font-size",
-      "description": "inheritance-resolved font size (read-only). Surfaced when the run does not set 'size' directly; resolved through run style → paragraph style → docDefaults.",
+      "description": "按继承关系解析得到的字体大小（只读）。当 run 未直接设置 'size' 时显示；解析链为 run style → paragraph style → docDefaults。",
       "add": false,
       "set": false,
       "get": true,
@@ -31,7 +31,7 @@
     },
     "underline": {
       "type": "enum",
-      "description": "underline style. Common values: single, double, dotted, dash, wave, none.",
+      "description": "下划线样式。常用值：single、double、dotted、dash、wave、none。",
       "values": [
         "single",
         "double",

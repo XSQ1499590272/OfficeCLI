@@ -16,14 +16,14 @@ static partial class CommandBuilder
     // which fails with "Unknown command". Document the per-item shape and a
     // concrete example here so `help batch` actually teaches it.
     private const string BatchHelpDescription =
-        "Execute multiple commands from a JSON array in a single pass. Standalone, this is one open/save cycle; through a live resident the items apply in memory and the disk write is deferred to save/close/idle-autosave — adaptive 2-10s after going idle, or before the batch returns under OFFICECLI_RESIDENT_FLUSH=each (officecli's own reads still see the changes immediately).\n\n"
-        + "Each array item is an OBJECT whose \"command\" is the bare verb "
-        + "(add/set/remove/move/swap/get/query/...); the verb's arguments are SIBLING fields, "
-        + "not a CLI string inside \"command\". Common fields: \"parent\" (add target), "
-        + "\"path\" (set/remove/get target), \"type\" (element type for add), "
-        + "\"props\" (a key->value map of --prop values), \"to\"/\"after\"/\"before\" (move), "
-        + "\"path2\" (swap's second path).\n\n"
-        + "Pass the array via --commands, or as the same JSON on stdin / --input <file>. Example:\n"
+        "在一次调用中执行 JSON array 中的多条命令。独立运行时只有一次 open/save 周期；通过运行中的 resident 时，item 在内存中应用，磁盘写入会延迟到 save/close/idle-autosave——空闲后自适应 2–10 秒，或在 OFFICECLI_RESIDENT_FLUSH=each 时于 batch 返回前写入（officecli 自身读取仍会立即看到修改）。\n\n"
+        + "每个 array item 都是 OBJECT，\"command\" 只能是裸动词 "
+        + "（add/set/remove/move/swap/get/query/...）；动词参数是同级字段，"
+        + "不能把完整 CLI 字符串放入 \"command\"。常见字段：\"parent\"（add 目标）、"
+        + "\"path\"（set/remove/get 目标）、\"type\"（add 的元素类型）、"
+        + "\"props\"（--prop 值的 key->value map）、\"to\"/\"after\"/\"before\"（move）、"
+        + "\"path2\"（swap 的第二个路径）。\n\n"
+        + "通过 --commands 传入 array，或将同一 JSON 传入 stdin / --input <file>。示例：\n"
         + "[\n"
         + "  {\"command\":\"add\",\"parent\":\"/slide[1]\",\"type\":\"shape\",\"props\":{\"text\":\"Hi\",\"x\":\"1cm\",\"y\":\"2cm\"}},\n"
         + "  {\"command\":\"set\",\"path\":\"/slide[1]/shape[1]\",\"props\":{\"bold\":\"true\"}},\n"
@@ -117,9 +117,9 @@ static partial class CommandBuilder
 
     private static Command BuildBatchCommand(Option<bool> jsonOption)
     {
-        var batchFileArg = new Argument<FileInfo>("file") { Description = "Office document path" };
-        var batchInputOpt = new Option<FileInfo?>("--input") { Description = "JSON file containing batch commands. If omitted, reads from stdin" };
-        var batchCommandsOpt = new Option<string?>("--commands") { Description = "Inline JSON array of batch commands (alternative to --input or stdin)" };
+        var batchFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径" };
+        var batchInputOpt = new Option<FileInfo?>("--input") { Description = "包含 batch 命令的 JSON 文件；省略时从 stdin 读取" };
+        var batchCommandsOpt = new Option<string?>("--commands") { Description = "内联 JSON batch 命令 array（可替代 --input 或 stdin）" };
         // BUG-R4-BT2: default flipped to continue-on-error. A 700-command
         // dump replay losing 80% of the document on the first failing item
         // (e.g. one unsupported prop) is a far worse default than reporting
@@ -128,8 +128,8 @@ static partial class CommandBuilder
         // exit code is 1 if any item failed, so callers can still tell
         // "everything succeeded". `--stop-on-error` opts back into the
         // strict abort-on-first-failure flow for callers who depend on it.
-        var batchForceOpt = new Option<bool>("--force") { Description = "Deprecated alias for the default continue-on-error mode (kept for compatibility)" };
-        var batchStopOpt = new Option<bool>("--stop-on-error") { Description = "Abort the batch as soon as any command fails (default: continue and report per-item errors)" };
+        var batchForceOpt = new Option<bool>("--force") { Description = "默认“遇错继续”模式的废弃别名（为兼容性保留）" };
+        var batchStopOpt = new Option<bool>("--stop-on-error") { Description = "任一命令失败时立即中止 batch（默认：继续执行并报告每个 item 的错误）" };
         var batchCommand = new Command("batch", BatchHelpDescription);
         batchCommand.Add(batchFileArg);
         batchCommand.Add(batchInputOpt);

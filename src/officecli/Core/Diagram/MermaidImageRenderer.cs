@@ -67,32 +67,6 @@ public static class MermaidImageRenderer
     public static bool IsAvailable() => TryLocateMmdc(out _) || HtmlScreenshot.HasChromeFamily();
 
     /// <summary>
-    /// Daily-refresh hook, called from <see cref="UpdateChecker"/>'s once-per-24h
-    /// background process (already talking to the mirror). Revalidates an <b>already
-    /// cached</b> mermaid.js against the mirror with a conditional request and updates
-    /// it if the server's copy changed. Never pre-downloads (first-use owns that),
-    /// never blocks, never throws. Only the chrome backend uses this cache; mmdc ships
-    /// its own mermaid.
-    /// </summary>
-    public static void RefreshCacheIfPresent()
-    {
-        try
-        {
-            if (!File.Exists(CachedJsPath)) return; // refresh only what the user actually uses
-            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-            using var req = new HttpRequestMessage(HttpMethod.Get, MirrorUrl);
-            req.Headers.IfModifiedSince = new DateTimeOffset(File.GetLastWriteTimeUtc(CachedJsPath));
-            using var resp = http.SendAsync(req).GetAwaiter().GetResult();
-            if (resp.StatusCode == System.Net.HttpStatusCode.NotModified) return; // unchanged → keep cache
-            if (!resp.IsSuccessStatusCode) return;                                 // mirror hiccup → keep cache
-            var bytes = resp.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-            if (bytes.Length > 500_000)
-                File.WriteAllBytes(CachedJsPath, bytes);
-        }
-        catch { /* best effort — the existing cache stays usable */ }
-    }
-
-    /// <summary>
     /// Render <paramref name="mermaid"/> to a temporary PNG file and return its path
     /// (caller owns + deletes it). Tries mmdc first (purpose-built, one call), then a
     /// chrome-family browser; degrades between them so a broken mmdc still yields a

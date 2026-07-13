@@ -18,7 +18,7 @@
       "/slide[N]/chart[N]/series[N]"
     ]
   },
-  "note": "At Add time, series pass as dotted props on the parent chart (series1.name, series1.values, series1.color, series1.categories); this schema is per-series Set/Get after creation. Combo charts (mixed chartType / secondary axis) are unsupported — create separate charts. `lineStyle` is not a key (rejected as UNSUPPORTED — use lineWidth + lineDash).",
+  "note": "Add 时，series 通过 parent chart 上的点号 props 传入（series1.name、series1.values、series1.color、series1.categories）；创建后使用此 schema 对单个 series 执行 Set/Get。不支持 Combo chart（混合 chartType 或 secondary axis），请创建多个 chart。lineStyle 不是有效 key（会被拒绝并报告 UNSUPPORTED），请改用 lineWidth + lineDash。",
   "extends": [
     "_shared/chart-series",
     "_shared/chart-series.pptx-xlsx"
@@ -26,7 +26,7 @@
   "properties": {
     "x": {
       "type": "string",
-      "description": "scatter/bubble per-series X values (the numeric X domain read from <c:xVal>). Read-only readback key surfaced by Get on scatter/bubble series. X data is supplied at Add time through the chart-level `categories=` list (scatter/bubble map categories onto the X axis), not via a per-series Set. Functional but previously undocumented.",
+      "description": "scatter/bubble 每个 series 的 X values（从 <c:xVal> 读出的 numeric X domain）。这是 Get 在 scatter/bubble series 上返回的只读 key。X data 在 Add 时通过 chart-level `categories=` list 提供（scatter/bubble 会将 categories 映射到 X 轴），而不是通过 per-series Set 提供。该功能可用，但此前未在文档中说明。",
       "add": false,
       "set": false,
       "get": true,
@@ -36,7 +36,7 @@
     },
     "categories": {
       "type": "string",
-      "description": "per-series category override; range reference only. pptx override: not supported on per-series Set (handler rejects categories on /chart[N]/series[N] paths). Set categories at chart level via `categories=...` instead.",
+      "description": "per-series category override；仅支持 range reference。pptx 特有行为：不支持在 per-series Set 中设置（handler 会拒绝 /chart[N]/series[N] path 上的 categories）。请改用 chart-level 的 `categories=...` 设置 categories。",
       "add": true,
       "set": false,
       "get": true,

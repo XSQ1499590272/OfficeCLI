@@ -16,7 +16,7 @@
     },
     "text": {
       "type": "string",
-      "description": "comment body. Required.",
+      "description": "comment 正文。必填。",
       "add": true,
       "set": true,
       "get": true,

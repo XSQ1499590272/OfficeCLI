@@ -9,7 +9,7 @@
     "get": true,
     "remove": false
   },
-  "note": "Mirror of pptx/chart-axis. Axes are created/destroyed implicitly by chartType changes — no direct Add/Remove. At chart-creation time, configure via the chart's axis* props (axismin/axismax/axistitle/axisfont/…); chart-axis covers post-creation only. Known gaps: `labelFont` writes the title run (not tick labels); `lineWidth`/`lineDash` apply to all plot-area series — use chart-series for series-specific line styling.",
+  "note": "这是 pptx/chart-axis 的镜像。axis 会随 chartType 变化隐式创建或销毁，不提供直接 Add/Remove。创建 chart 时通过 chart 的 axis* props（axismin/axismax/axistitle/axisfont/…）配置；chart-axis 仅覆盖创建后的操作。已知限制：labelFont 写入 title run，而不是 tick labels；lineWidth/lineDash 应用到所有 plot-area series；要设置单个 series 的线型，请使用 chart-series。",
   "addressing": {
     "key": "role",
     "pathForm": "/chart[N]/axis[@role=ROLE]",

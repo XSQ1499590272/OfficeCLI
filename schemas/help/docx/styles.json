@@ -14,9 +14,9 @@
   "paths": {
     "positional": ["/styles"]
   },
-  "note": "StyleDefinitionsPart container. Add new styles here (see docx/style.json). Individual styles addressed by id: /styles/StyleId.",
+  "note": "StyleDefinitionsPart container。可在此 Add 新 style（参见 docx/style.json）。单个 style 通过 id 定位：/styles/StyleId。",
   "properties": {
-    "count": { "type":"number", "add":false, "set":false, "get":true, "description":"total number of style definitions in styles.xml.", "readback":"integer style count", "enforcement":"report" }
+    "count": { "type":"number", "add":false, "set":false, "get":true, "description":"styles.xml 中 style definition 的总数。", "readback":"integer style count", "enforcement":"report" }
   },
   "children": [
     { "element": "style", "pathSegment": "{StyleId}", "cardinality": "0..n" }

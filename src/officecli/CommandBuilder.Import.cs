@@ -11,18 +11,18 @@ static partial class CommandBuilder
 {
     private static Command BuildImportCommand(Option<bool> jsonOption)
     {
-        var importFileArg = new Argument<FileInfo>("file") { Description = "Target Excel file (.xlsx)" };
-        var importParentPathArg = new Argument<string>("parent-path") { Description = "Sheet path (e.g. /Sheet1)" };
-        var importSourceArg = new Argument<FileInfo?>("source-file") { Description = "Source CSV/TSV file to import (positional, alternative to --file)" };
+        var importFileArg = new Argument<FileInfo>("file") { Description = "目标 Excel 文件（.xlsx）" };
+        var importParentPathArg = new Argument<string>("parent-path") { Description = "Sheet 路径（例如 /Sheet1）" };
+        var importSourceArg = new Argument<FileInfo?>("source-file") { Description = "要导入的源 CSV/TSV 文件（位置参数，可替代 --file）" };
         importSourceArg.DefaultValueFactory = _ => null!;
-        var importSourceOpt = new Option<FileInfo?>("--file") { Description = "Source CSV/TSV file to import" };
-        var importStdinOpt = new Option<bool>("--stdin") { Description = "Read CSV/TSV data from stdin" };
-        var importFormatOpt = new Option<string?>("--format") { Description = "Data format: csv or tsv (default: inferred from file extension, or csv)" };
-        var importHeaderOpt = new Option<bool>("--header") { Description = "First row is header: set AutoFilter and freeze pane" };
-        var importStartCellOpt = new Option<string>("--start-cell") { Description = "Starting cell (default: A1)" };
+        var importSourceOpt = new Option<FileInfo?>("--file") { Description = "要导入的源 CSV/TSV 文件" };
+        var importStdinOpt = new Option<bool>("--stdin") { Description = "从 stdin 读取 CSV/TSV 数据" };
+        var importFormatOpt = new Option<string?>("--format") { Description = "数据格式：csv 或 tsv（默认从文件扩展名推断，否则为 csv）" };
+        var importHeaderOpt = new Option<bool>("--header") { Description = "首行作为 header：设置 AutoFilter 并冻结窗格" };
+        var importStartCellOpt = new Option<string>("--start-cell") { Description = "起始单元格（默认：A1）" };
         importStartCellOpt.DefaultValueFactory = _ => "A1";
 
-        var importCommand = new Command("import", "Import CSV/TSV data into an Excel sheet");
+        var importCommand = new Command("import", "将 CSV/TSV 数据导入 Excel sheet");
         importCommand.Add(importFileArg);
         importCommand.Add(importParentPathArg);
         importCommand.Add(importSourceArg);
@@ -120,12 +120,12 @@ static partial class CommandBuilder
 
     private static Command BuildCreateCommand(Option<bool> jsonOption)
     {
-        var createFileArg = new Argument<string>("file") { Description = "Output file path (.docx, .xlsx, .pptx)" };
-        var createTypeOpt = new Option<string>("--type") { Description = "Document type (docx, xlsx, pptx) — optional, inferred from file extension" };
-        var createForceOpt = new Option<bool>("--force") { Description = "Overwrite an existing file." };
-        var createLocaleOpt = new Option<string>("--locale") { Description = "Locale tag (e.g. zh-CN, ja, ko, ar, he) — sets per-script default fonts in docDefaults and enables RTL layout for Arabic / Hebrew / Persian / Urdu and similar locales. Without this flag, the OS user culture (CFLocale on macOS, $LANG on Linux, user UI culture on Windows) is used as the default. Pass --locale en-US to force a deterministic LTR/Latin baseline regardless of the host machine. Currently only honored for .docx." };
-        var createMinimalOpt = new Option<bool>("--minimal") { Description = "(.docx only) Skip Word's Normal.dotm-style baseline (Calibri 11pt + Normal style + theme1.xml) and emit a raw OOXML-spec docx instead. Use for testing edge cases or producing maximally compact output. Without this flag, the doc carries Word-aligned defaults so it renders identically in Word, other producers, and the cli preview." };
-        var createCommand = new Command("create", "Create a blank Office document");
+        var createFileArg = new Argument<string>("file") { Description = "输出文件路径（.docx、.xlsx、.pptx）" };
+        var createTypeOpt = new Option<string>("--type") { Description = "文档类型（docx、xlsx、pptx）；可选，默认从文件扩展名推断" };
+        var createForceOpt = new Option<bool>("--force") { Description = "覆盖已存在的文件。" };
+        var createLocaleOpt = new Option<string>("--locale") { Description = "Locale tag（例如 zh-CN、ja、ko、ar、he）：在 docDefaults 中设置各文字系统默认字体，并为 Arabic / Hebrew / Persian / Urdu 等 RTL locale 启用 RTL 布局。不传时默认使用 OS 用户 culture（macOS 的 CFLocale、Linux 的 $LANG、Windows 的用户 UI culture）。传入 --locale en-US 可不受宿主机影响，强制确定性的 LTR/Latin 基线。目前仅对 .docx 生效。" };
+        var createMinimalOpt = new Option<bool>("--minimal") { Description = "（仅 .docx）跳过 Word 的 Normal.dotm 风格基线（Calibri 11pt + Normal style + theme1.xml），改为输出原始 OOXML-spec docx。适用于测试边界场景或生成最精简输出。不传时文档采用与 Word 对齐的默认值，以便在 Word、其他 producer 和 CLI preview 中一致渲染。" };
+        var createCommand = new Command("create", "创建空白 Office 文档");
         createCommand.Add(createFileArg);
         createCommand.Add(createTypeOpt);
         createCommand.Add(createForceOpt);
@@ -269,11 +269,11 @@ static partial class CommandBuilder
 
     private static Command BuildMergeCommand(Option<bool> jsonOption)
     {
-        var mergeTemplateArg = new Argument<string>("template") { Description = "Template file path (.docx, .xlsx, .pptx) with {{key}} placeholders" };
-        var mergeOutputArg = new Argument<string>("output") { Description = "Output file path" };
-        var mergeDataOpt = new Option<string>("--data") { Description = "JSON data or path to .json file", Required = true };
-        var mergeForceOpt = new Option<bool>("--force") { Description = "Overwrite an existing output file." };
-        var mergeCommand = new Command("merge", "Merge template with JSON data, replacing {{key}} placeholders");
+        var mergeTemplateArg = new Argument<string>("template") { Description = "含 {{key}} 占位符的 template 文件路径（.docx、.xlsx、.pptx）" };
+        var mergeOutputArg = new Argument<string>("output") { Description = "输出文件路径" };
+        var mergeDataOpt = new Option<string>("--data") { Description = "JSON 数据或 .json 文件路径", Required = true };
+        var mergeForceOpt = new Option<bool>("--force") { Description = "覆盖已存在的输出文件。" };
+        var mergeCommand = new Command("merge", "以 JSON 数据合并 template，替换 {{key}} 占位符");
         mergeCommand.Add(mergeTemplateArg);
         mergeCommand.Add(mergeOutputArg);
         mergeCommand.Add(mergeDataOpt);

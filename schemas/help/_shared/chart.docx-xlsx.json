@@ -4,7 +4,7 @@
   "properties": {
     "seriesCount": {
       "type": "number",
-      "description": "number of data series in the chart (extended cx:chart only).",
+      "description": "chart 中 data series 的数量（仅扩展 cx:chart）。",
       "add": false,
       "set": false,
       "get": true,

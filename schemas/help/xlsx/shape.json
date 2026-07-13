@@ -16,12 +16,12 @@
       "/SheetName/shape[N]"
     ]
   },
-  "note": "Aliases: textbox. Anchor: 'anchor=B2:F7' (cell range) or x/y/width/height in cell units. 'ref=B2' expands to a 1x1 cell rectangle. Font/text props accept either bare ('size', 'bold', 'color', 'font') or dotted ('font.size', 'font.bold', 'font.color', 'font.name') forms.",
+  "note": "Alias：textbox。Anchor 可使用 anchor=B2:F7（cell range），或使用 cell units 的 x/y/width/height。ref=B2 会扩展为 1x1 cell rectangle。Font/text props 既接受 bare form（size、bold、color、font），也接受点号 form（font.size、font.bold、font.color、font.name）。",
   "extends": "_shared/shape",
   "properties": {
     "anchor": {
       "type": "string",
-      "description": "cell range anchor (e.g. B2:F7) — Add-only. Set uses x/y/width/height; Get readback emits x/y/width/height instead of cell-range form (round-trip via numeric position, not anchor string).",
+      "description": "单元格范围 anchor（如 B2:F7），仅 Add 支持。Set 使用 x/y/width/height；Get 返回 x/y/width/height，而不是单元格范围形式（通过数值位置而非 anchor string round-trip）。",
       "aliases": [
         "ref"
       ],
@@ -36,7 +36,7 @@
     },
     "gradientFill": {
       "type": "string",
-      "description": "Two/three-stop linear gradient, e.g. 'C1-C2[-C3][:angle]'. Mutually exclusive with fill (gradientFill wins).",
+      "description": "两段或三段 linear gradient，如 'C1-C2[-C3][:angle]'。与 fill 互斥（gradientFill 优先）。",
       "add": true,
       "set": false,
       "examples": [
@@ -46,7 +46,7 @@
     },
     "geometry": {
       "type": "string",
-      "description": "geometry preset name (rect, ellipse, roundRect, triangle, rightArrow, etc.). Unknown presets fall back to rect with a stderr warning. Set replaces the existing PresetGeometry preserving fill/line/effects.",
+      "description": "geometry preset 名称（rect、ellipse、roundRect、triangle、rightArrow 等）。未知 preset 会回退为 rect，并在 stderr 输出警告。Set 会替换现有 PresetGeometry，同时保留 fill/line/effects。",
       "aliases": [
         "preset",
         "shape"
@@ -61,7 +61,7 @@
     },
     "flip": {
       "type": "string",
-      "description": "Compact flip token: 'h' / 'v' / 'both' / 'hv' / 'vh' / 'none'.",
+      "description": "简写 flip token：'h' / 'v' / 'both' / 'hv' / 'vh' / 'none'。",
       "add": true,
       "set": true,
       "examples": [
@@ -72,7 +72,7 @@
     },
     "flipBoth": {
       "type": "bool",
-      "description": "Flip both axes.",
+      "description": "同时翻转两个轴。",
       "add": true,
       "set": true,
       "examples": [
@@ -82,7 +82,7 @@
     },
     "x": {
       "type": "length",
-      "description": "x as TwoCellAnchor column/row index. xlsx cell-anchor positioning, integer.",
+      "description": "x 位置，以 TwoCellAnchor 的列/行索引表示。xlsx cell-anchor 定位，整数。",
       "aliases": [
         "left"
       ],
@@ -100,7 +100,7 @@
     },
     "y": {
       "type": "string",
-      "description": "y as TwoCellAnchor column/row index. xlsx cell-anchor positioning, integer.",
+      "description": "y 位置，以 TwoCellAnchor 的列/行索引表示。xlsx cell-anchor 定位，整数。",
       "add": true,
       "set": true,
       "get": true,
@@ -116,7 +116,7 @@
     },
     "width": {
       "type": "string",
-      "description": "width as TwoCellAnchor column/row index. xlsx cell-anchor positioning, integer.",
+      "description": "宽度，以 TwoCellAnchor 的列/行索引表示。xlsx cell-anchor 定位，整数。",
       "add": true,
       "set": true,
       "get": true,
@@ -133,7 +133,7 @@
     },
     "height": {
       "type": "string",
-      "description": "height as TwoCellAnchor column/row index. xlsx cell-anchor positioning, integer.",
+      "description": "高度，以 TwoCellAnchor 的列/行索引表示。xlsx cell-anchor 定位，整数。",
       "add": true,
       "set": true,
       "get": true,

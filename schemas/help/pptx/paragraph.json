@@ -16,7 +16,7 @@
       "/slide[N]/shape[M]/p[K]"
     ]
   },
-  "note": "Aliases: para. Appends a:p to a shape's TextBody. Alignment uses pptx vocabulary (l/ctr/r/just); lineSpacing via SpacingConverter.",
+  "note": "Alias：para。向 shape 的 TextBody 追加 a:p。对齐使用 pptx vocabulary（l/ctr/r/just）；lineSpacing 通过 SpacingConverter 处理。",
   "children": [
     {
       "element": "run",
@@ -49,7 +49,7 @@
     },
     "level": {
       "type": "int",
-      "description": "list indent level 0-8.",
+      "description": "list 缩进 level，范围 0–8。",
       "add": true,
       "set": true,
       "get": true,
@@ -64,7 +64,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "left text margin (CT_TextParagraphProperties @marL).",
+      "description": "左文本边距（CT_TextParagraphProperties @marL）。",
       "readback": "unit-qualified pt length (e.g. '36pt')",
       "enforcement": "report"
     },
@@ -73,7 +73,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "right text margin (CT_TextParagraphProperties @marR).",
+      "description": "右文本边距（CT_TextParagraphProperties @marR）。",
       "readback": "unit-qualified pt length (e.g. '36pt')",
       "enforcement": "report"
     },
@@ -82,12 +82,12 @@
       "add": false,
       "set": false,
       "get": false,
-      "description": "Not applicable to pptx. PowerPoint has no independent line-spacing rule — the rule is inferred from the lineSpacing value's format (e.g. '1.5x' / '150%' → percent rule, '18pt' → fixed-points rule). Override of _shared/paragraph which inherits the docx-style lineRule.",
+      "description": "不适用于 pptx。PowerPoint 没有独立的 line-spacing rule，会从 lineSpacing 值的格式推导（如 '1.5x' / '150%' → percent rule，'18pt' → fixed-points rule）。此项覆盖继承 docx-style lineRule 的 _shared/paragraph 定义。",
       "enforcement": "report"
     },
     "bold": {
       "type": "bool",
-      "description": "paragraph default run weight. Stored on the paragraph's defRPr (CT_TextCharacterProperties) and inherited by every run in the paragraph that does not override `bold`. Folded onto the paragraph by dump when every run shares the same value.",
+      "description": "paragraph 默认 run weight。存储在 paragraph 的 defRPr（CT_TextCharacterProperties）上，由未覆盖 bold 的每个 run 继承。当所有 run 共享相同值时，dump 会将其折叠到 paragraph。",
       "add": true,
       "set": true,
       "get": true,
@@ -97,7 +97,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "paragraph default run italic. Stored on the paragraph's defRPr and inherited by every run that does not override `italic`. Folded onto the paragraph by dump when every run shares the same value.",
+      "description": "paragraph 默认 run italic。存储在 paragraph 的 defRPr 上，由未覆盖 italic 的每个 run 继承。当所有 run 共享相同值时，dump 会将其折叠到 paragraph。",
       "add": true,
       "set": true,
       "get": true,
@@ -107,7 +107,7 @@
     },
     "color": {
       "type": "color",
-      "description": "paragraph default run color. Stored on the paragraph's defRPr solidFill and inherited by every run that does not override `color`. Folded onto the paragraph by dump when every run shares the same value.",
+      "description": "paragraph 默认 run color。存储在 paragraph 的 defRPr solidFill 上，由未覆盖 color 的每个 run 继承。当所有 run 共享相同值时，dump 会将其折叠到 paragraph。",
       "add": true,
       "set": true,
       "get": true,
@@ -117,7 +117,7 @@
     },
     "size": {
       "type": "length",
-      "description": "paragraph default run font size (points). Stored on the paragraph's defRPr (@sz, units of 1/100 pt) and inherited by every run that does not override `size`. Folded onto the paragraph by dump when every run shares the same value.",
+      "description": "paragraph 默认 run font size（pt）。存储在 paragraph 的 defRPr（@sz，单位为 1/100 pt）上，由未覆盖 size 的每个 run 继承。当所有 run 共享相同值时，dump 会将其折叠到 paragraph。",
       "add": true,
       "set": true,
       "get": true,
@@ -127,7 +127,7 @@
     },
     "lang": {
       "type": "string",
-      "description": "BCP-47 language tag stamped on the paragraph's defRPr (@lang). Folded onto the paragraph by dump when every run shares the same lang value (single-run collapse). See pptx/run.json for full semantics.",
+      "description": "写入 paragraph defRPr（@lang）的 BCP-47 language tag。当每个 run 具有相同 lang 值时，dump 会折叠到 paragraph（single-run collapse）。完整语义见 pptx/run.json。",
       "aliases": ["lang.latin"],
       "add": true,
       "set": true,
@@ -138,7 +138,7 @@
     },
     "list": {
       "type": "string",
-      "description": "paragraph bullet style. Named presets (bullet, dash, arrow, check, star, none) or a literal bullet character; 'numbered'/'alpha'/'roman'/... map to auto-numbered schemes. Mutually exclusive with bulletRaw — when a non-standard bullet (custom buFont/buChar/buBlip) is present, Get emits bulletRaw instead of list.",
+      "description": "paragraph bullet 样式。支持命名 preset（bullet、dash、arrow、check、star、none）或字面 bullet character；'numbered'/'alpha'/'roman' 等映射为 auto-numbered scheme。与 bulletRaw 互斥：存在非标准 bullet（自定义 buFont/buChar/buBlip）时，Get 返回 bulletRaw 而非 list。",
       "aliases": ["bullet"],
       "add": true,
       "set": true,
@@ -149,7 +149,7 @@
     },
     "tabs": {
       "type": "string",
-      "description": "custom tab stops as a compact comma-separated list of pos:align pairs (e.g. '1in:l,2in:r'). Alignment aliases: l (left), ctr (center), r (right), dec (decimal). Writes a:tabLst on the paragraph. An invalid alignment token rejects the whole value and leaves existing tab stops intact.",
+      "description": "自定义 tab stop，使用紧凑的逗号分隔 pos:align 对（如 '1in:l,2in:r'）。对齐别名：l（left）、ctr（center）、r（right）、dec（decimal）。会在 paragraph 上写入 a:tabLst。无效的 alignment token 会拒绝整个值，并保留现有 tab stop。",
       "aliases": ["tablist"],
       "add": true,
       "set": true,

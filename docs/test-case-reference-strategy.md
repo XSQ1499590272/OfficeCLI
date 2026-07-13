@@ -24,9 +24,9 @@
    - 这是当前 CI 实际执行的验证边界。
    - 适合定义 E2E 的最低线：发布产物能创建文档、修改文档、读取文档、安装自身，SDK 能完成自动安装和 pipe round-trip。
 
-4. `README.md`、`plugins/plugin-protocol.md`、`schemas/README.md`
+4. `SKILL.md`、`schemas/README.md`
    - 这是架构、协议和能力说明。
-   - 适合提取跨模块测试：L1 view、L2 DOM、L3 raw XML、插件协议、错误码、session 生命周期。
+   - 适合提取跨模块测试：L1 view、L2 DOM、L3 raw XML、错误码、session 生命周期。
 
 5. 历史回归信息
    - 历史提交中带有 `fix(...)`、`round-trip`、`dump-batch test campaign`、`schema drift` 等关键词的提交，可作为回归测试候选来源。
@@ -73,8 +73,7 @@
 优先覆盖：
 
 - 三种主格式各一条最小链路：`.docx`、`.xlsx`、`.pptx`。
-- 安装链路：`install`、`install.sh`、`install.ps1`。
-- SDK 链路：Node SDK 和 Python SDK 的自动安装 + pipe round-trip。
+- SDK 链路：Node SDK 和 Python SDK 在既有二进制路径下的 pipe round-trip。
 - 少量代表性示例脚本，而不是全量 examples。
 
 参考现有文件：
@@ -93,7 +92,7 @@
 
 - 类型: unit | integration | e2e | contract | regression
 - 优先级: P0 | P1 | P2
-- 依据: schema | example | ci | readme | plugin-protocol | regression | source-confirmed
+- 依据: schema | example | ci | skill | regression | source-confirmed
 - 依据文件: `<path>`
 - 覆盖能力: `<command/element/property>`
 - 前置条件: `<需要的样例文件、SDK、平台或环境变量>`

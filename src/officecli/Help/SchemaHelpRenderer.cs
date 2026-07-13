@@ -53,12 +53,12 @@ internal static class SchemaHelpRenderer
             && (!opsEl.TryGetProperty(verbFilter, out var opVal)
                 || opVal.ValueKind != JsonValueKind.True))
         {
-            sb.AppendLine($"'{verbFilter}' is not supported on {format} {element}.");
+            sb.AppendLine($"{format} {element} 不支持 '{verbFilter}'。");
             return sb.ToString().TrimEnd('\r', '\n');
         }
 
         if (isContainer)
-            sb.AppendLine("Read-only container (never created or removed via CLI).");
+            sb.AppendLine("只读容器（不能通过 CLI 创建或删除）。");
 
         if (root.TryGetProperty("description", out var topDesc)
             && topDesc.ValueKind == JsonValueKind.String
@@ -77,7 +77,7 @@ internal static class SchemaHelpRenderer
                 _ => "",
             };
             if (!string.IsNullOrEmpty(parentStr))
-                sb.AppendLine($"Parent: {parentStr}");
+                sb.AppendLine($"父元素：{parentStr}");
         }
 
         if (root.TryGetProperty("paths", out var paths))
@@ -90,14 +90,14 @@ internal static class SchemaHelpRenderer
                 foreach (var p in pos.EnumerateArray())
                     if (p.GetString() is { } s) pathList.Add(s);
             if (pathList.Count > 0)
-                sb.AppendLine($"Paths: {string.Join("  ", pathList)}");
+                sb.AppendLine($"路径：{string.Join("  ", pathList)}");
         }
 
         if (root.TryGetProperty("addressing", out var addressing))
         {
             var form = addressing.TryGetProperty("pathForm", out var pf) ? pf.GetString() : null;
             if (!string.IsNullOrEmpty(form))
-                sb.AppendLine($"Addressing: {form}");
+                sb.AppendLine($"寻址方式：{form}");
 
             // Render the address-key's allowed values (e.g. role=cat|val|ser).
             // Without this, the path placeholder ("ROLE") is undocumented and
@@ -111,7 +111,7 @@ internal static class SchemaHelpRenderer
                 foreach (var v in kv.EnumerateArray())
                     if (v.ValueKind == JsonValueKind.String) vals.Add(v.GetString()!);
                 if (vals.Count > 0)
-                    sb.AppendLine($"  {keyEl.GetString()} values: {string.Join(", ", vals)}");
+                    sb.AppendLine($"  {keyEl.GetString()} 可选值：{string.Join(", ", vals)}");
             }
         }
 
@@ -124,7 +124,7 @@ internal static class SchemaHelpRenderer
                     active.Add(op.Name);
             }
             if (active.Count > 0)
-                sb.AppendLine($"Operations: {string.Join(" ", active)}");
+                sb.AppendLine($"操作：{string.Join(" ", active)}");
 
             // Usage examples block: synthesize one CLI line per supported verb
             // from `paths.positional[0]` (fallback `paths.stable[0]`) + `element`.
@@ -137,8 +137,8 @@ internal static class SchemaHelpRenderer
         {
             sb.AppendLine();
             sb.AppendLine(verbFilter == null
-                ? "Properties:"
-                : $"Properties ({verbFilter}):");
+                ? "属性："
+                : $"属性（{verbFilter}）：");
             int shown = 0;
             foreach (var prop in props.EnumerateObject())
             {
@@ -153,7 +153,7 @@ internal static class SchemaHelpRenderer
                 shown++;
             }
             if (verbFilter != null && shown == 0)
-                sb.AppendLine($"  (no properties participate in '{verbFilter}' for this element)");
+                sb.AppendLine($"  （此元素没有参与 '{verbFilter}' 的属性）");
         }
 
         if (root.TryGetProperty("parts", out var parts)
@@ -161,7 +161,7 @@ internal static class SchemaHelpRenderer
             && parts.GetArrayLength() > 0)
         {
             sb.AppendLine();
-            sb.AppendLine("Parts:");
+            sb.AppendLine("Part：");
             int padTo = 0;
             foreach (var pt in parts.EnumerateArray())
             {
@@ -181,7 +181,7 @@ internal static class SchemaHelpRenderer
             && children.GetArrayLength() > 0)
         {
             sb.AppendLine();
-            sb.AppendLine("Children:");
+            sb.AppendLine("子元素：");
             foreach (var child in children.EnumerateArray())
             {
                 var el = child.TryGetProperty("element", out var ce) ? ce.GetString() : "?";
@@ -194,7 +194,7 @@ internal static class SchemaHelpRenderer
         if (root.TryGetProperty("note", out var note) && note.GetString() is { } noteStr)
         {
             sb.AppendLine();
-            sb.AppendLine($"Note: {noteStr}");
+            sb.AppendLine($"说明：{noteStr}");
         }
 
         if (root.TryGetProperty("examples", out var topExamples)
@@ -202,7 +202,7 @@ internal static class SchemaHelpRenderer
             && topExamples.GetArrayLength() > 0)
         {
             sb.AppendLine();
-            sb.AppendLine("Examples:");
+            sb.AppendLine("示例：");
             foreach (var ex in topExamples.EnumerateArray())
             {
                 if (ex.ValueKind == JsonValueKind.String)
@@ -297,7 +297,7 @@ internal static class SchemaHelpRenderer
         if (lines.Count == 0) return;
 
         sb.AppendLine();
-        sb.AppendLine("Usage:");
+        sb.AppendLine("用法：");
         foreach (var line in lines) sb.AppendLine(line);
     }
 
@@ -344,19 +344,19 @@ internal static class SchemaHelpRenderer
                     .Select(a => a.GetString())
                     .Where(a => !string.IsNullOrEmpty(a))
                     .ToList();
-                if (list.Count > 0) aliasStr = $"   aliases: {string.Join(", ", list!)}";
+                if (list.Count > 0) aliasStr = $"   别名：{string.Join(", ", list!)}";
             }
             else if (aliases.ValueKind == JsonValueKind.Object)
             {
                 var list = aliases.EnumerateObject().Select(a => a.Name).ToList();
-                if (list.Count > 0) aliasStr = $"   aliases: {string.Join(", ", list)}";
+                if (list.Count > 0) aliasStr = $"   别名：{string.Join(", ", list)}";
             }
         }
 
         sb.AppendLine($"  {name}   {type}   [{opsStr}]{aliasStr}");
 
         if (body.TryGetProperty("description", out var desc) && desc.GetString() is { } dstr)
-            sb.AppendLine($"    description: {dstr}");
+            sb.AppendLine($"    说明：{dstr}");
 
         if (body.TryGetProperty("values", out var values)
             && values.ValueKind == JsonValueKind.Array)
@@ -364,7 +364,7 @@ internal static class SchemaHelpRenderer
             var vlist = values.EnumerateArray()
                 .Select(v => v.GetString()).Where(v => !string.IsNullOrEmpty(v)).ToList();
             if (vlist.Count > 0)
-                sb.AppendLine($"    values: {string.Join(", ", vlist!)}");
+                sb.AppendLine($"    可选值：{string.Join(", ", vlist!)}");
         }
 
         if (body.TryGetProperty("examples", out var examples)
@@ -372,10 +372,10 @@ internal static class SchemaHelpRenderer
         {
             foreach (var ex in examples.EnumerateArray())
                 if (ex.GetString() is { } exs)
-                    sb.AppendLine($"    example: {exs}");
+                    sb.AppendLine($"    示例：{exs}");
         }
 
         if (body.TryGetProperty("readback", out var rb) && rb.GetString() is { } rbstr)
-            sb.AppendLine($"    readback: {rbstr}");
+            sb.AppendLine($"    读取结果：{rbstr}");
     }
 }

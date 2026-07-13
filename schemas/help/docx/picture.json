@@ -16,7 +16,7 @@
       "/body/p[@paraId=X]/r[N]"
     ]
   },
-  "note": "Aliases: image, img. 'src' is required (alias 'path'). Image source resolved via ImageSource — accepts file path, URL, data-URI, or raw bytes. SVGs auto-generate a PNG fallback.",
+  "note": "Aliases：image、img。'src' 必填（alias：'path'）。Image source 通过 ImageSource 解析，接受 file path、URL、data-URI 或 raw bytes。SVG 会自动生成 PNG fallback。",
   "extends": [
     "_shared/picture",
     "_shared/picture.docx-pptx",
@@ -25,7 +25,7 @@
   "properties": {
     "decorative": {
       "type": "bool",
-      "description": "Mark the picture as decorative for accessibility. Stored as an adec:decorative extension under <wp:docPr> (uri {C183D7F6-DF14-4A22-8298-3B9A5F5C6C3B}). Screen readers skip decorative images; Word treats their alt text as absent.",
+      "description": "将图片标记为用于 accessibility 的 decorative 图片。存储为 <wp:docPr> 下的 adec:decorative extension（uri {C183D7F6-DF14-4A22-8298-3B9A5F5C6C3B}）。screen reader 会跳过 decorative 图片；Word 视其没有 alt text。",
       "add": true,
       "set": true,
       "get": true,
@@ -37,7 +37,7 @@
     },
     "crop": {
       "type": "string",
-      "description": "Crop rectangle in percent (0-100), 1 or 4 comma-separated values (left,top,right,bottom). Stored as <a:srcRect> inside <a:blipFill> (1000ths-of-a-percent). Get emits the canonical 4-value form (e.g. 12,6,18,9); the per-side keys (cropLeft/cropTop/cropRight/cropBottom) are accepted on add/set only.",
+      "description": "裁剪矩形的百分比（0–100），可传入 1 个值，或 4 个以逗号分隔的值（left,top,right,bottom）。存储为 <a:blipFill> 内的 <a:srcRect>（千分之一百分比）。Get 返回规范的 4 值格式（如 12,6,18,9）；单边键 cropLeft/cropTop/cropRight/cropBottom 仅接受 add/set。",
       "add": true,
       "set": true,
       "get": true,
@@ -50,7 +50,7 @@
     },
     "cropLeft": {
       "type": "string",
-      "description": "Crop from the left edge as percent (0-100). Set/add only — Get folds all sides into the canonical crop key.",
+      "description": "从左边裁剪的百分比（0–100）。仅 Set/add；Get 会将所有边合并到规范的 crop 键。",
       "aliases": ["cropleft"],
       "add": true,
       "set": true,
@@ -60,7 +60,7 @@
     },
     "cropTop": {
       "type": "string",
-      "description": "Crop from the top edge as percent (0-100). Set/add only — Get folds all sides into the canonical crop key.",
+      "description": "从上边裁剪的百分比（0–100）。仅 Set/add；Get 会将所有边合并到规范的 crop 键。",
       "aliases": ["croptop"],
       "add": true,
       "set": true,
@@ -70,7 +70,7 @@
     },
     "cropRight": {
       "type": "string",
-      "description": "Crop from the right edge as percent (0-100). Set/add only — Get folds all sides into the canonical crop key.",
+      "description": "从右边裁剪的百分比（0–100）。仅 Set/add；Get 会将所有边合并到规范的 crop 键。",
       "aliases": ["cropright"],
       "add": true,
       "set": true,
@@ -80,7 +80,7 @@
     },
     "cropBottom": {
       "type": "string",
-      "description": "Crop from the bottom edge as percent (0-100). Set/add only — Get folds all sides into the canonical crop key.",
+      "description": "从下边裁剪的百分比（0–100）。仅 Set/add；Get 会将所有边合并到规范的 crop 键。",
       "aliases": ["cropbottom"],
       "add": true,
       "set": true,
@@ -93,7 +93,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "true to create a floating (anchored) picture instead of inline. Required to enable wrap/hPosition/vPosition/hRelative/vRelative/behindText.",
+      "description": "传入 true 创建 floating（anchored）图片而非 inline 图片。启用 wrap/hPosition/vPosition/hRelative/vRelative/behindText 的前提。",
       "examples": [
         "--prop anchor=true --prop wrap=square"
       ],
@@ -105,7 +105,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "text wrapping mode for floating picture (none, square, tight, topandbottom, through). For 'behind text', use wrap=none + behindText=true.",
+      "description": "floating picture 的 text wrapping 模式（none、square、tight、topandbottom、through）。要使用 'behind text'，请设置 wrap=none + behindText=true。",
       "examples": [
         "--prop wrap=square"
       ],
@@ -117,7 +117,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "true when the picture floats behind text (anchor @behindDoc=1).",
+      "description": "图片浮于文本后方时为 true（anchor @behindDoc=1）。",
       "readback": "true on behind-text floats",
       "enforcement": "report"
     },
@@ -126,7 +126,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "z-order (stacking) of an anchored/floating picture (anchor @relativeHeight). Higher = nearer the front. Distinct per overlapping float; round-trips the raw OOXML value.",
+      "description": "anchored/floating picture 的 z-order（stacking）（anchor @relativeHeight）。值越高越靠前。每个重叠的 float 独立设置；会按原始 OOXML 值 round-trip。",
       "examples": [
         "--prop anchor=true --prop relativeHeight=251664384"
       ],
@@ -138,7 +138,7 @@
       "add": true,
       "set": false,
       "get": false,
-      "description": "drawing visual overflow/effect margin (wp:effectExtent) as 4 comma-separated EMU ints: left,top,right,bottom. Word's inline-picture layout height depends on this even when wp:extent is identical, so the dump→batch round-trip restores it byte-for-byte. Round-trip prop — emitted by `dump --format batch`, not by `get`; absent value defaults to 0,0,0,0 (the interactive Add default).",
+      "description": "drawing visual overflow/effect margin（wp:effectExtent），为 4 个逗号分隔的 EMU 整数：left,top,right,bottom。即使 wp:extent 相同，Word 的 inline-picture 布局高度仍依赖此值，因此 dump→batch round-trip 会按字节恢复它。这是 round-trip prop：由 dump --format batch 返回，而非 get；缺省时为 0,0,0,0（交互式 Add 的默认值）。",
       "examples": [
         "--prop effectExtent=0,0,9525,9525"
       ],
@@ -149,7 +149,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "absolute horizontal anchor position (positionH/posOffset). Always pass a unit (cm/in/pt) — a bare number is interpreted as raw EMU (914400 per inch), so hPosition=3 is a 3-EMU offset.",
+      "description": "绝对水平 anchor 位置（positionH/posOffset）。始终传入单位（cm/in/pt）：裸数字被视为原始 EMU（每 inch 为 914400），因此 hPosition=3 仅是 3-EMU 偏移。",
       "examples": [
         "--prop hPosition=3cm"
       ],
@@ -161,7 +161,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "absolute vertical anchor position (positionV/posOffset). Always pass a unit (cm/in/pt) — a bare number is interpreted as raw EMU (914400 per inch), so vPosition=4 is a 4-EMU offset.",
+      "description": "绝对垂直 anchor 位置（positionV/posOffset）。始终传入单位（cm/in/pt）：裸数字被视为原始 EMU（每 inch 为 914400），因此 vPosition=4 仅是 4-EMU 偏移。",
       "examples": [
         "--prop vPosition=4cm"
       ],
@@ -173,7 +173,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "horizontal anchor reference frame (e.g. page, margin, column, character).",
+      "description": "水平 anchor 的参照框（如 page、margin、column、character）。",
       "readback": "OOXML positionH @relativeFrom token",
       "enforcement": "report"
     },
@@ -182,7 +182,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "vertical anchor reference frame (e.g. page, margin, paragraph, line).",
+      "description": "垂直 anchor 的参照框（如 page、margin、paragraph、line）。",
       "readback": "OOXML positionV @relativeFrom token",
       "enforcement": "report"
     },
@@ -191,7 +191,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "relative horizontal alignment keyword for a floating picture (left, center, right, inside, outside) via positionH/align. Overrides hPosition when set.",
+      "description": "floating picture 的相对水平对齐关键字（left、center、right、inside、outside），通过 positionH/align 写入。设置后会覆盖 hPosition。",
       "examples": [
         "--prop anchor=true --prop hAlign=right --prop hRelative=margin"
       ],
@@ -203,7 +203,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "relative vertical alignment keyword for a floating picture (top, bottom, center, inside, outside) via positionV/align. Overrides vPosition when set.",
+      "description": "floating picture 的相对垂直对齐关键字（top、bottom、center、inside、outside），通过 positionV/align 写入。设置后会覆盖 vPosition。",
       "examples": [
         "--prop anchor=true --prop vAlign=top --prop vRelative=margin"
       ],
@@ -215,7 +215,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "click-hyperlink target for the image, making it clickable (<a:hlinkClick> on pic:cNvPr). An absolute URL or relative target round-trips as a TargetMode=External relationship; a '#anchor' or bare bookmark name round-trips as an internal anchor.",
+      "description": "图片的点击 hyperlink 目标，使其可点击（pic:cNvPr 上的 <a:hlinkClick>）。absolute URL 或 relative target 会作为 TargetMode=External relationship round-trip；'#anchor' 或裸 bookmark name 会作为 internal anchor round-trip。",
       "examples": [
         "--prop src=logo.png --prop link=https://example.com"
       ],
@@ -224,7 +224,7 @@
     },
     "width": {
       "type": "length",
-      "description": "width (extent.Cx). Always pass a unit (cm/in/pt) — a bare number is interpreted as raw EMU (914400 per inch), so width=5 renders an effectively invisible 5-EMU image.",
+      "description": "宽度（extent.Cx）。始终传入单位（cm/in/pt）：裸数字被视为原始 EMU（每 inch 为 914400），因此 width=5 会渲染出几乎不可见的 5-EMU 图片。",
       "aliases": ["w"],
       "add": true,
       "set": true,
@@ -239,7 +239,7 @@
     },
     "height": {
       "type": "length",
-      "description": "height (extent.Cy). Always pass a unit (cm/in/pt) — a bare number is interpreted as raw EMU (914400 per inch), so height=5 renders an effectively invisible 5-EMU image.",
+      "description": "高度（extent.Cy）。始终传入单位（cm/in/pt）：裸数字被视为原始 EMU（每 inch 为 914400），因此 height=5 会渲染出几乎不可见的 5-EMU 图片。",
       "aliases": ["h"],
       "add": true,
       "set": true,

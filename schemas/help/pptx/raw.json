@@ -10,7 +10,7 @@
     "remove": false
   },
   "properties": {},
-  "description": "Raw OOXML access via the `raw` (read) and `raw-set` (write) commands. Use only when L2 DOM operations cannot express what you need. Two part-path forms are accepted: (1) semantic short names (recommended — /slide[N] is stable across reorder) and (2) zip-internal URIs (any path ending in .xml is resolved literally against the package, e.g. /ppt/slides/slide1.xml).",
+  "description": "通过 `raw`（读取）和 `raw-set`（写入）命令访问 Raw OOXML。仅当 L2 DOM operations 无法表达需求时使用。支持两种 part-path 形式：（1）semantic short names（推荐，/slide[N] 在重新排序后仍稳定）；（2）zip-internal URIs（任何以 .xml 结尾的 path 都会按原样在 package 中解析，例如 /ppt/slides/slide1.xml）。",
   "parts": [
     { "name": "/presentation",   "desc": "Presentation part (slide list, sizing, defaults)" },
     { "name": "/theme",          "desc": "Theme (color scheme, font scheme)" },

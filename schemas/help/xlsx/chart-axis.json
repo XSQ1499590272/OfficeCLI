@@ -9,7 +9,7 @@
     "get": true,
     "remove": false
   },
-  "note": "Axes are created/destroyed implicitly by chartType changes — no direct Add/Remove. Extended charts (funnel/treemap/sunburst/boxWhisker/histogram) reject axis paths; use chart-level Set. At chart-creation time, configure axes via the chart's axis* props (axismin/axismax/axistitle/axisfont/…); chart-axis covers post-creation only. Known gaps: `labelFont` writes the title run (not tick labels); `lineWidth`/`lineDash` Set on an axis path applies to all plot-area series — use chart-series for series-specific line styling.",
+  "note": "axis 会随 chartType 变化隐式创建或销毁，不提供直接 Add/Remove。extended chart（funnel/treemap/sunburst/boxWhisker/histogram）拒绝 axis path，请使用 chart-level Set。创建 chart 时通过 chart 的 axis* props（axismin、axismax、axistitle、axisfont/…）配置；chart-axis 仅覆盖创建后的操作。已知限制：labelFont 写入 title run，而不是 tick labels；在 axis path 上 Set lineWidth/lineDash 会作用于所有 plot-area series；要设置单个 series 的线型，请使用 chart-series。",
   "addressing": {
     "key": "role",
     "pathForm": "/SheetName/chart[N]/axis[@role=ROLE]",
@@ -30,7 +30,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "axis role token — value, value2, category, series. Surfaces on Get to identify which axis this node represents.",
+      "description": "axis role token：value、value2、category、series。Get 时返回，用于标识此 node 代表的 axis。",
       "readback": "axis role token (lowercase)",
       "enforcement": "report"
     }

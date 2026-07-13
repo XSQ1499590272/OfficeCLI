@@ -1,11 +1,8 @@
 name: Publish SDK (npm)
 
 # Publishes @officecli/sdk (sdk/node) on its OWN cadence — decoupled from the
-# CLI release. The SDK depends on @officecli/officecli via a semver range
-# (^1.0.0), so a CLI version bump flows to users automatically (fresh installs
-# resolve the newest CLI; existing installs auto-update the bundled binary)
-# WITHOUT republishing the SDK. The SDK is republished only when its own source
-# changes — i.e. when sdk/node/package.json's version is bumped.
+# CLI release. The SDK is republished only when its own source changes — i.e.
+# when sdk/node/package.json's version is bumped.
 #
 # Trigger: a push touching sdk/node/** (or manual dispatch). A guard skips the
 # publish when that version is already on npm, so only a version bump actually

@@ -5,7 +5,7 @@
   "properties": {
     "style": {
       "type": "string",
-      "description": "table style name or GUID (accepted aliases: tableStyle, tableStyleId). Valid names: medium1..4, light1..3, dark1..2, none, or a direct {GUID}.",
+      "description": "表格样式名称或 GUID（接受别名 tableStyle、tableStyleId）。有效名称为 medium1..4、light1..3、dark1..2、none，或直接传入 {GUID}。",
       "values": [
         "medium1",
         "medium2",

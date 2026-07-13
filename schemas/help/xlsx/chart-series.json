@@ -15,7 +15,7 @@
       "/SheetName/chart[N]/series[K]"
     ]
   },
-  "note": "At chart-Add time, series pass as dotted props on the parent chart (series1.name, series1.values, series1.color, series1.categories); afterwards `add --type chart-series` on the chart parent (/SheetName/chart[N]) appends a series — values/categories accept cell ranges (resolved to refs with cached snapshots) or literal comma-separated data; the chart must already have at least one series to derive structure from. Combo charts (mixed chartType / secondary axis) are unsupported — create separate charts. `lineStyle` is not a key (rejected as UNSUPPORTED — use lineWidth + lineDash). remove is NOT supported on this element: recreate the chart with the full series list instead.",
+  "note": "chart Add 时，series 通过 parent chart 上的点号 props 传入（series1.name、series1.values、series1.color、series1.categories）；之后可在 chart parent（/SheetName/chart[N]）上使用 add --type chart-series 追加 series。values/categories 接受 cell range（会解析为带 cached snapshot 的 refs）或逗号分隔的 literal data；chart 必须已有至少一个 series 以便推导结构。不支持 Combo chart（混合 chartType 或 secondary axis），请创建多个 chart。lineStyle 不是有效 key（会报告 UNSUPPORTED），请改用 lineWidth + lineDash。此 element 不支持 remove，请用完整 series list 重新创建 chart。",
   "extends": [
     "_shared/chart-series",
     "_shared/chart-series.pptx-xlsx"
@@ -26,7 +26,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "A1 cell range backing the series values.",
+      "description": "作为 series values 数据源的 A1 cell range。",
       "readback": "A1 range string",
       "enforcement": "report"
     },
@@ -35,7 +35,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "trendline displayEquation flag.",
+      "description": "trendline 的 displayEquation flag。",
       "readback": "true when shown",
       "enforcement": "report"
     },
@@ -44,7 +44,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "trendline displayRSquaredValue flag.",
+      "description": "trendline 的 displayRSquaredValue flag。",
       "readback": "true when shown",
       "enforcement": "report"
     }

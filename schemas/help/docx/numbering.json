@@ -14,10 +14,10 @@
   "paths": {
     "positional": ["/numbering"]
   },
-  "note": "NumberingDefinitionsPart container — bullet / numbered list definitions. The container itself is read-only; mutate via its children: --type abstractNum (the template) and --type num (the instance), see docx/abstractNum.json and docx/num.json. Paragraphs/styles then bind to an instance by id via the 'numId' / 'ilvl' props, or via the higher-level 'listStyle' shortcut (see docx/paragraph.json).",
+  "note": "NumberingDefinitionsPart container，用于保存 bullet/numbered list definitions。container 本身只读；请通过 children 修改：--type abstractNum（template）和 --type num（instance），参见 docx/abstractNum.json、docx/num.json。之后 paragraph/style 通过 numId/ilvl props 绑定到 instance，或使用更高层的 listStyle shortcut（参见 docx/paragraph.json）。",
   "properties": {
-    "abstractNumCount": { "type":"number", "add":false, "set":false, "get":true, "description":"total number of abstractNum definitions in numbering.xml.", "readback":"integer abstractNum count", "enforcement":"report" },
-    "abstractNumId":    { "type":"number", "add":false, "set":false, "get":true, "description":"per-num child readback — the abstractNumId referenced by each /num child. Surfaces on enumerated num child nodes, not the numbering container itself.", "readback":"integer abstractNum reference", "enforcement":"report" }
+    "abstractNumCount": { "type":"number", "add":false, "set":false, "get":true, "description":"numbering.xml 中 abstractNum definition 的总数。", "readback":"integer abstractNum count", "enforcement":"report" },
+    "abstractNumId":    { "type":"number", "add":false, "set":false, "get":true, "description":"per-num child 的读回值：每个 /num child 引用的 abstractNumId。该值出现在枚举出的 num child node 上，不出现在 numbering container 本身。", "readback":"integer abstractNum reference", "enforcement":"report" }
   },
   "children": [
     { "element": "abstractNum", "pathSegment": "abstractNum", "cardinality": "0..n" },

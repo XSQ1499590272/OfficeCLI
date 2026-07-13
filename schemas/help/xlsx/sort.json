@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName", "/SheetName/A1:D50"]
   },
-  "note": "Sort is Set-only — it mutates row order in a sheet or range. Sheet-level Set auto-detects the used range. Range-level Set operates only on the supplied range. SortState persists across save.",
+  "note": "Sort 只支持 Set，会修改 sheet 或 range 中的 row order。Sheet-level Set 会自动检测 used range；range-level Set 只处理传入的 range。SortState 会在 save 后保留。",
   "properties": {
     "sort": {
       "type": "string",
-      "description": "sort spec: 'COL [DIR][, COL [DIR] ...]'. COL is a column letter (A, B, AA..XFD). DIR is asc (default) or desc. Comma-separated for multi-key sort.",
+      "description": "sort 规格：'COL [DIR][, COL [DIR] ...]'。COL 为 column letter（A、B、AA..XFD）；DIR 为 asc（默认）或 desc。多关键字排序时使用逗号分隔。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop sort=B", "--prop sort=\"B desc, C asc\""],
       "readback": "SortState description string",
@@ -25,7 +25,7 @@
     },
     "sortHeader": {
       "type": "bool",
-      "description": "treat first row as header (excluded from reorder).",
+      "description": "将第一行视为 header，不参与重新排序。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop sortHeader=true"],
       "readback": "n/a",

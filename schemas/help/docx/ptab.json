@@ -18,7 +18,7 @@
       "/footer[N]/p[M]/r[K]"
     ]
   },
-  "note": "Inline positional tab (w:ptab, Word 2007+). Anchors left/center/right alignment regions in headers/footers. Inserted as <w:r><w:ptab/></w:r>; surfaced by Get as type=ptab. Aliases: positionaltab.",
+  "note": "Inline positional tab（w:ptab，Word 2007+）。用于在 header/footer 中锚定 left/center/right 对齐区域。插入形式为 <w:r><w:ptab/></w:r>；Get 会以 type=ptab 返回。Alias：positionaltab。",
   "properties": {
     "align": {
       "type": "enum",

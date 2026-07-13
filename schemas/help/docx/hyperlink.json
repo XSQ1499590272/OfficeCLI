@@ -16,12 +16,12 @@
       "/body/p[N]/hyperlink[M]"
     ]
   },
-  "note": "Aliases: link. Exactly one of 'url' (external) or 'anchor' (internal bookmark ref) is required. Colors default to theme Hyperlink (or 0563C1 fallback) with single underline.",
+  "note": "Aliases：link。必须且只能提供一个目标：'url'（external）或 'anchor'（internal bookmark ref）。颜色默认使用 theme Hyperlink（若无则回退到 0563C1），并带单下划线。",
   "extends": "_shared/hyperlink",
   "properties": {
     "url": {
       "type": "string",
-      "description": "external URL. Aliases: href, link. docx Set accepts all three (url canonical).",
+      "description": "外部 URL。别名：href、link。docx Set 接受三者，url 为 canonical key。",
       "aliases": [
         "href",
         "link"
@@ -37,7 +37,7 @@
     },
     "anchor": {
       "type": "string",
-      "description": "bookmark name for internal links. Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper).",
+      "description": "内部链接的 bookmark 名称。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。",
       "aliases": [
         "bookmark"
       ],
@@ -52,7 +52,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "hover text (w:tooltip / ScreenTip) shown when the cursor rests on the link. Set after Add not supported — supply on Add. Renders as the HTML title attribute in the preview.",
+      "description": "鼠标停在 link 上时显示的 hover text（w:tooltip / ScreenTip）。不支持 Add 后 Set，请在 Add 时传入。预览中会渲染为 HTML title attribute。",
       "add": true,
       "set": false,
       "get": true,
@@ -64,7 +64,7 @@
     },
     "text": {
       "type": "string",
-      "description": "display text. Defaults to url or anchor value if omitted.",
+      "description": "显示文本。省略时默认使用 url 或 anchor 值。",
       "add": true,
       "set": true,
       "get": true,
@@ -76,7 +76,7 @@
     },
     "rStyle": {
       "type": "string",
-      "description": "Run style id applied to the hyperlink's run (typically 'Hyperlink' to inherit theme color/underline).",
+      "description": "应用到 hyperlink run 的 Run style id（通常为 'Hyperlink'，以继承 theme color/underline）。",
       "add": true,
       "set": false,
       "get": true,
@@ -88,7 +88,7 @@
     },
     "color": {
       "type": "color",
-      "description": "override link color (default: theme Hyperlink or 0563C1). Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper).",
+      "description": "覆盖 link 颜色（默认：theme Hyperlink 或 0563C1）。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。",
       "add": true,
       "set": false,
       "get": true,
@@ -108,7 +108,7 @@
       ],
       "readback": "font name",
       "enforcement": "report",
-      "description": " Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper)."
+      "description": "hyperlink run 的 font。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。"
     },
     "size": {
       "type": "length",
@@ -120,11 +120,11 @@
       ],
       "readback": "unit-qualified pt",
       "enforcement": "report",
-      "description": " Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper)."
+      "description": "hyperlink run 的 font size。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。"
     },
     "underline": {
       "type": "enum",
-      "description": "underline style for the link's run. Defaults to single when omitted (theme Hyperlink look). Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper). Aliases: font.underline.",
+      "description": "link run 的 underline 样式。省略时默认 single（theme Hyperlink 外观）。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。别名：font.underline。",
       "values": [
         "single",
         "double",
@@ -163,7 +163,7 @@
       ],
       "readback": "true/false",
       "enforcement": "report",
-      "description": " Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper)."
+      "description": "hyperlink run 的 bold。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。"
     },
     "italic": {
       "type": "bool",
@@ -175,11 +175,11 @@
       ],
       "readback": "true/false",
       "enforcement": "report",
-      "description": " Set after Add not supported — formatting lives on inner runs (Set the run, not the hyperlink wrapper)."
+      "description": "hyperlink run 的 italic。不支持 Add 后 Set：formatting 位于内部 run，请 Set run，而非 hyperlink wrapper。"
     },
     "docLocation": {
       "type": "string",
-      "description": "w:docLocation — frame name (or location-within-document for non-text-anchor refs). Preserved on dump round-trip. Get only; set via the underlying hyperlink rewrite path on Add.",
+      "description": "w:docLocation：frame name（或非文本 anchor 引用的 document 内位置）。会在 dump round-trip 中保留。仅 Get；Add 时通过底层 hyperlink rewrite path 设置。",
       "aliases": ["doclocation"],
       "add": false,
       "set": false,

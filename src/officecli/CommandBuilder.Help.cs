@@ -15,27 +15,17 @@ static partial class CommandBuilder
     private static readonly string[] HelpVerbs =
         { "add", "set", "get", "query", "remove" };
 
-    // Commands that are NOT registered as System.CommandLine subcommands but
-    // are instead early-dispatched in Program.cs. They do not understand
-    // `--help` (install would actually run InstallBinary!), so the help
-    // dispatcher must print their usage itself rather than shell out.
-    // Keep these usage blurbs in sync with the Console.Error.WriteLine
-    // blocks in Program.cs (mcp: ~line 40, skills: ~line 87, install path:
-    // documented via Installer.Run).
+    // MCP and load_skill are dispatched before System.CommandLine sees them,
+    // so help renders their usage directly.
     /// <summary>
     /// Print the verbose usage block for an early-dispatch command
-    /// (mcp/skills/install) to the given writer. Single source of truth shared
+    /// (mcp/load_skill) to the given writer. Single source of truth shared
     /// between `officecli help &lt;cmd&gt;`, the integration stubs' SetAction, and
     /// Program.cs's invalid-args error path. Returns true if the command name
     /// was recognized.
     /// </summary>
     internal static bool WriteEarlyDispatchUsage(string name, TextWriter writer)
     {
-        // `skill` is the singular alias of `skills` (Program.cs accepts both as
-        // the early-dispatch token). Normalize here so `officecli skill --help`
-        // and `officecli help skill` resolve to the same usage block.
-        if (string.Equals(name, "skill", StringComparison.OrdinalIgnoreCase))
-            name = "skills";
         if (!EarlyDispatchHelp.TryGetValue(name, out var lines)) return false;
         foreach (var line in lines) writer.WriteLine(line);
         return true;
@@ -46,44 +36,23 @@ static partial class CommandBuilder
         {
             ["mcp"] = new[]
             {
-                "Usage:",
-                "  officecli mcp                    Start MCP stdio server (for AI agents)",
-                "  officecli mcp <target>           Register officecli with an MCP client",
-                "  officecli mcp uninstall <target> Unregister officecli from an MCP client",
-                "  officecli mcp list               Show registration status across all clients",
+                "用法：",
+                "  officecli mcp                    启动 MCP stdio server（供 AI agent 使用）",
+                "  officecli mcp <target>           向 MCP client 注册 officecli",
+                "  officecli mcp uninstall <target> 从 MCP client 注销 officecli",
+                "  officecli mcp list               查看各 client 的注册状态",
                 "",
-                "Targets: lms (LM Studio), claude (Claude Code), cursor, vscode (Copilot)",
-            },
-            ["skills"] = new[]
-            {
-                "Usage:",
-                "  officecli skills install                Install base SKILL.md to all detected agents",
-                "  officecli skills install <skill-name>   Install a specific skill to all detected agents",
-                "  officecli skills install <skill-name> <agent>  Install a specific skill to a single agent (either order works)",
-                "  officecli skills <agent>                Install base SKILL.md to a specific agent",
-                "  officecli skills list                   List all available skills",
-                "",
-                "Skills: pptx, word, excel, word-form, morph-ppt, morph-ppt-3d, pitch-deck, academic-paper, data-dashboard, financial-model",
-                "Agents: claude, copilot, codex, cursor, windsurf, minimax, opencode, openclaw, nanobot, zeroclaw, hermes, all",
+                "目标：lms（LM Studio）、claude（Claude Code）、cursor、vscode（Copilot）",
             },
             ["load_skill"] = new[]
             {
-                "Usage:",
-                "  officecli load_skill                         List all skills with the triggers that say when to use each",
-                "  officecli load_skill <name>                 Print the skill's SKILL.md + a manifest of its bundled reference files",
-                "  officecli load_skill <name> --path <relpath> Print one bundled reference file (e.g. --path reference/decision-rules.md)",
+                "用法：",
+                "  officecli load_skill                         列出全部 Skill 及其触发条件",
+                "  officecli load_skill <name>                 输出该 Skill 的 SKILL.md 及内嵌参考文件清单",
+                "  officecli load_skill <name> --path <relpath> 输出一个内嵌参考文件（例如 --path reference/decision-rules.md）",
                 "",
-                "Skills: pptx, word, excel, word-form, morph-ppt, morph-ppt-3d, pitch-deck, academic-paper, data-dashboard, financial-model",
-                "To install a skill (with binary assets) on disk, run: officecli skills install <name>",
-            },
-            ["install"] = new[]
-            {
-                "Usage:",
-                "  officecli install           One-step setup: install binary + skills + MCP to all detected agents",
-                "  officecli install <target>  Install to a specific agent (claude, copilot, cursor, vscode, ...)",
-                "",
-                "Equivalent to: installing the binary, then `officecli skills install` and `officecli mcp <target>`.",
-                "Targets: claude, copilot, codex, cursor, windsurf, vscode, minimax, opencode, openclaw, nanobot, zeroclaw, hermes, all",
+                "Skill：pptx、word、excel、word-form、morph-ppt、morph-ppt-3d、pitch-deck、academic-paper、data-dashboard、financial-model",
+                "二进制参考资源不能通过文本通道输出。",
             },
         };
 
@@ -106,17 +75,17 @@ static partial class CommandBuilder
     {
         var formatArg = new Argument<string?>("format")
         {
-            Description = "Document format: docx/xlsx/pptx (aliases: word, excel, ppt, powerpoint). Omit to list formats.",
+            Description = "文档格式：docx/xlsx/pptx（别名：word、excel、ppt、powerpoint）。省略时列出格式。",
             Arity = ArgumentArity.ZeroOrOne,
         };
         var secondArg = new Argument<string?>("verb-or-element")
         {
-            Description = "Verb (add/set/get/query/remove) or element name. Omit to list all elements.",
+            Description = "动词（add/set/get/query/remove）或元素名称。省略时列出全部元素。",
             Arity = ArgumentArity.ZeroOrOne,
         };
         var thirdArg = new Argument<string?>("element")
         {
-            Description = "Element name when a verb was given (e.g. 'help docx add chart').",
+            Description = "已给出动词时的元素名称（例如 'help docx add chart'）。",
             Arity = ArgumentArity.ZeroOrOne,
         };
         // Scoped to `help` only — `help all`/`help <fmt> all` can emit either:
@@ -129,10 +98,10 @@ static partial class CommandBuilder
         // listings with no JSON form.
         var jsonlOption = new Option<bool>("--jsonl")
         {
-            Description = "(help all only) Emit NDJSON: one JSON object per line, no envelope.",
+            Description = "（仅 help all）输出 NDJSON：每行一个 JSON object，不加 envelope。",
         };
 
-        var command = new Command("help", "Show schema-driven capability reference for officecli.");
+        var command = new Command("help", "显示 officecli 基于 schema 的命令参考。");
         command.Add(formatArg);
         command.Add(secondArg);
         command.Add(thirdArg);
@@ -172,7 +141,7 @@ static partial class CommandBuilder
                         // silently falling through to Case 2 (which would list all
                         // elements, ignoring user input).
                         Console.Error.WriteLine(
-                            $"error: unknown verb '{second}'. Valid: {string.Join(", ", HelpVerbs)}.");
+                            $"错误：未知动词“{second}”。可用值：{string.Join(", ", HelpVerbs)}。");
                         return 1;
                     }
                     // else: format is a HelpVerb (CRUD-verb-as-format from the
@@ -206,7 +175,7 @@ static partial class CommandBuilder
         // with a clear message rather than silently picking one.
         if (json && jsonl)
         {
-            Console.Error.WriteLine("error: --json and --jsonl are mutually exclusive.");
+            Console.Error.WriteLine("错误：--json 与 --jsonl 不能同时使用。");
             return 1;
         }
 
@@ -230,7 +199,7 @@ static partial class CommandBuilder
             if (verb != null || element != null)
             {
                 Console.Error.WriteLine(
-                    "error: 'help all' takes no further arguments. Pipe to grep to filter.");
+                    "错误：'help all' 不接受额外参数。可通过管道传给 grep 筛选。");
                 return 1;
             }
             if (json)
@@ -279,28 +248,28 @@ static partial class CommandBuilder
                 Console.WriteLine();
             }
 
-            Console.WriteLine("Schema Reference (docx/xlsx/pptx):");
-            Console.WriteLine("  officecli help <format>                         List all elements");
-            Console.WriteLine("  officecli help <format> <verb>                  Elements supporting the verb");
-            Console.WriteLine("  officecli help <format> <element>               Full element detail");
-            Console.WriteLine("  officecli help <format> <verb> <element>        Verb-filtered element detail");
-            Console.WriteLine("  officecli help <format> <element> --json        Raw schema JSON");
-            Console.WriteLine("  officecli help all                              Flat dump of every (format,element,property) — pipe to grep");
-            Console.WriteLine("  officecli help all --json                       Same dump as one envelope-wrapped JSON document");
-            Console.WriteLine("  officecli help all --jsonl                      Same dump as NDJSON (one JSON object per line)");
+            Console.WriteLine("Schema 参考（docx/xlsx/pptx）：");
+            Console.WriteLine("  officecli help <format>                         列出全部元素");
+            Console.WriteLine("  officecli help <format> <verb>                  列出支持该动词的元素");
+            Console.WriteLine("  officecli help <format> <element>               显示完整元素详情");
+            Console.WriteLine("  officecli help <format> <verb> <element>        显示该动词范围内的元素详情");
+            Console.WriteLine("  officecli help <format> <element> --json        输出原始 schema JSON");
+            Console.WriteLine("  officecli help all                              平铺列出全部（format、element、property），可通过管道传给 grep");
+            Console.WriteLine("  officecli help all --json                       将相同内容输出为一个 envelope 包装的 JSON 文档");
+            Console.WriteLine("  officecli help all --jsonl                      将相同内容输出为 NDJSON（每行一个 JSON object）");
             Console.WriteLine();
-            Console.Write("  Formats: ");
+            Console.Write("  格式：");
             Console.WriteLine(string.Join(", ", SchemaHelpLoader.ListFormats()));
-            Console.WriteLine("  Verbs:   add, set, get, query, remove");
-            Console.WriteLine("  Aliases: word→docx, excel→xlsx, ppt/powerpoint→pptx");
+            Console.WriteLine("  动词：add、set、get、query、remove");
+            Console.WriteLine("  别名：word→docx、excel→xlsx、ppt/powerpoint→pptx");
             Console.WriteLine();
-            Console.WriteLine("Tip: most shells expand [brackets] — quote paths: officecli get doc.docx \"/body/p[1]\"");
+            Console.WriteLine("提示：多数 shell 会展开 [brackets]，请为路径加引号：officecli get doc.docx \"/body/p[1]\"");
             return 0;
         }
 
         // Case 1b: not a format — try command help.
-        //   - Early-dispatch commands (mcp/skills/install) don't understand
-        //     --help (install would actually run InstallBinary!), so print
+        //   - The early-dispatch MCP command does not participate in the
+        //     command tree, so print this text before normal parsing.
         //     a hardcoded usage blurb.
         //   - Registered SCL subcommands get their --help forwarded.
         //
@@ -312,8 +281,7 @@ static partial class CommandBuilder
         if (!SchemaHelpLoader.IsKnownFormat(format)
             && verb == null
             && (element == null || HelpVerbs.Contains(format, StringComparer.OrdinalIgnoreCase)
-                || EarlyDispatchHelp.ContainsKey(format)
-                || string.Equals(format, "skill", StringComparison.OrdinalIgnoreCase)))
+                || EarlyDispatchHelp.ContainsKey(format)))
         {
             if (WriteEarlyDispatchUsage(format, Console.Out))
                 return 0;
@@ -332,7 +300,7 @@ static partial class CommandBuilder
         // Validate verb if supplied.
         if (verb != null && !HelpVerbs.Contains(verb, StringComparer.OrdinalIgnoreCase))
         {
-            Console.Error.WriteLine($"error: unknown verb '{verb}'. Valid: {string.Join(", ", HelpVerbs)}.");
+            Console.Error.WriteLine($"错误：未知动词“{verb}”。可用值：{string.Join(", ", HelpVerbs)}。");
             return 1;
         }
 
@@ -351,13 +319,13 @@ static partial class CommandBuilder
 
             if (filtered.Count == 0 && verb != null)
             {
-                Console.WriteLine($"No elements in {canonicalFormat} support '{verb}'.");
+                Console.WriteLine($"{canonicalFormat} 中没有支持“{verb}”的元素。");
                 return 0;
             }
 
             var header = verb == null
-                ? $"Elements for {canonicalFormat}:"
-                : $"Elements for {canonicalFormat} supporting '{verb}':";
+                ? $"{canonicalFormat} 的元素："
+                : $"{canonicalFormat} 中支持“{verb}”的元素：";
             Console.WriteLine(header);
 
             // Build parent → children map for tree rendering. Children whose
@@ -398,8 +366,8 @@ static partial class CommandBuilder
             Console.WriteLine();
 
             var detailHint = verb == null
-                ? $"Run 'officecli help {canonicalFormat} <element>' for detail."
-                : $"Run 'officecli help {canonicalFormat} {verb} <element>' for verb-filtered detail.";
+                ? $"运行 'officecli help {canonicalFormat} <element>' 查看详情。"
+                : $"运行 'officecli help {canonicalFormat} {verb} <element>' 查看按动词筛选的详情。";
             Console.WriteLine(detailHint);
             return 0;
         }

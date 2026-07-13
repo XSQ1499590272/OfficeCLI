@@ -18,12 +18,12 @@
       "/body/tbl[N]/tr[R]/tc[C]"
     ]
   },
-  "note": "Only 'text' and 'width' are honored at Add time; every other property is applied via Set after the cell exists. Run-level formatting (font/size/bold/italic/color/highlight/underline/strike) is written to every run in every paragraph in the cell — and to ParagraphMarkRunProperties when the cell has no runs yet. Border value format is STYLE[;SIZE[;COLOR[;SPACE]]], e.g. 'single;4;FF0000'.",
+  "note": "Add 时只有 text 和 width 会生效；其他 property 要在 cell 创建后通过 Set 应用。Run-level formatting（font/size/bold/italic/color/highlight/underline/strike）会写入 cell 中每个 paragraph 的每个 run；如果 cell 尚无 run，则写入 ParagraphMarkRunProperties。Border value 格式为 STYLE[;SIZE[;COLOR[;SPACE]]], 例如 'single;4;FF0000'。",
   "extends": "_shared/table-cell",
   "properties": {
     "width": {
       "type": "string",
-      "description": "cell preferred width (w:tcW). Accepts a bare twips integer or unit-qualified 'Ndxa' (Dxa), 'N%' (percent of table width), 'auto' (auto-fit, no preferred width), or 'nil' (no preferred width — distinct from a zero-twip explicit width). Get echoes the same unit-qualified form so the type round-trips losslessly.",
+      "description": "单元格首选宽度（w:tcW）。支持裸 twips 整数、带单位的 'Ndxa'（Dxa）、'N%'（table width 的百分比）、'auto'（自动适应，无首选宽度）或 'nil'（无首选宽度，区别于显式的零 twip 宽度）。Get 会按相同带单位形式返回，以保证无损 round-trip。",
       "add": true,
       "set": true,
       "get": true,
@@ -38,7 +38,7 @@
     },
     "skipGridSync": {
       "type": "bool",
-      "description": "suppress the per-cell tblGrid synchronization side effect that normally fires when `width` is set. Used by dump → batch replay to preserve the source table's authoritative colWidths when individual tcW values disagree with the gridCol widths (Word renders by tcW; tblGrid is a layout hint). Set-only.",
+      "description": "禁止设置 width 时通常会触发的逐单元格 tblGrid 同步副作用。用于 dump → batch replay：当单个 tcW 与 gridCol 宽度不一致时，保留源 table 的权威 colWidths（Word 按 tcW 渲染，tblGrid 只是布局提示）。仅支持 Set。",
       "add": false,
       "set": true,
       "get": false,
@@ -50,7 +50,7 @@
     },
     "font": {
       "type": "string",
-      "description": "font family applied to every run in every paragraph in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个段落、每个 run 的 font family（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "fontname",
         "fontFamily"
@@ -66,7 +66,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size applied to every run in the cell. Accepts raw number (points), '14pt', '10.5pt' (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的 font size。支持裸数字（按 pt）、'14pt'、'10.5pt'（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "fontsize"
       ],
@@ -82,7 +82,7 @@
     },
     "bold": {
       "type": "bool",
-      "description": "bold applied to every run in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的 bold（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -94,7 +94,7 @@
     },
     "italic": {
       "type": "bool",
-      "description": "italic applied to every run in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的 italic（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -116,7 +116,7 @@
         "wave",
         "words"
       ],
-      "description": "underline style applied to every run in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的 underline 样式（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -129,7 +129,7 @@
     },
     "strike": {
       "type": "bool",
-      "description": "strike-through applied to every run in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的 strike-through（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -141,7 +141,7 @@
     },
     "color": {
       "type": "color",
-      "description": "run text color applied to every run in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个 run 的文本颜色（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -155,7 +155,7 @@
     },
     "highlight": {
       "type": "color",
-      "description": "text highlight color. Mapped to Word's named highlight palette (yellow, green, cyan, magenta, blue, red, darkBlue, …) (set-only; apply after add).",
+      "description": "文本高亮颜色。映射到 Word 的命名高亮调色板（yellow、green、cyan、magenta、blue、red、darkBlue 等）（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -167,7 +167,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "cell background shading (w:shd @fill). Accepts a solid color — hex ('FF0000'), '#'-prefixed hex ('#FF0000'), named color ('red'), rgb(...) notation, or 'transparent' to clear. docx <w:shd> has no native gradient primitive: the CSS-style hyphen form 'COLOR1-COLOR2[-ANGLE]' is NOT accepted (native gradient cell fill is a pptx-only feature). A synthetic two-stop gradient is available via the semicolon form 'gradient;STARTCOLOR;ENDCOLOR[;ANGLE]', emulated with a shading pattern. Bare 'none' is not accepted — use 'transparent'. Set-only; apply after add.",
+      "description": "单元格背景 shading（w:shd @fill）。支持纯色：hex（'FF0000'）、带 '#' 的 hex（'#FF0000'）、命名色（'red'）、rgb(...)，或使用 'transparent' 清除。docx <w:shd> 没有原生 gradient；不支持 CSS 风格的 'COLOR1-COLOR2[-ANGLE]'（原生 gradient cell fill 仅限 pptx）。可用分号格式 'gradient;STARTCOLOR;ENDCOLOR[;ANGLE]' 创建模拟的两段 gradient，底层以 shading pattern 实现。不支持裸 'none'，请使用 'transparent'。仅支持 Set；请在 add 后使用。",
       "aliases": [
         "shd",
         "shading"
@@ -195,7 +195,7 @@
         "both",
         "distribute"
       ],
-      "description": "horizontal paragraph alignment applied to every paragraph in the cell (set-only; apply after add).",
+      "description": "应用到单元格内每个段落的水平对齐方式（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "alignment"
       ],
@@ -215,7 +215,7 @@
         "center",
         "bottom"
       ],
-      "description": "vertical alignment of cell contents (set-only; apply after add).",
+      "description": "单元格内容的垂直对齐方式（仅支持 Set；请在 add 后使用）。",
       "add": false,
       "set": true,
       "get": true,
@@ -227,7 +227,7 @@
     },
     "colspan": {
       "type": "int",
-      "description": "number of grid columns this cell spans. Aliases: gridspan. Adjusts cell width to the sum of spanned grid columns and removes now-redundant trailing cells in the row (set-only; apply after add).",
+      "description": "该单元格跨越的 grid column 数。别名：gridspan。设置后会将单元格宽度调整为所跨 grid column 宽度之和，并移除本行中变为冗余的后续单元格（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "gridspan"
       ],
@@ -242,7 +242,7 @@
     },
     "fitText": {
       "type": "bool",
-      "description": "enable w:fitText on every run so text is squeezed to the cell width (set-only; apply after add).",
+      "description": "在每个 run 上启用 w:fitText，使文本压缩以适应单元格宽度（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "fittext"
       ],
@@ -268,7 +268,7 @@
         "lrtb-r",
         "tblr-r"
       ],
-      "description": "text flow direction inside the cell. Aliases: textdir (set-only; apply after add).",
+      "description": "单元格内的文本流向。别名：textdir（仅支持 Set；请在 add 后使用）。",
       "aliases": [
         "textdir"
       ],
@@ -291,7 +291,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction (Arabic / Hebrew). 'rtl' writes <w:bidi/> on every cell paragraph, <w:rtl/> on each paragraph mark, and <w:rtl/> on every run; 'ltr' clears all three. Distinct from textDirection (which controls vertical/horizontal text flow inside the cell).",
+      "description": "阅读方向（Arabic / Hebrew）。'rtl' 会在每个单元格段落写入 <w:bidi/>、在每个段落标记和每个 run 写入 <w:rtl/>；'ltr' 清除这三处设置。不同于 textDirection，后者控制单元格内文本的垂直/水平流向。",
       "add": true,
       "set": true,
       "get": true,
@@ -303,7 +303,7 @@
     },
     "nowrap": {
       "type": "bool",
-      "description": "disable text wrapping inside the cell.",
+      "description": "禁用单元格内的文本换行。",
       "add": true,
       "set": true,
       "get": true,
@@ -315,7 +315,7 @@
     },
     "hideMark": {
       "type": "bool",
-      "description": "w:hideMark — ignore the cell's end-of-cell mark when measuring the row height for autofit (the cell appears empty even though it holds a paragraph mark).",
+      "description": "w:hideMark：自动适应计算行高时忽略单元格结束标记（即使单元格包含段落标记，也会显示为空）。",
       "aliases": [
         "hidemark"
       ],
@@ -330,7 +330,7 @@
     },
     "tcFitText": {
       "type": "bool",
-      "description": "w:tcFitText — fit the cell's text to its width (the tcPr-level toggle). Distinct from the run-level 'fitText' property, which squeezes each run via w:fitText.",
+      "description": "w:tcFitText：使单元格文本适应其宽度（tcPr 级开关）。不同于 run 级的 'fitText' 属性，后者通过 w:fitText 压缩每个 run。",
       "aliases": [
         "tcfittext"
       ],
@@ -345,7 +345,7 @@
     },
     "padding.top": {
       "type": "number",
-      "description": "top cell margin in twips (integer; 1 twip = 1/20 pt, e.g. 100 = 5pt). Raw integer only — no unit suffix.",
+      "description": "上单元格边距，单位为 twips（整数；1 twip = 1/20 pt，如 100 = 5pt）。仅支持裸整数，不带单位后缀。",
       "add": false,
       "set": true,
       "get": true,
@@ -357,7 +357,7 @@
     },
     "padding.bottom": {
       "type": "number",
-      "description": "bottom cell margin in twips (integer; 1 twip = 1/20 pt, e.g. 100 = 5pt). Raw integer only — no unit suffix.",
+      "description": "下单元格边距，单位为 twips（整数；1 twip = 1/20 pt，如 100 = 5pt）。仅支持裸整数，不带单位后缀。",
       "add": false,
       "set": true,
       "get": true,
@@ -369,7 +369,7 @@
     },
     "padding.left": {
       "type": "number",
-      "description": "left cell margin in twips (integer; 1 twip = 1/20 pt, e.g. 100 = 5pt). Raw integer only — no unit suffix.",
+      "description": "左单元格边距，单位为 twips（整数；1 twip = 1/20 pt，如 100 = 5pt）。仅支持裸整数，不带单位后缀。",
       "add": false,
       "set": true,
       "get": true,
@@ -381,7 +381,7 @@
     },
     "padding.right": {
       "type": "number",
-      "description": "right cell margin in twips (integer; 1 twip = 1/20 pt, e.g. 100 = 5pt). Raw integer only — no unit suffix.",
+      "description": "右单元格边距，单位为 twips（整数；1 twip = 1/20 pt，如 100 = 5pt）。仅支持裸整数，不带单位后缀。",
       "add": false,
       "set": true,
       "get": true,
@@ -397,7 +397,7 @@
         "restart",
         "continue"
       ],
-      "description": "vertical merge marker (w:vMerge). 'restart' marks the top cell of a vertical span; 'continue' marks subsequent merged cells in the same column. Bare <w:vMerge/> reads as 'continue'.",
+      "description": "纵向合并标记（w:vMerge）。'restart' 标记纵向跨度顶部单元格；'continue' 标记同列后续合并单元格。裸 <w:vMerge/> 会读取为 'continue'。",
       "add": false,
       "set": true,
       "get": true,
@@ -414,7 +414,7 @@
         "restart",
         "continue"
       ],
-      "description": "horizontal merge marker (w:hMerge — legacy form). 'restart' marks the leading cell of a horizontal span; 'continue' marks subsequent merged cells. Most modern docs prefer gridSpan; hmerge is preserved for round-trip with files that already use it.",
+      "description": "横向合并标记（w:hMerge，legacy 格式）。'restart' 标记横向跨度的首个单元格；'continue' 标记后续合并单元格。多数现代文档优先使用 gridSpan；保留 hmerge 是为了与已有此格式的文件进行 round-trip。",
       "add": false,
       "set": true,
       "get": true,
@@ -427,7 +427,7 @@
     },
     "cnfStyle": {
       "type": "string",
-      "description": "conditional-formatting bitmask (ST_Cnf @val) on the cell (tcPr). A 12-digit binary string — each '0'/'1' flags one region in order: firstRow, lastRow, firstColumn, lastColumn, oddVBand, evenVBand, oddHBand, evenHBand, firstRowFirstColumn, firstRowLastColumn, lastRowFirstColumn, lastRowLastColumn. Short binary input is right-padded to 12. Not a hex number.",
+      "description": "单元格（tcPr）上的 conditional-formatting bitmask（ST_Cnf @val）。为 12 位二进制字符串，每个 '0'/'1' 按顺序标记一个区域：firstRow、lastRow、firstColumn、lastColumn、oddVBand、evenVBand、oddHBand、evenHBand、firstRowFirstColumn、firstRowLastColumn、lastRowFirstColumn、lastRowLastColumn。较短的二进制输入会在右侧补齐到 12 位；不是 hex number。",
       "add": false,
       "set": true,
       "get": true,

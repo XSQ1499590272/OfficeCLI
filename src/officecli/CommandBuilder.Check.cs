@@ -11,8 +11,8 @@ static partial class CommandBuilder
 {
     private static Command BuildValidateCommand(Option<bool> jsonOption)
     {
-        var validateFileArg = new Argument<FileInfo>("file") { Description = "Office document path (required even with open/close mode)" };
-        var validateCommand = new Command("validate", "Validate document against OpenXML schema");
+        var validateFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（即使使用 open/close mode 也必填）" };
+        var validateCommand = new Command("validate", "根据 OpenXML schema 验证文档");
         validateCommand.Add(validateFileArg);
         validateCommand.Add(jsonOption);
         validateCommand.SetAction(result => { var json = result.GetValue(jsonOption); return SafeRun(() =>

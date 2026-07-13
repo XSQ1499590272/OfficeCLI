@@ -19,11 +19,11 @@
       "/body/p[N]/sdt[M]"
     ]
   },
-  "note": "Aliases: contentcontrol. Structured document tags — inline or block. Block-level SDT wraps paragraphs; inline SDT wraps runs.",
+  "note": "Aliases：contentcontrol。Structured document tag，可为 inline 或 block；block-level SDT 包装 paragraph，inline SDT 包装 run。",
   "properties": {
     "type": {
       "type": "enum",
-      "description": "SDT variant. Supported at add-time: text, richtext, dropdown, combobox, date, group, picture, checkbox. buildingBlockGallery / repeatingSection are not implemented at add-time — create those in Word and edit via CLI. Type cannot be changed after creation.",
+      "description": "SDT 变体。add 时支持：text、richtext、dropdown、combobox、date、group、picture、checkbox。add 时尚未实现 buildingBlockGallery / repeatingSection，请在 Word 中创建后再通过 CLI 编辑。创建后不可修改 type。",
       "values": [
         "text",
         "richtext",
@@ -47,7 +47,7 @@
     },
     "tag": {
       "type": "string",
-      "description": "machine-readable tag for data-binding.",
+      "description": "用于 data-binding 的 machine-readable tag。",
       "add": true,
       "set": true,
       "get": true,
@@ -59,7 +59,7 @@
     },
     "alias": {
       "type": "string",
-      "description": "human-readable display name shown in Word.",
+      "description": "在 Word 中显示的 human-readable 名称。",
       "add": true,
       "set": true,
       "get": true,
@@ -71,7 +71,7 @@
     },
     "text": {
       "type": "string",
-      "description": "placeholder/initial content.",
+      "description": "placeholder/初始内容。",
       "add": true,
       "set": true,
       "get": true,
@@ -83,7 +83,7 @@
     },
     "checked": {
       "type": "bool",
-      "description": "checkbox content-control checked state (<w14:checked w14:val=\"1|0\">). Checkbox controls only; default false. The content run shows ☒ (checked) / ☐ (unchecked).",
+      "description": "checkbox content-control 的选中状态（<w14:checked w14:val=\"1|0\">）。仅适用于 Checkbox control，默认 false。内容 run 显示 ☒（checked）/ ☐（unchecked）。",
       "add": true,
       "set": false,
       "get": true,
@@ -95,7 +95,7 @@
     },
     "format": {
       "type": "string",
-      "description": "date-picker display format string (e.g. yyyy-MM-dd). Date controls only.",
+      "description": "date-picker 的显示格式字符串（如 yyyy-MM-dd）。仅适用于 Date control。",
       "add": true,
       "set": false,
       "get": true,
@@ -107,7 +107,7 @@
     },
     "items": {
       "type": "string",
-      "description": "comma-separated dropdown/combobox choices. Each item may use display|value form (e.g. Draft|DRAFT) when display text differs from the stored value.",
+      "description": "逗号分隔的 dropdown/combobox 选项。当显示文本与存储值不同时，每项可用 display|value 形式（如 Draft|DRAFT）。",
       "add": true,
       "set": false,
       "get": true,
@@ -120,7 +120,7 @@
     },
     "lock": {
       "type": "enum",
-      "description": "content-control locking. unlocked (default), contentLocked (content read-only), sdtLocked (control cannot be deleted), sdtContentLocked (both).",
+      "description": "content-control 锁定方式。unlocked（默认）、contentLocked（内容只读）、sdtLocked（control 不可删除）、sdtContentLocked（两者同时）。",
       "values": [
         "unlocked",
         "contentLocked",
@@ -138,7 +138,7 @@
     },
     "placeholder": {
       "type": "bool",
-      "description": "true when the control is currently showing its placeholder text (<w:showingPlcHdr/>).",
+      "description": "control 当前显示 placeholder text 时为 true（<w:showingPlcHdr/>）。",
       "add": true,
       "set": false,
       "get": true,
@@ -150,7 +150,7 @@
     },
     "placeholderText": {
       "type": "string",
-      "description": "docPart gallery reference for the placeholder content (<w:placeholder><w:docPart w:val=.../></w:placeholder>).",
+      "description": "placeholder 内容的 docPart gallery 引用（<w:placeholder><w:docPart w:val=.../></w:placeholder>）。",
       "add": true,
       "set": false,
       "get": true,
@@ -162,7 +162,7 @@
     },
     "date.fullDate": {
       "type": "string",
-      "description": "date-picker selected value as ISO-8601 UTC (w:fullDate). The actual chosen date, distinct from the display format.",
+      "description": "date-picker 选中的值，使用 ISO-8601 UTC（w:fullDate）。是实际选择的日期，不同于 display format。",
       "add": true,
       "set": false,
       "get": true,
@@ -174,7 +174,7 @@
     },
     "date.calendar": {
       "type": "string",
-      "description": "date-picker calendar system (w:calendar), e.g. gregorian, hijri, japan.",
+      "description": "date-picker calendar system（w:calendar），如 gregorian、hijri、japan。",
       "add": true,
       "set": false,
       "get": true,
@@ -186,7 +186,7 @@
     },
     "date.lid": {
       "type": "string",
-      "description": "date-picker locale/language id (w:lid), e.g. en-US.",
+      "description": "date-picker locale/language id（w:lid），如 en-US。",
       "add": true,
       "set": false,
       "get": true,
@@ -198,7 +198,7 @@
     },
     "date.storeMappedDataAs": {
       "type": "string",
-      "description": "date-picker XML-mapping storage type (w:storeMappedDataAs), e.g. dateTime, date, text.",
+      "description": "date-picker XML-mapping 的存储类型（w:storeMappedDataAs），如 dateTime、date、text。",
       "add": true,
       "set": false,
       "get": true,
@@ -210,7 +210,7 @@
     },
     "comboBox.lastValue": {
       "type": "string",
-      "description": "combobox current selection (w:lastValue on <w:comboBox>).",
+      "description": "combobox 当前选择值（<w:comboBox> 上的 w:lastValue）。",
       "add": true,
       "set": false,
       "get": true,
@@ -222,7 +222,7 @@
     },
     "dropDown.lastValue": {
       "type": "string",
-      "description": "dropdown current selection (w:lastValue on <w:dropDownList>).",
+      "description": "dropdown 当前选择值（<w:dropDownList> 上的 w:lastValue）。",
       "add": true,
       "set": false,
       "get": true,
@@ -234,7 +234,7 @@
     },
     "id": {
       "type": "number",
-      "description": "OOXML SdtId value; source of @sdtId in stable path /sdt[@sdtId=N].",
+      "description": "OOXML SdtId 值；稳定路径 /sdt[@sdtId=N] 中 @sdtId 的来源。",
       "add": false,
       "set": false,
       "get": true,
@@ -243,7 +243,7 @@
     },
     "editable": {
       "type": "bool",
-      "description": "false when content is locked (lock = contentLocked or sdtContentLocked) on this content control.",
+      "description": "当前 content control 的内容被锁定时为 false（lock = contentLocked 或 sdtContentLocked）。",
       "add": false,
       "set": false,
       "get": true,

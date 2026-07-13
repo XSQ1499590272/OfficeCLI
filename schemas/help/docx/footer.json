@@ -16,7 +16,7 @@
       "/footer[N]"
     ]
   },
-  "note": "Mirror of header.json — same surface, stored in FooterParts. Duplicate type per section rejected at Add. A single Add supports at most one text + one field pair. For composite footers like 'Page X of Y' (two fields + literal text), create the footer first, then Add additional runs/fields to its paragraph (/footer[N]/p[1]) one by one — see examples.",
+  "note": "Footer 与 header.json 使用相同的 surface，存储在 FooterParts 中。每个 section 的重复 type 会在 Add 时被拒绝。单次 Add 最多支持一个 text + 一个 field pair。对于 'Page X of Y' 这类组合 footer（两个 field 加字面文本），先创建 footer，再逐个向其 paragraph（/footer[N]/p[1]）Add 额外的 run/field。",
   "examples": [
     "Simple page-number footer: officecli add file.docx / --type footer --prop field=page --prop align=center",
     "'Page X of Y' — must be built in steps after creating the footer:",
@@ -89,7 +89,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction. 'rtl' writes <w:bidi/> on the footer paragraph, <w:rtl/> on the paragraph mark, and <w:rtl/> on every run (text + field runs alike) so Arabic / Hebrew character order reverses end-to-end. 'ltr' clears all three.",
+      "description": "文字方向。'rtl' 会在 footer paragraph 上写入 <w:bidi/>，在 paragraph mark 上写入 <w:rtl/>，并在所有 run（包括 text 和 field run）上写入 <w:rtl/>，使 Arabic / Hebrew 的字符顺序全程反转。'ltr' 会清除这三项。",
       "add": true,
       "set": true,
       "get": false,
@@ -111,7 +111,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size. Accepts bare number or pt-suffixed.",
+      "description": "font size。接受不带单位的数字或带 pt 后缀的值。",
       "add": true,
       "set": true,
       "get": true,
@@ -145,7 +145,7 @@
     },
     "color": {
       "type": "color",
-      "description": "font color. Accepts #RRGGBB, RRGGBB, named colors (red, blue…), rgb(r,g,b), or 3-char shorthand (F00).",
+      "description": "font color。接受 #RRGGBB、RRGGBB、named colors（red、blue…）、rgb(r,g,b) 或 3-char shorthand（F00）。",
       "add": true,
       "set": true,
       "get": true,

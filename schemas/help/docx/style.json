@@ -16,11 +16,11 @@
       "/styles/StyleId"
     ]
   },
-  "note": "Style type defaults to paragraph. 'id' must be unique in styles.xml; duplicate id rejected if explicit, else auto-suffixed. Built-in ids (Normal, Heading1..9, Title, Subtitle, Quote, IntenseQuote, ListParagraph, NoSpacing, TOCHeading) bypass the customStyle=true flag. Path forms /style[@name=NAME] and /style[N] are NOT supported — only /styles/StyleId resolves; navigation does not handle a bare 'style' top-level segment.",
+  "note": "Style type 默认是 paragraph。'id' 必须在 styles.xml 中唯一；显式重复 id 会被拒绝，否则系统会自动追加后缀。内置 id（Normal、Heading1..9、Title、Subtitle、Quote、IntenseQuote、ListParagraph、NoSpacing、TOCHeading）不受 customStyle=true 限制。/style[@name=NAME] 和 /style[N] path 不支持，只有 /styles/StyleId 可解析；navigation 也不处理顶层的 bare 'style' segment。",
   "properties": {
     "id": {
       "type": "string",
-      "description": "w:styleId (unique, immutable identity). Aliases fall through to 'name' when 'id' is omitted. Renaming after Add would require rewriting every paragraph/run/basedOn reference in the document; not supported.",
+      "description": "w:styleId（唯一且不可变的 identity）。省略 'id' 时，alias 会转而使用 'name'。Add 后改名需要重写 document 中每个 paragraph/run/basedOn reference；不支持。",
       "aliases": [
         "styleId",
         "styleid"
@@ -37,7 +37,7 @@
     },
     "name": {
       "type": "string",
-      "description": "display name. Defaults to 'id' when omitted.",
+      "description": "显示名称。省略时默认使用 'id'。",
       "aliases": [
         "styleName",
         "stylename"
@@ -76,11 +76,11 @@
       ],
       "readback": "one of values (innerText of StyleValues)",
       "enforcement": "report",
-      "note": "Style type is fixed at creation — changing a style's type after Add would orphan every paragraph/run that already references it. Recreate the style if you need a different type."
+      "note": "Style type 在创建时固定；创建后改变 type 会使已引用该 style 的 paragraph/run 失去关联。如需另一种 type，请重新创建 style。"
     },
     "basedOn": {
       "type": "string",
-      "description": "parent style id to inherit from. Must be an existing w:styleId (not display name). Inherited properties are overridden by properties defined on this style.",
+      "description": "要继承的 parent style id。必须是已有 w:styleId（不是显示名称）。本 style 定义的 property 会覆盖继承的 property。",
       "aliases": [
         "basedon"
       ],
@@ -98,13 +98,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved path to the parent style node (get-only). Shortcut: use basedOn to Set.",
+      "description": "解析后的 parent style node 路径（仅 get）。快捷方式：Set 请使用 basedOn。",
       "readback": "/styles/{styleId}",
       "enforcement": "report"
     },
     "next": {
       "type": "string",
-      "description": "next-paragraph style id.",
+      "description": "下一 paragraph 的 style id。",
       "add": true,
       "set": true,
       "get": true,
@@ -119,7 +119,7 @@
       "aliases": [
         "link"
       ],
-      "description": "linked-style pair: a paragraph style references its companion character style (or vice versa). Word UI: 'Linked (paragraph and character)'. Value is the partner styleId; must exist in styles.xml.",
+      "description": "linked-style 对：paragraph style 引用配套 character style（或反之）。Word UI 中显示为“Linked (paragraph and character)”。值为配套 styleId，必须存在于 styles.xml。",
       "add": true,
       "set": true,
       "get": true,
@@ -134,7 +134,7 @@
       "aliases": [
         "qformat"
       ],
-      "description": "mark as a 'primary' (quick) style shown in Word's Styles gallery (<w:qFormat/>). The default Normal style carries this; without round-tripping it the gallery designation is lost.",
+      "description": "标记为显示在 Word Styles gallery 中的“primary”（quick）style（<w:qFormat/>）。默认 Normal style 带有此标记；若不在往返中保留，gallery designation 会丢失。",
       "add": true,
       "set": true,
       "get": true,
@@ -149,7 +149,7 @@
       "aliases": [
         "uipriority"
       ],
-      "description": "sort order of the style in Word's Styles pane / Recommended list (<w:uiPriority>). Lower sorts first.",
+      "description": "style 在 Word Styles pane / Recommended list 中的排序（<w:uiPriority>）。值越小越靠前。",
       "add": true,
       "set": true,
       "get": true,
@@ -164,7 +164,7 @@
       "aliases": [
         "semihidden"
       ],
-      "description": "hide the style from the main Styles gallery while keeping it usable (<w:semiHidden/>). Usually paired with unhideWhenUsed.",
+      "description": "从主 Styles gallery 隐藏 style，但仍可使用（<w:semiHidden/>）。通常与 unhideWhenUsed 配合。",
       "add": true,
       "set": true,
       "get": true,
@@ -179,7 +179,7 @@
       "aliases": [
         "unhidewhenused"
       ],
-      "description": "reveal a semiHidden style in the gallery once it is first applied in the document (<w:unhideWhenUsed/>).",
+      "description": "当 semiHidden style 首次应用于 document 时，在 gallery 中显示它（<w:unhideWhenUsed/>）。",
       "add": true,
       "set": true,
       "get": true,
@@ -191,7 +191,7 @@
     },
     "locked": {
       "type": "bool",
-      "description": "lock the style against use when document formatting protection is active (<w:locked/>).",
+      "description": "当 document formatting protection 启用时，锁定该 style 不可使用（<w:locked/>）。",
       "add": true,
       "set": true,
       "get": true,
@@ -206,7 +206,7 @@
       "aliases": [
         "customstyle"
       ],
-      "description": "mark the style as user-authored rather than one of Word's built-ins (<w:customStyle/>). Carried verbatim through dump->batch so a built-in style renamed to a short id (Normal->'a') is NOT mis-flagged as custom on rebuild. Omitted from `add`/`set` falls back to inferring built-in-ness from the styleId.",
+      "description": "将 style 标记为用户创建，而非 Word 内置 style（<w:customStyle/>）。会原样经过 dump->batch，避免将改为短 id（Normal->'a'）的内置 style 在重建时误标为 custom。未在 `add`/`set` 指定时，会按 styleId 推断是否内置。",
       "add": true,
       "set": false,
       "get": true,
@@ -274,7 +274,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "w:spacing @beforeAutospacing — Word's 'automatic spacing between paragraphs of the same style' toggle for the space BEFORE paragraphs using this style (e.g. the built-in 'Normal (Web)' style). Surfaced on get only when present.",
+      "description": "w:spacing @beforeAutospacing——控制使用该 style 的 paragraph 段前间距的 Word“同样式段落自动间距”开关（例如内置 'Normal (Web)' style）。仅在存在时由 get 返回。",
       "examples": [
         "--prop spaceBeforeAuto=true"
       ],
@@ -289,7 +289,7 @@
       "add": true,
       "set": true,
       "get": true,
-      "description": "w:spacing @afterAutospacing — automatic spacing toggle for the space AFTER paragraphs using this style. See spaceBeforeAuto.",
+      "description": "w:spacing @afterAutospacing——控制使用该 style 的 paragraph 段后间距的自动间距开关。参见 spaceBeforeAuto。",
       "examples": [
         "--prop spaceAfterAuto=true"
       ],
@@ -309,7 +309,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (rFonts/eastAsia) for the style — Chinese / Japanese / Korean typefaces.",
+      "description": "该 style 的 East-Asian 字体槽位（rFonts/eastAsia）——Chinese / Japanese / Korean 字体。",
       "aliases": [
         "font.eastAsia",
         "font.eastasia",
@@ -325,7 +325,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font slot (rFonts/cs) for the style — Arabic / Hebrew / Thai typefaces.",
+      "description": "该 style 的 complex-script 字体槽位（rFonts/cs）——Arabic / Hebrew / Thai 字体。",
       "add": true,
       "set": true,
       "get": true,
@@ -336,7 +336,7 @@
     },
     "font.asciiTheme": {
       "type": "string",
-      "description": "Theme font binding for the style's ascii slot (rFonts/asciiTheme). Values: minorHAnsi, majorHAnsi, minorEastAsia, majorEastAsia, minorBidi, majorBidi.",
+      "description": "该 style 的 ascii 槽位 Theme font binding（rFonts/asciiTheme）。可选值：minorHAnsi、majorHAnsi、minorEastAsia、majorEastAsia、minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -347,7 +347,7 @@
     },
     "font.hAnsiTheme": {
       "type": "string",
-      "description": "Theme font binding for the style's hAnsi slot (rFonts/hAnsiTheme).",
+      "description": "该 style 的 hAnsi 槽位 Theme font binding（rFonts/hAnsiTheme）。",
       "add": true,
       "set": true,
       "get": true,
@@ -358,7 +358,7 @@
     },
     "font.eaTheme": {
       "type": "string",
-      "description": "Theme font binding for the style's East-Asia slot (rFonts/eastAsiaTheme). Values: minorEastAsia, majorEastAsia.",
+      "description": "该 style 的 East-Asia 槽位 Theme font binding（rFonts/eastAsiaTheme）。可选值：minorEastAsia、majorEastAsia。",
       "aliases": [
         "font.eastAsiaTheme"
       ],
@@ -372,7 +372,7 @@
     },
     "font.csTheme": {
       "type": "string",
-      "description": "Theme font binding for the style's complex-script slot (rFonts/cstheme). Values: minorBidi, majorBidi.",
+      "description": "该 style 的 complex-script 槽位 Theme font binding（rFonts/cstheme）。可选值：minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -383,7 +383,7 @@
     },
     "size": {
       "type": "font-size",
-      "description": "font size. Accepts bare number or pt-suffixed.",
+      "description": "字体大小。接受不带单位的数值或带 pt 后缀的值。",
       "add": true,
       "set": true,
       "get": true,
@@ -417,7 +417,7 @@
     },
     "color": {
       "type": "color",
-      "description": "font color. Accepts #RRGGBB, RRGGBB, named colors (red, blue…), rgb(r,g,b), or 3-char shorthand (F00).",
+      "description": "字体颜色。接受 #RRGGBB、RRGGBB、命名颜色（red、blue 等）、rgb(r,g,b) 或三字符简写（F00）。",
       "add": true,
       "set": true,
       "get": true,
@@ -429,7 +429,7 @@
     },
     "underline": {
       "type": "string",
-      "description": "underline style (true/false, single, double, thick, dotted, dash, wavy, none, ...). Applied to the style's rPr.",
+      "description": "下划线样式（true/false、single、double、thick、dotted、dash、wavy、none 等）。应用于该 style 的 rPr。",
       "add": true,
       "set": true,
       "get": true,
@@ -442,7 +442,7 @@
     },
     "strike": {
       "type": "bool",
-      "description": "single-line strikethrough on the style's rPr.",
+      "description": "该 style rPr 上的单删除线。",
       "aliases": [
         "strikethrough"
       ],
@@ -457,7 +457,7 @@
     },
     "dstrike": {
       "type": "bool",
-      "description": "double-line strikethrough on the style's rPr.",
+      "description": "该 style rPr 上的双删除线。",
       "aliases": [
         "doublestrike"
       ],
@@ -472,7 +472,7 @@
     },
     "highlight": {
       "type": "string",
-      "description": "highlight color (yellow, green, cyan, magenta, blue, red, darkBlue, darkCyan, darkGreen, darkMagenta, darkRed, darkYellow, darkGray, lightGray, black, white, none).",
+      "description": "突出显示颜色（yellow、green、cyan、magenta、blue、red、darkBlue、darkCyan、darkGreen、darkMagenta、darkRed、darkYellow、darkGray、lightGray、black、white、none）。",
       "add": true,
       "set": true,
       "get": true,
@@ -484,7 +484,7 @@
     },
     "caps": {
       "type": "bool",
-      "description": "all-caps display on the style's rPr.",
+      "description": "该 style rPr 上的全大写显示。",
       "add": true,
       "set": true,
       "get": true,
@@ -496,7 +496,7 @@
     },
     "smallCaps": {
       "type": "bool",
-      "description": "small-caps display on the style's rPr.",
+      "description": "该 style rPr 上的小型大写显示。",
       "aliases": [
         "smallcaps"
       ],
@@ -511,7 +511,7 @@
     },
     "vanish": {
       "type": "bool",
-      "description": "hidden text on the style's rPr.",
+      "description": "该 style rPr 上的隐藏文本。",
       "aliases": [
         "hidden"
       ],
@@ -526,7 +526,7 @@
     },
     "rtl": {
       "type": "bool",
-      "description": "right-to-left run layout on the style's rPr.",
+      "description": "该 style rPr 上从右到左的 run layout。",
       "add": true,
       "set": true,
       "get": true,
@@ -543,7 +543,7 @@
         "subscript",
         "baseline"
       ],
-      "description": "vertical text alignment (superscript/subscript) on the style's rPr.",
+      "description": "该 style rPr 上的垂直文本对齐（superscript/subscript）。",
       "aliases": [
         "vertalign",
         "verticalAlign"
@@ -559,7 +559,7 @@
     },
     "charSpacing": {
       "type": "length",
-      "description": "character spacing (letter-spacing) on the style's rPr.",
+      "description": "该 style rPr 上的字符间距（letter-spacing）。",
       "aliases": [
         "charspacing",
         "letterSpacing",
@@ -576,7 +576,7 @@
     },
     "shading": {
       "type": "color",
-      "description": "background shading fill color on the style's rPr (or pPr for paragraph styles).",
+      "description": "该 style rPr 的背景 shading fill color（paragraph style 则为 pPr）。",
       "aliases": [
         "shd"
       ],
@@ -591,7 +591,7 @@
     },
     "lineSpacing": {
       "type": "string",
-      "description": "line spacing — multiplier (1.5x, 150%) or fixed (18pt). Applied to the style's pPr.",
+      "description": "行距——倍数（1.5x、150%）或固定值（18pt）。应用于该 style 的 pPr。",
       "aliases": [
         "linespacing"
       ],
@@ -607,7 +607,7 @@
     },
     "lineRule": {
       "type": "enum",
-      "description": "line spacing rule paired with lineSpacing. 'auto' = multiplier, 'exact' = exact fixed height, 'atLeast' = minimum height (lines may grow to fit tall content). Applied to the style's pPr.",
+      "description": "与 lineSpacing 配套的行距规则。'auto' = 倍数，'exact' = 精确固定高度，'atLeast' = 最小高度（行可随较高内容增大）。应用于该 style 的 pPr。",
       "values": [
         "auto",
         "exact",
@@ -627,7 +627,7 @@
     },
     "contextualSpacing": {
       "type": "bool",
-      "description": "suppress spacing between paragraphs of the same style.",
+      "description": "抑制同一 style 的 paragraph 之间的间距。",
       "aliases": [
         "contextualspacing"
       ],
@@ -642,7 +642,7 @@
     },
     "outlineLvl": {
       "type": "int",
-      "description": "outline level (0-9, 0=Heading 1). Drives TOC and Navigator. Applied to the style's pPr.",
+      "description": "outline 级别（0–9，0=Heading 1）。驱动 TOC 和 Navigator。应用于该 style 的 pPr。",
       "aliases": [
         "outlinelvl",
         "outlineLevel",
@@ -659,7 +659,7 @@
     },
     "kinsoku": {
       "type": "bool",
-      "description": "kinsoku (CJK line-break rules) toggle. Applied to the style's pPr.",
+      "description": "kinsoku（CJK 换行规则）开关。应用于该 style 的 pPr。",
       "add": true,
       "set": true,
       "get": true,
@@ -671,7 +671,7 @@
     },
     "snapToGrid": {
       "type": "bool",
-      "description": "snap to document grid for CJK layout. Applied to the style's pPr. Add/Set only — Get does not surface this back today.",
+      "description": "为 CJK layout 对齐到 document grid。应用于该 style 的 pPr。仅 Add/Set；当前 Get 不返回此项。",
       "aliases": [
         "snaptogrid"
       ],
@@ -686,7 +686,7 @@
     },
     "wordWrap": {
       "type": "bool",
-      "description": "allow word-break for non-CJK text inside CJK lines. Applied to the style's pPr. Add/Set only — Get does not surface this back today.",
+      "description": "允许 CJK 行内的非 CJK 文本断词。应用于该 style 的 pPr。仅 Add/Set；当前 Get 不返回此项。",
       "aliases": [
         "wordwrap"
       ],
@@ -701,7 +701,7 @@
     },
     "autoSpaceDE": {
       "type": "bool",
-      "description": "auto spacing between East-Asian and Latin text. Applied to the style's pPr.",
+      "description": "East-Asian 与 Latin 文本之间的自动间距。应用于该 style 的 pPr。",
       "aliases": [
         "autospacede"
       ],
@@ -716,7 +716,7 @@
     },
     "autoSpaceDN": {
       "type": "bool",
-      "description": "auto spacing between East-Asian text and numbers. Applied to the style's pPr.",
+      "description": "East-Asian 文本与数字之间的自动间距。应用于该 style 的 pPr。",
       "aliases": [
         "autospacedn"
       ],
@@ -731,7 +731,7 @@
     },
     "bidi": {
       "type": "bool",
-      "description": "right-to-left paragraph direction. Applied to the style's pPr.",
+      "description": "从右到左的 paragraph direction。应用于该 style 的 pPr。",
       "add": true,
       "set": true,
       "get": true,
@@ -750,7 +750,7 @@
       "aliases": [
         "dir"
       ],
-      "description": "Paragraph reading direction (Arabic / Hebrew). 'rtl' writes <w:bidi/> on the style pPr; equivalent to bidi=true in canonical form.",
+      "description": "Paragraph 阅读方向（Arabic / Hebrew）。'rtl' 会在 style pPr 上写入 <w:bidi/>；标准形式等同于 bidi=true。",
       "add": true,
       "set": true,
       "get": true,
@@ -762,7 +762,7 @@
     },
     "overflowPunct": {
       "type": "bool",
-      "description": "allow punctuation to hang outside the text margin (CJK). Applied to the style's pPr.",
+      "description": "允许标点悬挂在文本页边距之外（CJK）。应用于该 style 的 pPr。",
       "aliases": [
         "overflowpunct"
       ],
@@ -777,7 +777,7 @@
     },
     "topLinePunct": {
       "type": "bool",
-      "description": "compress punctuation at the start of a line (CJK). Applied to the style's pPr. Add/Set only — Get does not surface this back today.",
+      "description": "压缩行首标点（CJK）。应用于该 style 的 pPr。仅 Add/Set；当前 Get 不返回此项。",
       "aliases": [
         "toplinepunct"
       ],
@@ -792,7 +792,7 @@
     },
     "suppressAutoHyphens": {
       "type": "bool",
-      "description": "disable automatic hyphenation in this style. Add/Set only — Get does not surface this back today.",
+      "description": "在此 style 中禁用自动连字符。仅 Add/Set；当前 Get 不返回此项。",
       "aliases": [
         "suppressautohyphens"
       ],
@@ -807,7 +807,7 @@
     },
     "suppressLineNumbers": {
       "type": "bool",
-      "description": "exclude this paragraph style from line numbering. Add/Set only — Get does not surface this back today.",
+      "description": "将此 paragraph style 排除在行号之外。仅 Add/Set；当前 Get 不返回此项。",
       "aliases": [
         "suppresslinenumbers"
       ],
@@ -822,7 +822,7 @@
     },
     "keepNext": {
       "type": "bool",
-      "description": "keep this paragraph on the same page as the next.",
+      "description": "使使用此 style 的 paragraph 与下一 paragraph 保持在同一页。",
       "aliases": [
         "keepnext"
       ],
@@ -837,7 +837,7 @@
     },
     "keepLines": {
       "type": "bool",
-      "description": "keep all lines of this paragraph together on one page.",
+      "description": "使使用此 style 的 paragraph 所有行保持在同一页。",
       "aliases": [
         "keeplines"
       ],
@@ -852,7 +852,7 @@
     },
     "pageBreakBefore": {
       "type": "bool",
-      "description": "force a page break before each paragraph using this style.",
+      "description": "在每个使用此 style 的 paragraph 前强制分页。",
       "aliases": [
         "pagebreakbefore"
       ],
@@ -867,7 +867,7 @@
     },
     "widowControl": {
       "type": "bool",
-      "description": "prevent widows and orphans (single isolated lines).",
+      "description": "防止孤行和寡行（孤立的单行）。",
       "aliases": [
         "widowcontrol"
       ],
@@ -882,7 +882,7 @@
     },
     "pbdr": {
       "type": "string",
-      "description": "paragraph border. Sub-keys: pbdr.top / pbdr.bottom / pbdr.left / pbdr.right / pbdr.between / pbdr.bar / pbdr.all. Value form: 'style:size:color' (e.g. 'single:6:#FF0000'). Set-only — Get does not surface paragraph borders on the style today.",
+      "description": "paragraph 边框。子 key：pbdr.top / pbdr.bottom / pbdr.left / pbdr.right / pbdr.between / pbdr.bar / pbdr.all。取值形式：'style:size:color'（例如 'single:6:#FF0000'）。仅 Set；当前 Get 不返回 style 上的 paragraph border。",
       "aliases": [
         "border"
       ],
@@ -898,7 +898,7 @@
     },
     "numId": {
       "type": "int",
-      "description": "numbering instance ID this style references. Paragraphs using --prop style=<id> inherit numbering through ResolveNumPrFromStyle without their own numPr — the canonical multi-level outline pattern (Heading1..9). Requires the numId to already exist in /numbering.",
+      "description": "该 style 引用的 numbering instance ID。使用 --prop style=<id> 的 paragraph 会通过 ResolveNumPrFromStyle 继承 numbering，而无需自身 numPr——这是标准的多级 outline 模式（Heading1..9）。numId 必须已存在于 /numbering。",
       "aliases": [
         "numid"
       ],
@@ -913,7 +913,7 @@
     },
     "ilvl": {
       "type": "int",
-      "description": "list level (0-8) for the style-borne numPr.",
+      "description": "style 自带 numPr 的 list level（0–8）。",
       "aliases": [
         "numLevel",
         "numlevel"
@@ -932,7 +932,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved paragraph alignment after walking basedOn → linked → docDefaults.",
+      "description": "沿 basedOn → linked → docDefaults 解析后的 paragraph 对齐方式。",
       "readback": "alignment token (left|center|right|both|distribute)",
       "enforcement": "report"
     },
@@ -941,7 +941,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "source pointer for effective.alignment (style id chain).",
+      "description": "effective.alignment 的来源指针（style id chain）。",
       "readback": "style id or `docDefaults`",
       "enforcement": "report"
     },
@@ -950,7 +950,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved paragraph reading direction (rtl|ltr).",
+      "description": "解析后的 paragraph 阅读方向（rtl|ltr）。",
       "readback": "`rtl` | `ltr`",
       "enforcement": "report"
     },
@@ -959,7 +959,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "source pointer for effective.direction.",
+      "description": "effective.direction 的来源指针。",
       "readback": "style id or `docDefaults`",
       "enforcement": "report"
     },
@@ -968,7 +968,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved highlight color name (yellow|green|cyan|...) inherited from the style chain.",
+      "description": "从 style chain 继承并解析的突出显示颜色名称（yellow|green|cyan|...）。",
       "readback": "highlight token",
       "enforcement": "report"
     },
@@ -977,7 +977,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved line spacing (`<N>x` or `<N>pt`).",
+      "description": "解析后的行距（`<N>x` 或 `<N>pt`）。",
       "readback": "unit-qualified spacing",
       "enforcement": "report"
     },
@@ -986,7 +986,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "source pointer for effective.lineSpacing.",
+      "description": "effective.lineSpacing 的来源指针。",
       "readback": "style id or `docDefaults`",
       "enforcement": "report"
     },
@@ -995,7 +995,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved space-before (unit-qualified).",
+      "description": "解析后的段前间距（带单位）。",
       "readback": "unit-qualified length",
       "enforcement": "report"
     },
@@ -1004,7 +1004,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "source pointer for effective.spaceBefore.",
+      "description": "effective.spaceBefore 的来源指针。",
       "readback": "style id or `docDefaults`",
       "enforcement": "report"
     },
@@ -1013,7 +1013,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "resolved space-after (unit-qualified).",
+      "description": "解析后的段后间距（带单位）。",
       "readback": "unit-qualified length",
       "enforcement": "report"
     },
@@ -1022,7 +1022,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "source pointer for effective.spaceAfter.",
+      "description": "effective.spaceAfter 的来源指针。",
       "readback": "style id or `docDefaults`",
       "enforcement": "report"
     },
@@ -1031,7 +1031,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true when strike-through is inherited from the style chain.",
+      "description": "当删除线从 style chain 继承时为 true。",
       "readback": "true|false",
       "enforcement": "report"
     }

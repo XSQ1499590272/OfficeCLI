@@ -16,6 +16,6 @@
       "/slide[N]/table[M]/tr[R]"
     ]
   },
-  "note": "Row inherits column count from the table grid unless 'cols' override is supplied. Per-cell seed text via c{N}=value props.",
+  "note": "除非提供 'cols' override，否则 row 会继承 table grid 的 column count。使用 c{N}=value props 为每个 cell 提供初始文本。",
   "extends": "_shared/table-row"
 }

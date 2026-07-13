@@ -14,11 +14,11 @@
     "stable":     ["/<sheetName>/<A1Ref>"],
     "positional": ["/Sheet1/A1", "/Sheet1/B2:C3"]
   },
-  "note": "Get returns canonical keys: numberformat (not `format`), alignment.{horizontal,vertical,wrapText}, font.{bold,italic,name,size,color}. Add/Set accept both font.* and short forms (bold, italic, font, size). The bare `color` key is rejected on cells (ambiguous with `fill`) — use `font.color` for text color or `fill` for background. Cross-format note: pptx shape `color=` unambiguously means text color; xlsx must be explicit because a cell has both font color and fill color. Parent path controls placement: `/Sheet1` appends to the next empty cell; `/Sheet1/A2` targets a specific cell. Set auto-vivifies any in-bounds cell (A1:XFD1048576) — writing to a never-written cell creates it rather than throwing not_found, since OOXML xlsx stores only cells with content. Sheet-level and out-of-bounds writes still error.",
+  "note": "Get 返回 canonical keys：numberformat（不是 format）、alignment.{horizontal,vertical,wrapText}、font.{bold,italic,name,size,color}。Add/Set 同时接受 font.* 和 short form（bold、italic、font、size）。cell 上的 bare color key 会因与 fill 歧义而被拒绝；文本颜色使用 font.color，背景使用 fill。跨格式注意：pptx shape 的 color= 明确表示 text color，xlsx cell 必须明确区分 font color 和 fill color。parent path 控制放置位置：/Sheet1 追加到下一个空 cell，/Sheet1/A2 定位到指定 cell。Set 会自动创建范围内尚未写入的 cell（A1:XFD1048576），不会因为 not_found 抛错；sheet-level 和越界写入仍会报错。",
   "properties": {
     "value": {
       "type": "string",
-      "description": "literal cell value — string, number, or date. Numeric strings stored as numbers unless cell has text format (@) or explicit type=string. Readback in DocumentNode.Text.",
+      "description": "字面 cell value——string、number 或 date。除非 cell 使用文本格式（@）或显式 type=string，否则 numeric string 会作为 number 存储。读取结果位于 DocumentNode.Text。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop value=\"Hello\"", "--prop value=42", "--prop value=42 --prop type=string", "--prop value=42 --prop type=number"],
       "readback": "plain string in DocumentNode.Text",
@@ -26,7 +26,7 @@
     },
     "formula": {
       "type": "string",
-      "description": "cell formula, without leading =",
+      "description": "cell formula，不含开头的 =。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop formula=\"SUM(A1:A10)\""],
       "readback": "formula text without leading =",
@@ -34,7 +34,7 @@
     },
     "numberformat": {
       "type": "string",
-      "description": "Excel format code — covers number, date, percentage, currency, and text (@). \"@\" forces String storage on subsequent values.",
+      "description": "Excel format code——涵盖 number、date、percentage、currency 和 text（@）。\"@\" 会强制后续 value 以 String 存储。",
       "aliases": ["format", "numfmt"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop numberformat=\"#,##0.00\"", "--prop numberformat=yyyy-mm-dd", "--prop numberformat=@"],
@@ -43,7 +43,7 @@
     },
     "font.bold": {
       "type": "bool",
-      "description": "bold font weight on the cell.",
+      "description": "cell 的粗体 font weight。",
       "aliases": ["bold"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop bold=true"],
@@ -52,7 +52,7 @@
     },
     "font.italic": {
       "type": "bool",
-      "description": "italic style on the cell.",
+      "description": "cell 的 italic 样式。",
       "aliases": ["italic"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop italic=true"],
@@ -61,7 +61,7 @@
     },
     "font.name": {
       "type": "string",
-      "description": "font family name. Aliases: font, fontname.",
+      "description": "font family 名称。别名：font、fontname。",
       "aliases": ["font", "fontname"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop font=\"Calibri\""],
@@ -78,7 +78,7 @@
     },
     "font.color": {
       "type": "color",
-      "description": "font color on the cell. Note: the bare 'color' alias is intentionally rejected on cells due to ambiguity with 'fill' (background) — use 'font.color' explicitly.",
+      "description": "cell 的 font color。注意：不带子字段的 'color' 在 cell 上因与 'fill'（background）含义不明确而被有意拒绝；请显式使用 'font.color'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop font.color=FF0000"],
       "readback": "#RRGGBB uppercase",
@@ -86,7 +86,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "cell background fill. Solid color (hex / named / rgb(...)) or a linear gradient as 'COLOR1-COLOR2[-ANGLE]' / 'gradient;COLOR1;COLOR2[;ANGLE]'. Scheme color names (accent1..) and 'none' are not accepted on input — readback may surface them when a cell already carries them.",
+      "description": "cell 背景 fill。可为纯色（hex / named / rgb(...)）或线性 gradient：'COLOR1-COLOR2[-ANGLE]' / 'gradient;COLOR1;COLOR2[;ANGLE]'。输入不接受 Scheme color 名称（accent1..）和 'none'；cell 已带有它们时，读取结果可能返回。",
       "aliases": ["bgcolor"],
       "add": true, "set": true, "get": true,
       "examples": [
@@ -102,7 +102,7 @@
     "fillPattern": {
       "type": "enum",
       "values": ["none", "solid", "gray125", "gray0625", "mediumGray", "darkGray", "lightGray", "darkHorizontal", "darkVertical", "darkDown", "darkUp", "darkGrid", "darkTrellis", "lightHorizontal", "lightVertical", "lightDown", "lightUp", "lightGrid", "lightTrellis"],
-      "description": "non-solid pattern fill type. When set, `fill` supplies the pattern foreground color and `fillBg` supplies the background color. Omit to keep a plain solid `fill`.",
+      "description": "非纯色 pattern fill 类型。设置后，`fill` 提供 pattern 前景色，`fillBg` 提供背景色。省略以保持普通纯色 `fill`。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop fillPattern=lightGray --prop fill=FF0000 --prop fillBg=FFFF00"],
       "readback": "camelCase pattern name (e.g. lightGray); present only for non-solid patterns",
@@ -110,7 +110,7 @@
     },
     "fillBg": {
       "type": "color",
-      "description": "background color of a non-solid pattern fill (see fillPattern). Ignored for solid fills.",
+      "description": "非纯色 pattern fill 的背景色（参见 fillPattern）。纯色 fill 会忽略。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop fillPattern=darkGrid --prop fill=000000 --prop fillBg=FFFFFF"],
       "readback": "#RRGGBB uppercase; present only for non-solid patterns with a background color",
@@ -118,7 +118,7 @@
     },
     "strike": {
       "type": "bool",
-      "description": "single strikethrough on the cell text.",
+      "description": "cell 文本的单删除线。",
       "aliases": ["strikethrough", "font.strike"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop strike=true"],
@@ -128,7 +128,7 @@
     "underline": {
       "type": "enum",
       "values": ["single", "double", "singleAccounting", "doubleAccounting", "none"],
-      "description": "underline style on the cell text.",
+      "description": "cell 文本的下划线样式。",
       "aliases": ["font.underline"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop underline=single"],
@@ -137,7 +137,7 @@
     },
     "locked": {
       "type": "bool",
-      "description": "cell protection: lock the cell against edits when the sheet is protected. Default Excel behavior is locked=true. Add/Set only — readback is exposed under 'protection.locked'.",
+      "description": "cell protection：当 sheet 受保护时锁定 cell 以禁止编辑。Excel 默认行为为 locked=true。仅 Add/Set；读取结果位于 'protection.locked'。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop locked=false"],
       "readback": "n/a (use protection.locked on Get)",
@@ -145,35 +145,35 @@
     },
     "protection.locked": {
       "type": "bool",
-      "description": "cell protection lock state. Get-only readback (dotted form). For Add/Set use the flat `locked` key.",
+      "description": "cell protection lock 状态。仅 Get 读取结果（点分形式）。Add/Set 请使用平铺的 `locked` key。",
       "add": false, "set": false, "get": true,
       "readback": "true | false",
       "enforcement": "report"
     },
     "protection.hidden": {
       "type": "bool",
-      "description": "hide formula in protected sheet. Get-only readback.",
+      "description": "在受保护 sheet 中隐藏 formula。仅 Get 读取结果。",
       "add": false, "set": false, "get": true,
       "readback": "true | false",
       "enforcement": "report"
     },
     "numFmtId": {
       "type": "number",
-      "description": "raw OOXML number format id (supplementary; prefer `numberformat`). Emitted only when numFmtId > 0.",
+      "description": "原始 OOXML number format id（补充信息；优先使用 `numberformat`）。仅当 numFmtId > 0 时输出。",
       "add": false, "set": false, "get": true,
       "readback": "integer",
       "enforcement": "report"
     },
     "phonetic": {
       "type": "string",
-      "description": "phonetic guide text from SST PhoneticRun. Emitted only when present.",
+      "description": "来自 SST PhoneticRun 的 phonetic guide 文本。仅在存在时输出。",
       "add": false, "set": false, "get": true,
       "readback": "phonetic string",
       "enforcement": "report"
     },
     "quotePrefix": {
       "type": "bool",
-      "description": "leading apostrophe quote-prefix flag. Emitted only when set. Set it via a leading apostrophe on `value` (Excel's force-text idiom).",
+      "description": "前导 apostrophe quote-prefix 标记。仅在设置时输出。请通过 `value` 前的 apostrophe 设置（Excel 强制文本的惯用方式）。",
       "add": false, "set": false, "get": true,
       "readback": "true | false",
       "enforcement": "report"
@@ -181,7 +181,7 @@
     "alignment.horizontal": {
       "type": "enum",
       "values": ["left", "center", "right", "justify", "fill", "distributed"],
-      "description": "horizontal text alignment. Alias: halign.",
+      "description": "水平文本对齐。别名：halign。",
       "aliases": ["halign"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop alignment.horizontal=center"],
@@ -191,7 +191,7 @@
     "alignment.vertical": {
       "type": "enum",
       "values": ["top", "center", "bottom"],
-      "description": "vertical text alignment. Alias: valign.",
+      "description": "垂直文本对齐。别名：valign。",
       "aliases": ["valign"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop alignment.vertical=center"],
@@ -200,7 +200,7 @@
     },
     "alignment.wrapText": {
       "type": "bool",
-      "description": "wrap text within the cell. Aliases: wrap, wrapText.",
+      "description": "在 cell 内换行文本。别名：wrap、wrapText。",
       "aliases": ["wrap", "wrapText"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop alignment.wrapText=true"],
@@ -210,7 +210,7 @@
     "alignment.readingOrder": {
       "type": "enum",
       "values": ["context", "ltr", "rtl"],
-      "description": "cell text reading direction (OOXML 0=context, 1=ltr, 2=rtl). Use 'rtl' for Arabic / Hebrew, 'ltr' to force left-to-right, 'context' (default) to derive from content.",
+      "description": "cell 文本阅读方向（OOXML 0=context、1=ltr、2=rtl）。Arabic / Hebrew 请使用 'rtl'，使用 'ltr' 强制从左到右，使用 'context'（默认）根据内容推导。",
       "aliases": ["readingorder", "readingOrder", "direction", "dir"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop alignment.readingOrder=rtl", "--prop direction=rtl"],
@@ -218,14 +218,14 @@
     },
     "merge": {
       "type": "string",
-      "description": "merge range applied post-cell-creation (parity with `set`). Accepts a single A1 range (A1:C3) or comma-separated ranges (A1:B1,A2:B2). Use merge=false to clear an existing merge anchored at this cell (aliases: unmerge, none, empty).",
+      "description": "在创建 cell 后应用的 merge range（与 `set` 一致）。接受单个 A1 range（A1:C3）或以逗号分隔的 range（A1:B1,A2:B2）。使用 merge=false 清除以此 cell 为 anchor 的已有 merge（别名：unmerge、none、empty）。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop merge=A1:C3", "--prop merge=false"],
       "enforcement": "report"
     },
     "ref": {
       "type": "string",
-      "description": "target A1 cell reference (alternative to encoding the address in the path tail).",
+      "description": "目标 A1 cell reference（可替代在 path tail 中编码地址）。",
       "aliases": ["address"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop ref=B2"],
@@ -233,7 +233,7 @@
     },
     "link": {
       "type": "string",
-      "description": "hyperlink target attached to the cell. Accepts external URL (https://, http://, mailto:, file://, onenote:, tel:) or internal anchor (#Sheet!Cell, #NamedRange). Use link=none on Set to remove. Parity with Set. Alias: url.",
+      "description": "附加到 cell 的 hyperlink target。接受外部 URL（https://、http://、mailto:、file://、onenote:、tel:）或内部 anchor（#Sheet!Cell、#NamedRange）。Set 时使用 link=none 移除。与 Set 一致。别名：url。",
       "aliases": ["url"],
       "add": true, "set": true, "get": true,
       "examples": [
@@ -246,7 +246,7 @@
     },
     "tooltip": {
       "type": "string",
-      "description": "ScreenTip text shown on hover for an existing hyperlink. Pair with link= during Add, or apply to a cell that already has a hyperlink during Set.",
+      "description": "现有 hyperlink hover 时显示的 ScreenTip 文本。Add 时与 link= 配合，或在 Set 时应用于已有 hyperlink 的 cell。",
       "aliases": ["screenTip", "screentip"],
       "add": true, "set": true, "get": false,
       "examples": ["--prop link=https://example.com --prop tooltip=\"Open in browser\""],
@@ -254,7 +254,7 @@
     },
     "display": {
       "type": "string",
-      "description": "friendly display text (@display attribute) for an existing hyperlink. Pair with link= during Add, or apply to a cell that already has a hyperlink during Set.",
+      "description": "现有 hyperlink 的友好显示文本（@display attribute）。Add 时与 link= 配合，或在 Set 时应用于已有 hyperlink 的 cell。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop link=https://example.com --prop display=\"Company site\""],
       "readback": "display string",
@@ -263,7 +263,7 @@
     "type": {
       "type": "enum",
       "values": ["string", "number", "boolean", "date", "error", "richtext"],
-      "description": "force a cell type. Normally inferred from value/formula. Add/Set accept the listed values only; SST-backed shared strings and inline strings are not creatable via Add (use plain string instead). Get may still surface 'SharedString' or 'InlineString' when reading cells written by Excel or other tools.",
+      "description": "强制指定 cell type。通常由 value/formula 推断。Add/Set 仅接受列出的值；由 SST 支持的 shared string 和 inline string 不能通过 Add 创建（请改用 plain string）。读取 Excel 或其他工具写入的 cell 时，Get 仍可能返回 'SharedString' 或 'InlineString'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop value=01234 --prop type=string"],
       "readback": "PascalCase type name (e.g. \"String\", \"Number\", \"Boolean\", \"Error\", \"SharedString\", \"InlineString\", \"Date\")",
@@ -271,7 +271,7 @@
     },
     "runs": {
       "type": "string",
-      "description": "rich-text runs as JSON array (e.g. '[{\"text\":\"Hello\",\"bold\":true}]'). Used when type=richtext.",
+      "description": "以 JSON array 表示的 rich-text run（例如 '[{\"text\":\"Hello\",\"bold\":true}]'）。当 type=richtext 时使用。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop type=richtext --prop runs='[{\"text\":\"Bold\",\"bold\":true}]'"],
       "readback": "n/a (decomposed into /run[N] subnodes)",
@@ -279,7 +279,7 @@
     },
     "clear": {
       "type": "bool",
-      "description": "clear the cell value/formula before applying new content.",
+      "description": "在应用新内容前清除 cell value/formula。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop clear=true"],
       "readback": "n/a",
@@ -287,7 +287,7 @@
     },
     "shift": {
       "type": "string",
-      "description": "Cell-level Insert/Delete shift (Excel UI parity). On `add --type cell`: 'right' pushes existing cells in the same row right by one to make room; 'down' pushes existing cells in the same column down by one. On `remove` (passed via the top-level `--shift` flag, not `--prop`): 'left' shifts cells in the same row left into the gap; 'up' shifts cells in the same column up. Scope cap: only cellRefs within the affected row (left/right) or column (up/down) are rewritten — formulas, mergeCells, and CF/DV/hyperlink/table refs that span the affected band are NOT adjusted. For full-band shift with all metadata adjusted, use add/remove --type row or --type col.",
+      "description": "cell 级 Insert/Delete shift（与 Excel UI 一致）。在 `add --type cell` 中：'right' 将同一 row 的已有 cell 右移一格腾出位置；'down' 将同一 column 的已有 cell 下移一格。在 `remove` 中（通过顶级 `--shift` flag 而非 `--prop` 传入）：'left' 将同一 row 的 cell 左移填补空缺；'up' 将同一 column 的 cell 上移。范围限制：仅改写受影响 row（left/right）或 column（up/down）中的 cellRef——跨越受影响带的 formula、mergeCells 和 CF/DV/hyperlink/table reference 不会调整。若需全带 shift 并调整全部 metadata，请使用 add/remove --type row 或 --type col。",
       "add": true, "set": false, "get": false,
       "examples": [
         "add file.xlsx /Sheet1/B5 --type cell --prop shift=right --prop value=NEW",
@@ -300,7 +300,7 @@
     },
     "arrayformula": {
       "type": "string",
-      "description": "dynamic-array formula spilled into ref range (without leading '=').",
+      "description": "溢出到 ref range 的 dynamic-array formula（不含开头的 '='）。",
       "add": true, "set": true, "get": false,
       "examples": ["--prop arrayformula=\"A1:A10*2\" --prop ref=B1:B10"],
       "readback": "n/a",
@@ -308,44 +308,44 @@
     },
     "cachedValue": {
       "type": "string",
-      "description": "raw <x:v> cached display value as stored in the file. Surfaces only on Get/Query for formula cells; absent on plain-value cells. Mirrors what the last writer (Excel/LibreOffice) computed — may be stale.",
+      "description": "文件中保存的原始 <x:v> cached display value。仅 formula cell 的 Get/Query 返回；plain-value cell 不返回。反映最后写入方（Excel/LibreOffice）的计算结果，可能已过期。",
       "add": false, "set": false, "get": true,
       "readback": "raw cached display value for formula cells; absent on plain-value cells",
       "enforcement": "report"
     },
     "computedValue": {
       "type": "string",
-      "description": "OfficeCli evaluator's prediction of the formula result. Surfaces only on Get/Query for formula cells when the evaluator could compute a value. Compare against cachedValue to detect stale caches (see view issues subtype formula_cache_stale).",
+      "description": "OfficeCli evaluator 对 formula 结果的预测。仅当 evaluator 能计算出值时，在 formula cell 的 Get/Query 返回。可与 cachedValue 比较以检测过期 cache（参见 view issues subtype formula_cache_stale）。",
       "add": false, "set": false, "get": true,
       "readback": "evaluator-predicted value for formula cells; absent when the evaluator could not compute",
       "enforcement": "report"
     },
     "evaluated": {
       "type": "bool",
-      "description": "cross-handler protocol flag — true when cachedValue is present OR the evaluator produced computedValue; false when the formula has neither (view text substitutes #OCLI_NOTEVAL!). Read this via get --json instead of pattern-matching the sentinel, since literal user content may collide. Subtype: formula_not_evaluated.",
+      "description": "cross-handler protocol 标记——当存在 cachedValue 或 evaluator 生成 computedValue 时为 true；formula 两者皆无时为 false（view 文本会替换为 #OCLI_NOTEVAL!）。请通过 get --json 读取，不要匹配 sentinel，因为字面用户内容可能冲突。Subtype：formula_not_evaluated。",
       "add": false, "set": false, "get": true,
       "readback": "true|false (true ⇒ either cachedValue or computedValue is available)",
       "enforcement": "report"
     },
-    "alignment.indent":         { "type":"number", "add":true, "set":true, "get":true, "description":"cell alignment indent units (CT_CellAlignment @indent). Alias: indent.", "readback":"integer indent units", "enforcement":"report" },
-    "alignment.shrinkToFit":    { "type":"bool",   "add":true, "set":true, "get":true, "description":"shrink text to fit the cell width (CT_CellAlignment @shrinkToFit). Alias: shrink.", "readback":"true|false", "enforcement":"report" },
-    "alignment.textRotation":   { "type":"number", "add":true, "set":true, "get":true, "description":"text rotation in degrees, 0-90 up / 91-180 down, or 255 for vertical stacking (CT_CellAlignment @textRotation). The `rotation` shorthand also works on Set.", "readback":"integer degrees", "enforcement":"report" },
-    "border.diagonal":          { "type":"string", "add":true, "set":true, "get":true, "description":"diagonal border line style (CT_Border/diagonal @style — thin, medium, thick, dashed, etc.). Pair with border.diagonalUp/Down to choose direction.", "readback":"line-style token", "enforcement":"report" },
-    "border.diagonal.color":    { "type":"color",  "add":true, "set":true, "get":true, "requires":["border.diagonal"], "description":"diagonal border color. Requires a border.diagonal line to attach to.", "readback":"#RRGGBB uppercase", "enforcement":"report" },
-    "border.diagonalDown":      { "type":"bool",   "add":true, "set":true, "get":true, "description":"draw a top-left → bottom-right diagonal border.", "readback":"true|false", "enforcement":"report" },
-    "border.diagonalUp":        { "type":"bool",   "add":true, "set":true, "get":true, "description":"draw a bottom-left → top-right diagonal border.", "readback":"true|false", "enforcement":"report" },
-    "border":                   { "type":"string", "add":true,  "set":true,  "get":false, "description":"shorthand applying one line style to all four sides (top/bottom/left/right). Equivalent to border.all. Get reads back per-side under border.top/bottom/left/right.", "examples":["--prop border=thin", "--prop border=medium"], "readback":"n/a (read per-side border.top/bottom/left/right)", "enforcement":"report" },
-    "border.all":               { "type":"string", "add":true,  "set":true,  "get":false, "description":"line style applied to all four sides (top/bottom/left/right). Values: thin, medium, thick, double, dashed, dotted, none.", "examples":["--prop border.all=thin", "--prop border.all=medium"], "readback":"n/a (read per-side border.top/bottom/left/right)", "enforcement":"report" },
-    "border.top":               { "type":"string", "add":true,  "set":true,  "get":true,  "description":"top border line style (thin, medium, thick, double, dashed, dotted, none).", "examples":["--prop border.top=thin"], "readback":"line-style token", "enforcement":"report" },
-    "border.bottom":            { "type":"string", "add":true,  "set":true,  "get":true,  "description":"bottom border line style (thin, medium, thick, double, dashed, dotted, none).", "examples":["--prop border.bottom=thin"], "readback":"line-style token", "enforcement":"report" },
-    "border.left":              { "type":"string", "add":true,  "set":true,  "get":true,  "description":"left border line style (thin, medium, thick, double, dashed, dotted, none).", "examples":["--prop border.left=thin"], "readback":"line-style token", "enforcement":"report" },
-    "border.right":             { "type":"string", "add":true,  "set":true,  "get":true,  "description":"right border line style (thin, medium, thick, double, dashed, dotted, none).", "examples":["--prop border.right=thin"], "readback":"line-style token", "enforcement":"report" },
-    "border.color":             { "type":"color",  "add":true,  "set":true,  "get":false, "description":"border color applied to all sides (per-side color also accepted as border.top.color etc.). Get reads back per-side under border.{side}.color.", "examples":["--prop border.all=thin --prop border.color=FF0000"], "readback":"n/a (read per-side border.{side}.color)", "enforcement":"report" },
-    "arrayref":                 { "type":"string", "add":false, "set":false, "get":true, "description":"array-formula spill range (CellFormula @ref). Surfaces on the master cell of an array formula.", "readback":"A1 range string", "enforcement":"report" },
-    "mergeAnchor":              { "type":"bool",   "add":false, "set":false, "get":true, "description":"true when this cell is the top-left anchor of a merged range. Empty merged-region cells receive mergeAnchor=false; the anchor receives true.", "readback":"true|false", "enforcement":"report" },
-    "empty":                    { "type":"bool",   "add":false, "set":false, "get":true, "description":"true when the cell has neither display text nor a formula. Useful for distinguishing styled-but-empty cells from data cells.", "readback":"true|false", "enforcement":"report" },
-    "richtext":                 { "type":"bool",   "add":false, "set":false, "get":true, "description":"true when the cell stores rich-text runs (multi-format text). Surfaces alongside `runs` in Get output.", "readback":"true|false", "enforcement":"report" },
-    "subscript":                { "type":"bool",   "add":true, "set":true, "get":true, "aliases":["font.subscript"], "description":"subscript text (font vertical alignment). Legacy alias: font.subscript.", "readback":"true|false", "enforcement":"report" },
-    "superscript":              { "type":"bool",   "add":true, "set":true, "get":true, "aliases":["font.superscript"], "description":"superscript text (font vertical alignment). Legacy alias: font.superscript.", "readback":"true|false", "enforcement":"report" }
+    "alignment.indent":         { "type":"number", "add":true, "set":true, "get":true, "description":"alignment indent 单位（CT_CellAlignment @indent）。别名：indent。", "readback":"integer indent units", "enforcement":"report" },
+    "alignment.shrinkToFit":    { "type":"bool",   "add":true, "set":true, "get":true, "description":"缩小文本以适应 cell 宽度（CT_CellAlignment @shrinkToFit）。别名：shrink。", "readback":"true|false", "enforcement":"report" },
+    "alignment.textRotation":   { "type":"number", "add":true, "set":true, "get":true, "description":"文本旋转角度：0–90 向上 / 91–180 向下，或 255 表示垂直堆叠（CT_CellAlignment @textRotation）。`rotation` 简写也可用于 Set。", "readback":"integer degrees", "enforcement":"report" },
+    "border.diagonal":          { "type":"string", "add":true, "set":true, "get":true, "description":"对角 border line 样式（CT_Border/diagonal @style——thin、medium、thick、dashed 等）。配合 border.diagonalUp/Down 选择方向。", "readback":"line-style token", "enforcement":"report" },
+    "border.diagonal.color":    { "type":"color",  "add":true, "set":true, "get":true, "requires":["border.diagonal"], "description":"对角 border 颜色。需要先有 border.diagonal line 才能附加。", "readback":"#RRGGBB uppercase", "enforcement":"report" },
+    "border.diagonalDown":      { "type":"bool",   "add":true, "set":true, "get":true, "description":"绘制左上 → 右下的对角 border。", "readback":"true|false", "enforcement":"report" },
+    "border.diagonalUp":        { "type":"bool",   "add":true, "set":true, "get":true, "description":"绘制左下 → 右上的对角 border。", "readback":"true|false", "enforcement":"report" },
+    "border":                   { "type":"string", "add":true,  "set":true,  "get":false, "description":"将一种 line style 应用于四条边（top/bottom/left/right）的简写。等同于 border.all。Get 会在 border.top/bottom/left/right 下按边返回。", "examples":["--prop border=thin", "--prop border=medium"], "readback":"n/a (read per-side border.top/bottom/left/right)", "enforcement":"report" },
+    "border.all":               { "type":"string", "add":true,  "set":true,  "get":false, "description":"应用到四条边（top/bottom/left/right）的 line style。可选值：thin、medium、thick、double、dashed、dotted、none。", "examples":["--prop border.all=thin", "--prop border.all=medium"], "readback":"n/a (read per-side border.top/bottom/left/right)", "enforcement":"report" },
+    "border.top":               { "type":"string", "add":true,  "set":true,  "get":true,  "description":"上 border line 样式（thin、medium、thick、double、dashed、dotted、none）。", "examples":["--prop border.top=thin"], "readback":"line-style token", "enforcement":"report" },
+    "border.bottom":            { "type":"string", "add":true,  "set":true,  "get":true,  "description":"下 border line 样式（thin、medium、thick、double、dashed、dotted、none）。", "examples":["--prop border.bottom=thin"], "readback":"line-style token", "enforcement":"report" },
+    "border.left":              { "type":"string", "add":true,  "set":true,  "get":true,  "description":"左 border line 样式（thin、medium、thick、double、dashed、dotted、none）。", "examples":["--prop border.left=thin"], "readback":"line-style token", "enforcement":"report" },
+    "border.right":             { "type":"string", "add":true,  "set":true,  "get":true,  "description":"右 border line 样式（thin、medium、thick、double、dashed、dotted、none）。", "examples":["--prop border.right=thin"], "readback":"line-style token", "enforcement":"report" },
+    "border.color":             { "type":"color",  "add":true,  "set":true,  "get":false, "description":"应用到所有边的 border color（也接受 border.top.color 等逐边颜色）。Get 会在 border.{side}.color 下按边返回。", "examples":["--prop border.all=thin --prop border.color=FF0000"], "readback":"n/a (read per-side border.{side}.color)", "enforcement":"report" },
+    "arrayref":                 { "type":"string", "add":false, "set":false, "get":true, "description":"array-formula spill range（CellFormula @ref）。在 array formula 的 master cell 上返回。", "readback":"A1 range string", "enforcement":"report" },
+    "mergeAnchor":              { "type":"bool",   "add":false, "set":false, "get":true, "description":"当此 cell 是 merged range 左上 anchor 时为 true。空的 merged-region cell 返回 mergeAnchor=false；anchor 返回 true。", "readback":"true|false", "enforcement":"report" },
+    "empty":                    { "type":"bool",   "add":false, "set":false, "get":true, "description":"当 cell 既没有 display text 也没有 formula 时为 true。可用于区分已设置 style 但为空的 cell 与 data cell。", "readback":"true|false", "enforcement":"report" },
+    "richtext":                 { "type":"bool",   "add":false, "set":false, "get":true, "description":"当 cell 存储 rich-text run（多格式文本）时为 true。在 Get 输出中与 `runs` 一并返回。", "readback":"true|false", "enforcement":"report" },
+    "subscript":                { "type":"bool",   "add":true, "set":true, "get":true, "aliases":["font.subscript"], "description":"subscript 文本（font 垂直对齐）。legacy 别名：font.subscript。", "readback":"true|false", "enforcement":"report" },
+    "superscript":              { "type":"bool",   "add":true, "set":true, "get":true, "aliases":["font.superscript"], "description":"superscript 文本（font 垂直对齐）。legacy 别名：font.superscript。", "readback":"true|false", "enforcement":"report" }
   }
 }

@@ -7,7 +7,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml AppVersion field.",
+      "description": "docProps/app.xml 中的 AppVersion 字段。",
       "readback": "version string",
       "enforcement": "report"
     },
@@ -16,7 +16,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml Characters count.",
+      "description": "docProps/app.xml 中的 Characters 计数。",
       "readback": "integer",
       "enforcement": "report"
     },
@@ -25,7 +25,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/app.xml Company field.",
+      "description": "docProps/app.xml 中的 Company 字段。",
       "readback": "company name",
       "enforcement": "report"
     },
@@ -34,7 +34,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml Lines count.",
+      "description": "docProps/app.xml 中的 Lines 计数。",
       "readback": "integer",
       "enforcement": "report"
     },
@@ -43,7 +43,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/app.xml Manager field.",
+      "description": "docProps/app.xml 中的 Manager 字段。",
       "readback": "manager name",
       "enforcement": "report"
     },
@@ -52,7 +52,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml Pages count.",
+      "description": "docProps/app.xml 中的 Pages 计数。",
       "readback": "integer",
       "enforcement": "report"
     },
@@ -61,7 +61,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml Paragraphs count.",
+      "description": "docProps/app.xml 中的 Paragraphs 计数。",
       "readback": "integer",
       "enforcement": "report"
     },
@@ -70,7 +70,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/app.xml Template field.",
+      "description": "docProps/app.xml 中的 Template 字段。",
       "readback": "template name",
       "enforcement": "report"
     },
@@ -79,7 +79,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml TotalTime field (minutes).",
+      "description": "docProps/app.xml 中的 TotalTime 字段，单位为分钟。",
       "readback": "integer minutes",
       "enforcement": "report"
     },
@@ -88,7 +88,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "docProps/app.xml Words count.",
+      "description": "docProps/app.xml 中的 Words 计数。",
       "readback": "integer",
       "enforcement": "report"
     },
@@ -108,7 +108,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 1.",
+      "description": "主题强调色 1。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -117,7 +117,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 2.",
+      "description": "主题强调色 2。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -126,7 +126,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 3.",
+      "description": "主题强调色 3。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -135,7 +135,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 4.",
+      "description": "主题强调色 4。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -144,7 +144,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 5.",
+      "description": "主题强调色 5。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -153,7 +153,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme accent color 6.",
+      "description": "主题强调色 6。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -162,7 +162,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme color slot dk1 (dark 1 / default text).",
+      "description": "主题颜色槽位 dk1（dark 1 / 默认文本）。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -171,7 +171,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme color slot dk2 (dark 2).",
+      "description": "主题颜色槽位 dk2（dark 2）。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -180,7 +180,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme followed-hyperlink color.",
+      "description": "主题中已访问 hyperlink 的颜色。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -189,7 +189,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme hyperlink color.",
+      "description": "主题 hyperlink 颜色。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -198,7 +198,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme color slot lt1 (light 1 / default background).",
+      "description": "主题颜色槽位 lt1（light 1 / 默认背景）。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -207,7 +207,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "theme color slot lt2 (light 2).",
+      "description": "主题颜色槽位 lt2（light 2）。",
       "readback": "#RRGGBB or scheme reference",
       "enforcement": "report"
     },
@@ -216,7 +216,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "color scheme name (a:clrScheme/@name).",
+      "description": "颜色方案名称（a:clrScheme/@name）。",
       "readback": "color scheme name",
       "enforcement": "report"
     },
@@ -225,7 +225,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "major (heading) East Asian typeface.",
+      "description": "major（heading）East Asian 字体。",
       "readback": "font family name",
       "enforcement": "report"
     },
@@ -234,7 +234,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "major (heading) Latin typeface.",
+      "description": "major（heading）Latin 字体。",
       "readback": "font family name",
       "enforcement": "report"
     },
@@ -243,7 +243,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "minor (body) East Asian typeface.",
+      "description": "minor（body）East Asian 字体。",
       "readback": "font family name",
       "enforcement": "report"
     },
@@ -252,7 +252,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "minor (body) Latin typeface.",
+      "description": "minor（body）Latin 字体。",
       "readback": "font family name",
       "enforcement": "report"
     },
@@ -261,7 +261,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "font scheme name (a:fontScheme/@name).",
+      "description": "字体方案名称（a:fontScheme/@name）。",
       "readback": "font scheme name",
       "enforcement": "report"
     },
@@ -270,7 +270,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "format scheme name (a:fmtScheme/@name).",
+      "description": "格式方案名称（a:fmtScheme/@name）。",
       "readback": "format scheme name",
       "enforcement": "report"
     },
@@ -279,7 +279,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "theme display name (a:theme/@name).",
+      "description": "主题显示名称（a:theme/@name）。",
       "readback": "theme name string",
       "enforcement": "report"
     }

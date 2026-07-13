@@ -13,7 +13,7 @@
   "paths": {
     "positional": ["/SheetName/row[N]"]
   },
-  "note": "Row index N is 1-based. Add/Set asymmetry: all formatting props are currently Set-only. Insert/move/clone at an occupied slot shifts every row at or past the slot down by one, and every range-bearing structure on the sheet (mergeCells, CF/DV sqref, autoFilter, hyperlink/table refs, named ranges, formula cell-refs) follows the displacement. 'add --from /SheetName/row[K]' with --before/--after clones cells + single-row mergeCells; relative formula refs are delta-shifted to the new anchor (Excel 'Insert Copied Cells' parity). Excel-style whole-row references (1:1; 2:5 spans on set) are accepted as input aliases for row[N]; readback paths stay canonical.",
+  "note": "Row index N 从 1 开始。Add/Set 不对称：当前所有 formatting props 只支持 Set。在已占用 slot 上 insert/move/clone 会将该 slot 及下方所有 row 向下移动，sheet 上所有带 range 的结构（mergeCells、CF/DV sqref、autoFilter、hyperlink/table refs、named ranges、formula cell-refs）也会跟随位移。使用 add --from /SheetName/row[K] 配合 --before/--after 会复制 cells 和单行 mergeCells；相对 formula refs 会按新 anchor 做 delta shift，行为对齐 Excel Insert Copied Cells。Excel 风格整行引用（1:1、2:5 span）可作为 row[N] 的输入 alias，readback path 仍保持 canonical。",
   "examples": [
     {
       "title": "Filter rows by column name (resolves against a ListObject or a detected header-row table)",
@@ -27,19 +27,19 @@
   "properties": {
     "matchedTable": {
       "type": "string",
-      "description": "label of the table whose column predicate this row matched (emitted on row nodes returned by a row[Col op val] selector). Get-only.",
+      "description": "当前 row 匹配的 column predicate 所属 table 的 label（由 row[Col op val] selector 返回的 row node 会携带）。仅 Get。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "tableSource": {
       "type": "string",
-      "description": "`detected` when matchedTable came from a header-sniffed (not real listObject) table. Get-only.",
+      "description": "当 matchedTable 来自通过 header sniff 识别的 table（并非真实 listObject）时为 detected。仅 Get。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "cols": {
       "type": "int",
-      "description": "number of empty cells to seed in the new row.",
+      "description": "新 row 初始化时创建的空单元格数量。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop cols=5"],
       "readback": "n/a (structural only)",
@@ -47,7 +47,7 @@
     },
     "height": {
       "type": "length",
-      "description": "row height in points.",
+      "description": "row 高度，单位为 pt。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop height=24"],
       "readback": "numeric points (raw double as stored)",
@@ -55,7 +55,7 @@
     },
     "hidden": {
       "type": "bool",
-      "description": "hide row.",
+      "description": "隐藏 row。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop hidden=true"],
       "readback": "true when hidden, key absent otherwise",
@@ -63,7 +63,7 @@
     },
     "outline": {
       "type": "int",
-      "description": "outline/group level 0-7. Aliases: outlineLevel, group. Set accepts `outline`/`outlineLevel`/`group`; Get readback uses canonical key `outlineLevel`.",
+      "description": "outline/group level，范围 0–7。别名：outlineLevel、group。Set 接受 outline/outlineLevel/group；Get 使用 canonical key outlineLevel 返回。",
       "aliases": ["outlinelevel", "group"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop outline=1"],
@@ -72,19 +72,19 @@
     },
     "outlineLevel": {
       "type": "number",
-      "description": "row outline grouping level (0 = ungrouped, 1..7 = nested group depth). Get-only readback of the value set via `outline`.",
+      "description": "row outline grouping level（0 = ungrouped，1..7 = 嵌套 group 深度）。仅 Get，返回通过 outline 设置的值。",
       "add": false, "set": false, "get": true,
       "readback": "integer 0..7; key omitted when row has no outline level",
       "enforcement": "report"
     },
     "collapsed": {
       "type": "bool",
-      "description": "collapse row group. Currently Set-only.",
+      "description": "折叠 row group。当前仅支持 Set。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop collapsed=true"],
       "readback": "not surfaced by Get",
       "enforcement": "report"
     },
-    "customHeight": { "type":"bool", "add":false, "set":false, "get":true, "description":"true when the row carries an explicit height (Row @customHeight). Get-only flag.", "readback":"true when row has a custom height", "enforcement":"report" }
+    "customHeight": { "type":"bool", "add":false, "set":false, "get":true, "description":"row 带有显式 height 时为 true（Row @customHeight）。仅 Get flag。", "readback":"true when row has a custom height", "enforcement":"report" }
   }
 }

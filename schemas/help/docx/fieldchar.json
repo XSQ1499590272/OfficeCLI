@@ -13,7 +13,7 @@
   "paths": {
     "positional": ["/body/p[@paraId=X]/r[N]", "/header[N]/p[M]/r[K]", "/footer[N]/p[M]/r[K]"]
   },
-  "note": "Field-character marker (w:fldChar) — inline atom that delimits a complex field's begin / separate / end boundaries. Atomic add is intentionally NOT supported because a fldChar in isolation is invalid OOXML; use --type field to insert a complete begin+instrText+separate+cached+end sequence as one unit. Get/Set on individual fldChars allows audit→fix workflows to inspect and adjust an existing field's structure.",
+  "note": "Field-character marker（w:fldChar）是用于界定 complex field begin/separate/end 的 inline atom。单独 Add 不受支持，因为孤立 fldChar 不是有效 OOXML；请使用 --type field 一次插入完整的 begin+instrText+separate+cached+end 序列。对单个 fldChar 的 Get/Set 可用于 audit→fix，检查并调整已有 field 的结构。",
   "properties": {
     "fieldCharType": {
       "type": "enum",

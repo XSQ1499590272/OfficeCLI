@@ -17,7 +17,7 @@
       "/slide[N]/chart[N]"
     ]
   },
-  "note": "source of truth: Core/Chart/ChartHelper.cs ParseChartType() for the classic (c:chart) family, Core/Chart/ChartExBuilder.cs IsExtendedChartType() for the extended (cx:chart) family. Adding a new chartType value MUST update both the handler and this file in the same PR — contract tests enforce equivalence. Axis configuration: chart-level axis* props (axismin, axismax, axistitle, axisfont, ...) are Add-time only; for post-creation axis Set/Get use the chart-axis element.",
+  "note": "事实来源：classic（c:chart）系列的 chartType 解析在 Core/Chart/ChartHelper.cs ParseChartType()，extended（cx:chart）系列在 Core/Chart/ChartExBuilder.cs IsExtendedChartType()。新增 chartType value 时，必须在同一个 PR 同步更新 handler 和本文件，contract tests 会校验两者一致。chart-level axis* props（axismin、axismax、axistitle、axisfont 等）仅在 Add 时配置；创建后请使用 chart-axis element 执行 axis Set/Get。",
   "children": [
     {
       "element": "chart-title",
@@ -83,20 +83,20 @@
         "--prop direction=rtl"
       ],
       "readback": "rtl|ltr",
-      "description": "Chart-level reading direction. rtl stamps a:rtl=\"1\" on chartSpace c:txPr lvl1pPr so default text bodies (axis labels, data labels) render right-to-left for Arabic / Hebrew."
+      "description": "chart 级别的文字方向。rtl 会在 chartSpace c:txPr lvl1pPr 上写入 a:rtl=\"1\"，使默认文本（axis labels、data labels）按 Arabic / Hebrew 的 right-to-left 方向渲染。"
     },
     "id": {
       "type": "number",
       "add": true,
       "set": false,
       "get": true,
-      "description": "cNvPr chart id; @id in /chart[@id=ID]. add honors a caller-supplied id so dump-replay keeps it stable for spTgt animation refs; immutable after creation.",
+      "description": "cNvPr chart id；对应 /chart[@id=ID] 中的 @id。Add 会保留调用方提供的 id，使 dump-replay 中的 spTgt animation refs 保持稳定；创建后不可修改。",
       "readback": "integer chart shape id",
       "enforcement": "report"
     },
     "zorder": {
       "type": "number",
-      "description": "1-based z-order in slide shape tree. On add, positions the chart within the shape tree (1 = back). Post-creation reordering is not supported via Set; use Move/Swap on the chart graphic frame, or raw-set the spTree child order.",
+      "description": "slide shape tree 中从 1 开始的 z-order。Add 时将 chart 放到 shape tree 的指定位置（1 = back）。创建后不支持通过 Set 重新排序；请对 chart graphic frame 使用 Move/Swap，或使用 raw-set 调整 spTree child order。",
       "aliases": ["z-order", "order"],
       "add": true,
       "set": false,
@@ -113,7 +113,7 @@
         "waterfall", "funnel", "treemap", "sunburst",
         "boxWhisker", "histogram", "pareto"
       ],
-      "description": "pptx override: chartType is consumed by AddChart (creation only). Switching chart type post-creation is not supported — rebuild the chart with the new type. INPUT is lenient and accepts friendly aliases (stackedArea, bar3D, percentStackedColumn, stackedLine, percentStackedBar, ...) which round-trip correctly. READBACK (Get) is intentionally NOT symmetric with input: it returns the systematic `base_modifier` token form — e.g. area_stacked, area_percentStacked, bar_stacked, bar_percentStacked, bar3d, column_stacked, column_percentStacked, line_stacked, line_percentStacked, pieOfPie, barOfPie. This canonical-readback form is by design (one systematic token per geometry); do not expect the readback to echo the friendly input alias.",
+      "description": "pptx 特有行为：chartType 由 AddChart 使用（仅创建时）。创建后不支持切换 chart type；请用新 type 重新构建 chart。INPUT 较宽松，接受 stackedArea、bar3D、percentStackedColumn、stackedLine、percentStackedBar 等 friendly alias，并可正确往返。READBACK（Get）有意不与 input 对称：返回系统化的 `base_modifier` token，例如 area_stacked、area_percentStacked、bar_stacked、bar_percentStacked、bar3d、column_stacked、column_percentStacked、line_stacked、line_percentStacked、pieOfPie、barOfPie。这种 canonical readback 形式是设计如此（每种 geometry 使用一个系统化 token）；不要期待读回值原样回显 friendly input alias。",
       "aliases": ["type"],
       "add": true,
       "set": false,
@@ -127,7 +127,7 @@
       "add": true,
       "set": false,
       "get": true,
-      "description": "shape name (DocProperties.Name).",
+      "description": "shape 名称（DocProperties.Name）。",
       "examples": [
         "--prop name=\"Sales Chart\""
       ],

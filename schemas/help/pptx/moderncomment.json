@@ -16,7 +16,7 @@
       "/slide[N]/modernComment[K]/reply[R]"
     ]
   },
-  "note": "Modern p188 (Office 2018/8) threaded comments. Distinct OOXML element from the legacy /slide[N]/comment[M]. Top-level threads live in PowerPointCommentPart (/ppt/comments/…); authors live in the presentation-level PowerPointAuthorsPart. Replies are nested as /slide[N]/modernComment[K]/reply[R] and surface as children on Get of the top-level node. resolved is a thread-level state (top-level only). Removing a top-level path removes the whole thread, mirroring PowerPoint UI.",
+  "note": "Modern p188（Office 2018/8）threaded comment。它与 legacy /slide[N]/comment[M] 是不同的 OOXML element。顶层 thread 位于 PowerPointCommentPart（/ppt/comments/…），author 位于 presentation-level PowerPointAuthorsPart。reply 作为 /slide[N]/modernComment[K]/reply[R] 嵌套，并在顶层 node 的 Get 结果中作为 child 返回。resolved 是 thread-level 状态，仅适用于顶层。删除顶层 path 会删除整个 thread，与 PowerPoint UI 行为一致。",
   "properties": {
     "author": {
       "type": "string",
@@ -29,7 +29,7 @@
     },
     "initials": {
       "type": "string",
-      "description": "author initials. Defaults to derived from author name when omitted.",
+      "description": "author 的 initials。未提供时，根据 author name 自动生成。",
       "add": true,
       "set": true,
       "get": true,
@@ -39,7 +39,7 @@
     },
     "text": {
       "type": "string",
-      "description": "comment body (plain text — rich-text replies deferred).",
+      "description": "comment 正文（纯文本；rich-text reply 暂不支持）。",
       "add": true,
       "set": true,
       "get": true,
@@ -49,7 +49,7 @@
     },
     "resolved": {
       "type": "bool",
-      "description": "Thread-level resolved state. Applies only to top-level comments; set on a reply path is rejected as unsupported.",
+      "description": "thread 级别的 resolved 状态。仅适用于顶层 comment；在 reply path 上设置会因不支持而被拒绝。",
       "add": true,
       "set": true,
       "get": true,
@@ -59,7 +59,7 @@
     },
     "created": {
       "type": "string",
-      "description": "ISO-8601 timestamp. Defaults to DateTime.UtcNow on add. Set accepts any ISO-8601 string; normalized to UTC `Z` form on readback.",
+      "description": "ISO-8601 时间戳。Add 时默认使用 DateTime.UtcNow。Set 接受任意 ISO-8601 字符串；读回时规范化为 UTC 的 `Z` 格式。",
       "add": true,
       "set": true,
       "get": true,
@@ -69,7 +69,7 @@
     },
     "parent": {
       "type": "string",
-      "description": "Path of an existing top-level modernComment to reply to. Add only — supplying parent= turns the new comment into a reply nested under that thread. Empty/missing creates a top-level comment.",
+      "description": "要回复的现有顶层 modernComment 的路径。仅支持 Add；提供 parent= 后，新 comment 会作为 reply 嵌套到该 thread 下。为空或未提供时创建顶层 comment。",
       "add": true,
       "set": false,
       "get": true,
@@ -79,7 +79,7 @@
     },
     "id": {
       "type": "string",
-      "description": "GUID identifier assigned by the engine on add.",
+      "description": "由 engine 在 Add 时分配的 GUID 标识符。",
       "add": false,
       "set": false,
       "get": true,

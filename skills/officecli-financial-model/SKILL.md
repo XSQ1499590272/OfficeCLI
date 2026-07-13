@@ -1,6 +1,6 @@
 ---
 name: officecli-financial-model
-description: "Use this skill when the user wants to build a financial model — 3-statement model, DCF valuation, LBO, SaaS unit economics, sensitivity / scenario analysis, debt schedule, or fundraising projections — in Excel. Trigger on: 'financial model', '3-statement model', 'P&L + BS + CF', 'DCF', 'WACC', 'NPV', 'terminal value', 'LBO', 'debt schedule', 'cash sweep', 'MOIC', 'IRR / XIRR', 'sensitivity table', 'scenario analysis', 'ARR model', 'unit economics', 'CAC / LTV', 'cap table forecast'. Output is a single formula-driven .xlsx. This skill is a scene layer on top of officecli-xlsx — it inherits every xlsx v2 rule (4-color code, visual floor, number formats, cache-drift, Known Issues, Delivery Gate minimum cycle). DO NOT invoke for a simple budget tracker, CSV dump, or operational KPI sheet — route those to officecli-xlsx base."
+description: "当用户要在 Excel 中创建 financial model 时使用此 Skill，例如 3-statement model、DCF valuation、LBO、SaaS unit economics、sensitivity / scenario analysis、debt schedule 或 fundraising projections。触发词包括：'financial model'、'3-statement model'、'P&L + BS + CF'、'DCF'、'WACC'、'NPV'、'terminal value'、'LBO'、'debt schedule'、'cash sweep'、'MOIC'、'IRR / XIRR'、'sensitivity table'、'scenario analysis'、'ARR model'、'unit economics'、'CAC / LTV'、'cap table forecast'。输出为单个由公式驱动的 .xlsx。此 Skill 是 officecli-xlsx 之上的 scene layer，继承 xlsx v2 的规则；简单预算追踪表、CSV dump 或运营 KPI 表不应触发，应转到基础 officecli-xlsx。"
 ---
 
 # OfficeCLI Financial-Model Skill
@@ -8,15 +8,6 @@ description: "Use this skill when the user wants to build a financial model — 
 **This skill is a scene layer on top of `officecli-xlsx`.** Every xlsx hard rule — shell quoting, incremental execution, Help-First Rule, visual delivery floor, CFO 4-color code (blue input / black formula / green cross-sheet / yellow-fill assumption), number-format standards (years as text, zero as `-`, `%` one decimal, negatives in parens), assumption-cell discipline, CSV batch import, chart data-feed forms (a/b/c), the 5-gate Delivery cycle, cache-drift guidance, Known Issues (the cross-sheet `!` trap, batch + resident for formulas, renderer caveats) — is **inherited, not re-taught**. This file adds only what a **financial model** requires on top: three-zone architecture, 3 model-type recipes (3-statement / DCF / LBO), sensitivity + scenario protocols, financial-function patterns, circular-reference discipline, and model-specific Delivery Gates 4–6.
 
 When the xlsx base rules cover it, the text here says `→ see xlsx v2 §X`. Read `skills/officecli-xlsx/SKILL.md` first if you have not.
-
-## Setup
-
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
 
 ## Help-First Rule
 

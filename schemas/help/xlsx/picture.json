@@ -16,7 +16,7 @@
       "/SheetName/picture[N]"
     ]
   },
-  "note": "Aliases: image, img. Anchor via ParseAnchorBoundsEmu — accepts cell counts or unit-qualified lengths. SVG sources get a PNG fallback.",
+  "note": "Aliases：image、img。通过 ParseAnchorBoundsEmu 设置 anchor，接受 cell count 或带单位的 length。SVG source 会生成 PNG fallback。",
   "extends": [
     "_shared/picture",
     "_shared/picture.docx-xlsx",
@@ -25,7 +25,7 @@
   "properties": {
     "crop": {
       "type": "string",
-      "description": "Crop in percent (0-100). 1 value = symmetric, 2 values = vertical,horizontal, 4 values = left,top,right,bottom. Excel reads but does not write crops — overrides shared base which marks add/set true (pptx-only writability).",
+      "description": "裁剪比例（0–100）。1 个值表示四边相同；2 个值依次为 vertical,horizontal；4 个值依次为 left,top,right,bottom。Excel 可读取但不会写入裁剪信息；此项覆盖 shared base 中 add/set=true 的定义，该写入能力仅适用于 pptx。",
       "add": false,
       "set": false,
       "get": true,
@@ -37,7 +37,7 @@
     },
     "title": {
       "type": "string",
-      "description": "OOXML @title attribute on cNvPr (distinct from alt).",
+      "description": "cNvPr 上的 OOXML @title 属性（不同于 alt）。",
       "add": true,
       "set": false,
       "examples": [
@@ -47,7 +47,7 @@
     },
     "decorative": {
       "type": "bool",
-      "description": "Mark the picture as decorative (a16:decorative ext under cNvPr). Excludes it from screen-reader alt-text traversal.",
+      "description": "将图片标记为 decorative（cNvPr 下的 a16:decorative ext），使 screen reader 不会遍历其 alt text。",
       "add": true,
       "set": false,
       "examples": [
@@ -57,7 +57,7 @@
     },
     "rotation": {
       "type": "string",
-      "description": "Rotation in degrees (positive = clockwise). Stored OOXML-internal as 60000ths of a degree on Transform2D @rot.",
+      "description": "旋转角度（正值为顺时针）。OOXML 内部将其以 1/60000 度写入 Transform2D @rot。",
       "add": true,
       "set": true,
       "examples": [
@@ -67,7 +67,7 @@
     },
     "flip": {
       "type": "string",
-      "description": "Compact flip token: 'h' / 'v' / 'both' / 'hv' / 'vh' / 'horizontal' / 'vertical'.",
+      "description": "简写 flip token：'h' / 'v' / 'both' / 'hv' / 'vh' / 'horizontal' / 'vertical'。",
       "add": true,
       "set": true,
       "examples": [
@@ -78,7 +78,7 @@
     },
     "flipH": {
       "type": "bool",
-      "description": "Flip horizontally (Office-API-style alias of flip=h).",
+      "description": "水平翻转（Office-API 风格的 flip=h 别名）。",
       "add": true,
       "set": true,
       "examples": [
@@ -88,7 +88,7 @@
     },
     "flipV": {
       "type": "bool",
-      "description": "Flip vertically (Office-API-style alias of flip=v).",
+      "description": "垂直翻转（Office-API 风格的 flip=v 别名）。",
       "add": true,
       "set": true,
       "examples": [
@@ -98,7 +98,7 @@
     },
     "flipBoth": {
       "type": "bool",
-      "description": "Flip both axes (alias of flip=both).",
+      "description": "同时翻转两个轴（flip=both 的别名）。",
       "add": true,
       "set": false,
       "examples": [
@@ -108,7 +108,7 @@
     },
     "opacity": {
       "type": "string",
-      "description": "Picture opacity. Accepts percent (50, '50%') or fraction (0.5). 100 / 100% / 1.0 = fully opaque.",
+      "description": "图片不透明度。支持百分数（50、'50%'）或小数（0.5）；100 / 100% / 1.0 表示完全不透明。",
       "add": true,
       "set": false,
       "examples": [
@@ -119,7 +119,7 @@
     },
     "hyperlink": {
       "type": "string",
-      "description": "Picture-level hyperlink. External URL (https://...) or in-document jump (#SheetName!A1).",
+      "description": "图片级 hyperlink。可为外部 URL（https://...）或文档内跳转（#SheetName!A1）。",
       "aliases": [
         "link"
       ],
@@ -132,7 +132,7 @@
     },
     "anchor": {
       "type": "string",
-      "description": "Cell-range anchor (e.g. 'B2:E6') or anchorMode token ('oneCell'/'twoCell'/'absolute'). Cell-range form implies twoCell mode.",
+      "description": "单元格范围 anchor（如 'B2:E6'），或 anchorMode token（'oneCell'/'twoCell'/'absolute'）。单元格范围形式会使用 twoCell mode。",
       "add": true,
       "set": false,
       "examples": [
@@ -143,7 +143,7 @@
     },
     "anchorMode": {
       "type": "string",
-      "description": "Explicit anchor mode: 'oneCell' / 'twoCell' / 'absolute'. Overrides any anchor= mode token.",
+      "description": "显式指定 anchor mode：'oneCell' / 'twoCell' / 'absolute'。会覆盖 anchor= 中的 mode token。",
       "add": true,
       "set": false,
       "examples": [
@@ -153,7 +153,7 @@
     },
     "shadow": {
       "type": "string",
-      "description": "Outer shadow effect. 'none' to clear, or a color/spec accepted by DrawingEffectsHelper.",
+      "description": "外部阴影效果。'none' 清除；否则传入 DrawingEffectsHelper 支持的颜色/配置。",
       "add": false,
       "set": true,
       "examples": [
@@ -163,7 +163,7 @@
     },
     "glow": {
       "type": "string",
-      "description": "Glow effect color/spec. 'none' to clear.",
+      "description": "发光效果的颜色/配置。'none' 清除。",
       "add": false,
       "set": true,
       "examples": [
@@ -173,7 +173,7 @@
     },
     "reflection": {
       "type": "string",
-      "description": "Reflection effect. 'none' to clear.",
+      "description": "倒影效果。'none' 清除。",
       "add": false,
       "set": true,
       "examples": [
@@ -186,7 +186,7 @@
       "aliases": [
         "softedge"
       ],
-      "description": "Soft edge effect radius. 'none' to clear.",
+      "description": "柔化边缘效果的半径。'none' 清除。",
       "add": false,
       "set": true,
       "examples": [
@@ -196,7 +196,7 @@
     },
     "crop.l": {
       "type": "string",
-      "description": "Crop from left edge as a percentage (e.g. 10 = 10%, '10%' also accepted). Internally stored in 1/1000 percent units.",
+      "description": "从左边裁剪的比例（如 10 = 10%，也接受 '10%'）。内部以 1/1000 百分比单位存储。",
       "add": true,
       "set": true,
       "examples": [
@@ -207,7 +207,7 @@
     },
     "crop.r": {
       "type": "string",
-      "description": "Crop from right edge as a percentage.",
+      "description": "从右边裁剪的比例。",
       "add": true,
       "set": true,
       "examples": [
@@ -217,7 +217,7 @@
     },
     "crop.t": {
       "type": "string",
-      "description": "Crop from top edge as a percentage.",
+      "description": "从上边裁剪的比例。",
       "add": true,
       "set": true,
       "examples": [
@@ -227,7 +227,7 @@
     },
     "crop.b": {
       "type": "string",
-      "description": "Crop from bottom edge as a percentage.",
+      "description": "从下边裁剪的比例。",
       "add": true,
       "set": true,
       "examples": [
@@ -237,7 +237,7 @@
     },
     "srcRect": {
       "type": "string",
-      "description": "Compound crop spec, e.g. 'l=10,r=10,t=5,b=5'. Equivalent to crop.l/crop.r/crop.t/crop.b.",
+      "description": "组合裁剪配置，如 'l=10,r=10,t=5,b=5'。等同于分别设置 crop.l/crop.r/crop.t/crop.b。",
       "add": true,
       "set": true,
       "examples": [
@@ -250,7 +250,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "anchor descriptor — sheet/cell-range path the picture is anchored to.",
+      "description": "anchor 描述：图片锚定到的 sheet/cell-range 路径。",
       "readback": "`/SheetName/A1[:Z9]` anchor path",
       "enforcement": "report"
     },
@@ -259,13 +259,13 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true when the picture is anchored to a merged-cell region.",
+      "description": "当图片锚定到 merged-cell 区域时为 true。",
       "readback": "true|false",
       "enforcement": "report"
     },
     "x": {
       "type": "length",
-      "description": "x as TwoCellAnchor column/row index (xlsx cell-anchor positioning, integer).",
+      "description": "x 位置，以 TwoCellAnchor 的列/行索引表示（xlsx cell-anchor 定位，整数）。",
       "add": true,
       "set": true,
       "get": true,
@@ -278,7 +278,7 @@
     },
     "y": {
       "type": "length",
-      "description": "y as TwoCellAnchor column/row index (xlsx cell-anchor positioning, integer).",
+      "description": "y 位置，以 TwoCellAnchor 的列/行索引表示（xlsx cell-anchor 定位，整数）。",
       "add": true,
       "set": true,
       "get": true,
@@ -291,7 +291,7 @@
     },
     "width": {
       "type": "integer",
-      "description": "width — TwoCellAnchor column/row span (xlsx cell-anchor positioning, integer)",
+      "description": "宽度，以 TwoCellAnchor 的列/行跨度表示（xlsx cell-anchor 定位，整数）。",
       "add": true,
       "set": true,
       "get": true,
@@ -304,7 +304,7 @@
     },
     "height": {
       "type": "integer",
-      "description": "height — TwoCellAnchor column/row span (xlsx cell-anchor positioning, integer)",
+      "description": "高度，以 TwoCellAnchor 的列/行跨度表示（xlsx cell-anchor 定位，整数）。",
       "add": true,
       "set": true,
       "get": true,

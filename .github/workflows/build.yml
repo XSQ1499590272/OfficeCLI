@@ -50,7 +50,17 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.301'
+
+      - name: Record .NET provenance
+        run: |
+          command -v dotnet
+          dotnet --info
+
+      - name: Verify Windows portability gate parser
+        if: matrix.rid == 'win-x64'
+        shell: powershell
+        run: ./build/verify-windows-portability.ps1 -SelfTest
 
       - name: Publish
         run: dotnet publish src/officecli/officecli.csproj -c Release -r ${{ matrix.rid }} -o publish --nologo
@@ -62,6 +72,15 @@ jobs:
           else
             mv publish/officecli publish/${{ matrix.name }}
           fi
+
+      - name: Verify macOS portability (pre-sign)
+        if: startsWith(matrix.rid, 'osx-')
+        run: build/verify-macos-portability.sh publish/${{ matrix.name }}
+
+      - name: Verify Windows portability (pre-sign)
+        if: startsWith(matrix.rid, 'win-')
+        shell: powershell
+        run: ./build/verify-windows-portability.ps1 "publish/${{ matrix.name }}"
 
       - name: Setup macOS code signing
         if: startsWith(matrix.rid, 'osx-')
@@ -153,50 +172,14 @@ jobs:
               /app/${{ matrix.name }} close issue115.docx; \
               /app/${{ matrix.name }} view issue115.docx text --json"
 
-      - name: Smoke test - install
-        if: >-
-          (matrix.rid == 'osx-arm64' && runner.arch == 'ARM64') ||
-          (matrix.rid == 'osx-x64' && runner.arch == 'X64') ||
-          (matrix.rid == 'linux-x64' && runner.os == 'Linux') ||
-          (matrix.rid == 'win-x64' && runner.os == 'Windows')
-        env:
-          MSYS_NO_PATHCONV: '1'
-          MSYS2_ARG_CONV_EXCL: '*'
-        run: |
-          publish/${{ matrix.name }} install
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            test -f "$LOCALAPPDATA/OfficeCLI/officecli.exe" || { echo "FAIL: officecli.exe not found in %LOCALAPPDATA%\\OfficeCLI"; exit 1; }
-            "$LOCALAPPDATA/OfficeCLI/officecli.exe" --version
-          else
-            test -f "$HOME/.local/bin/officecli" || { echo "FAIL: officecli not found in ~/.local/bin"; exit 1; }
-            "$HOME/.local/bin/officecli" --version
-          fi
+      - name: Verify macOS portability (final artifact)
+        if: startsWith(matrix.rid, 'osx-')
+        run: build/verify-macos-portability.sh publish/${{ matrix.name }}
 
-      - name: Smoke test - install.sh / install.ps1
-        # Exercises the shell installers themselves (separate from the CLI's
-        # own `install` subcommand tested above). Downloads from
-        # d.officecli.ai with github fallback — validates the production
-        # mirror is reachable AND the in-repo script is syntactically and
-        # logically correct on each platform.
-        if: >-
-          (matrix.rid == 'osx-arm64' && runner.arch == 'ARM64') ||
-          (matrix.rid == 'osx-x64' && runner.arch == 'X64') ||
-          (matrix.rid == 'linux-x64' && runner.os == 'Linux') ||
-          (matrix.rid == 'win-x64' && runner.os == 'Windows')
-        shell: bash
-        env:
-          MSYS_NO_PATHCONV: '1'
-          MSYS2_ARG_CONV_EXCL: '*'
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            pwsh -NoProfile -ExecutionPolicy Bypass -File ./install.ps1
-            test -f "$LOCALAPPDATA/OfficeCLI/officecli.exe" || { echo "FAIL: officecli.exe not installed"; exit 1; }
-            "$LOCALAPPDATA/OfficeCLI/officecli.exe" --version
-          else
-            bash install.sh
-            test -f "$HOME/.local/bin/officecli" || { echo "FAIL: officecli not installed at ~/.local/bin"; exit 1; }
-            "$HOME/.local/bin/officecli" --version
-          fi
+      - name: Verify Windows portability (final artifact)
+        if: startsWith(matrix.rid, 'win-')
+        shell: powershell
+        run: ./build/verify-windows-portability.ps1 "publish/${{ matrix.name }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6

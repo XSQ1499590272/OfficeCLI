@@ -11,11 +11,11 @@ static partial class CommandBuilder
 {
     private static Command BuildWatchCommand(Option<bool> jsonOption)
     {
-        var watchFileArg = new Argument<FileInfo>("file") { Description = "Office document path (.pptx, .xlsx, .docx)" };
-        var watchPortOpt = new Option<int>("--port") { Description = "HTTP port for preview server" };
+        var watchFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.pptx、.xlsx、.docx）" };
+        var watchPortOpt = new Option<int>("--port") { Description = "预览 server 的 HTTP port" };
         watchPortOpt.DefaultValueFactory = _ => 26315;
 
-        var watchCommand = new Command("watch", "Start a live preview server that refreshes when officecli modifies the document (external edits are not detected). Subcommands (mark/unmark/marks/goto) operate on the running preview.");
+        var watchCommand = new Command("watch", "启动实时预览 server；officecli 修改文档时自动刷新（不检测外部编辑）。子命令 mark/unmark/marks/goto 操作正在运行的预览。");
         watchCommand.Add(watchFileArg);
         watchCommand.Add(watchPortOpt);
 
@@ -105,8 +105,8 @@ static partial class CommandBuilder
 
     private static Command BuildUnwatchCommand()
     {
-        var unwatchFileArg = new Argument<FileInfo>("file") { Description = "Office document path (.pptx, .xlsx, .docx)" };
-        var unwatchCommand = new Command("unwatch", "Stop the watch preview server for the document");
+        var unwatchFileArg = new Argument<FileInfo>("file") { Description = "Office 文档路径（.pptx、.xlsx、.docx）" };
+        var unwatchCommand = new Command("unwatch", "停止该文档的 watch 预览 server");
         unwatchCommand.Add(unwatchFileArg);
 
         unwatchCommand.SetAction(result => SafeRun(() =>

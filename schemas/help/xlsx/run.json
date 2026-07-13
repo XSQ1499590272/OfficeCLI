@@ -15,7 +15,7 @@
       "/SheetName/CellRef/r[N]"
     ]
   },
-  "note": "Rich-text run inside an inline-string cell. Adds an rPh/r element with font properties on the run.",
+  "note": "inline-string cell 中的 rich-text run。会添加带有 run font properties 的 rPh/r element。",
   "extends": [
     "_shared/run",
     "_shared/run.docx-xlsx"

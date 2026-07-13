@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName/slicer[N]"]
   },
-  "note": "Slicers require an existing pivot table target. 'field' must match an existing cacheField name in the pivot's cache.",
+  "note": "Slicer 必须关联已有的 pivot table target。'field' 必须匹配 pivot cache 中现有的 cacheField name。",
   "properties": {
     "pivotTable": {
       "type": "string",
-      "description": "path or reference to an existing pivot table. Bare names resolve against the host sheet's pivots.",
+      "description": "现有 pivot table 的路径或引用。裸名称会在宿主 sheet 的 pivots 中解析。",
       "aliases": ["pivot", "source", "tableName"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop pivotTable='/Sheet1/pivottable[1]'", "--prop tableName=Pivot1"],
@@ -26,7 +26,7 @@
     },
     "field": {
       "type": "string",
-      "description": "pivot field name. Must match an existing cacheField (case-insensitive). Add-time only — Set ignores this key (slicers are anchored to their cache field at creation).",
+      "description": "pivot field 名称。必须匹配现有 cacheField（不区分大小写）。仅 Add 时生效；Set 会忽略此键，因为 slicer 创建时已锚定到 cache field。",
       "aliases": ["column"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop field=Region", "--prop column=Region"],
@@ -35,7 +35,7 @@
     },
     "caption": {
       "type": "string",
-      "description": "user-facing caption shown in the slicer header. Defaults to the field name.",
+      "description": "slicer header 中面向用户显示的 caption。默认使用 field name。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop caption='Filter by Region'"],
       "readback": "caption",
@@ -43,7 +43,7 @@
     },
     "name": {
       "type": "string",
-      "description": "slicer name. Sanitized; defaults to 'Slicer_<fieldName>'.",
+      "description": "slicer 名称。会进行清理；默认值为 'Slicer_<fieldName>'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=RegionSlicer"],
       "readback": "slicer name",
@@ -51,7 +51,7 @@
     },
     "rowHeight": {
       "type": "number",
-      "description": "row height of each slicer item, in EMU. Default 225425 (~17.5pt).",
+      "description": "每个 slicer item 的行高，单位为 EMU。默认 225425（约 17.5pt）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop rowHeight=250000"],
       "readback": "row height in EMU",
@@ -59,7 +59,7 @@
     },
     "columnCount": {
       "type": "number",
-      "description": "number of columns in the slicer button grid. Range 1..20000.",
+      "description": "slicer button grid 的列数。范围 1..20000。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop columnCount=2"],
       "readback": "number of columns",
@@ -67,18 +67,18 @@
     },
     "pivotCacheId": {
       "type": "number",
-      "description": "extension pivot cache id (x14 cacheField extension). Read-only — auto-assigned at slicer creation.",
+      "description": "extension pivot cache id（x14 cacheField extension）。只读；创建 slicer 时自动分配。",
       "add": false, "set": false, "get": true,
       "readback": "pivot cache index (read-only)",
       "enforcement": "report"
     },
     "itemCount": {
       "type": "number",
-      "description": "total number of items (buttons) in the slicer cache. Read-only — derived from the pivot's shared items.",
+      "description": "slicer cache 中 item（button）的总数。只读；由 pivot 的 shared items 推导。",
       "add": false, "set": false, "get": true,
       "readback": "total slicer item count",
       "enforcement": "report"
     },
-    "cache": { "type":"string", "add":false, "set":false, "get":true, "description":"slicer cache name (Slicer @cache attribute).", "readback":"slicer cache name", "enforcement":"report" }
+    "cache": { "type":"string", "add":false, "set":false, "get":true, "description":"slicer cache 名称（Slicer @cache 属性）。", "readback":"slicer cache name", "enforcement":"report" }
   }
 }

@@ -216,12 +216,8 @@ public class ResidentServer : IDisposable
         _pipeName = GetPipeName(_filePath);
         _editable = editable;
 
-        // Capture Console.Error during handler open so any warnings emitted
-        // by the dump-reader / format-handler open path (which run before
-        // any per-command stderr scope exists) are routed to the first
-        // command's reply envelope. Without this, plugin-side notices like
-        // "dump-reader produced no commands" disappear into the resident's
-        // own unread stderr pipe.
+        // Capture handler-open warnings until the first command can return
+        // them in its stderr envelope.
         var startupErrSink = new StringWriter();
         var origErr = Console.Error;
         Console.SetError(startupErrSink);
@@ -715,11 +711,8 @@ public class ResidentServer : IDisposable
             Console.SetOut(stdoutWriter);
             Console.SetError(stderrWriter);
 
-            // Replay any stderr captured during the constructor's
-            // DocumentHandlerFactory.Open so plugin-side warnings (e.g.
-            // "dump-reader produced no commands") reach the user on the
-            // first command's reply. One-shot drain: subsequent commands
-            // see an empty buffer.
+            // Replay stderr captured during handler construction once, so the
+            // first command receives all open-time diagnostics.
             if (_startupStderr is not null)
             {
                 Console.Error.WriteLine(_startupStderr);
@@ -1350,9 +1343,6 @@ public class ResidentServer : IDisposable
             else if (_handler is OfficeCli.Handlers.WordHandler)
                 html = CommandBuilder.RenderViaRegistry(_handler, "docx",
                     new OfficeCli.Core.Rendering.RenderOptions { PageFilter = pageFilter });
-            else if (_handler is OfficeCli.Core.Plugins.FormatHandlerProxy proxy)
-                html = proxy.ViewAsHtml(int.TryParse(pageFilter, out var pp) ? pp : (int?)null);
-
             if (html != null)
             {
                 // CONSISTENCY(view-html-stdout): mirror CommandBuilder.View.cs — default
@@ -1623,18 +1613,6 @@ public class ResidentServer : IDisposable
                     { Output = OfficeCli.Core.Rendering.RenderOutputKind.Svg, StartPage = slideNum })!;
                 Console.Write(svg);
             }
-            else if (_handler is OfficeCli.Core.Plugins.FormatHandlerProxy svgProxy)
-            {
-                int? svgPage = null;
-                if (!string.IsNullOrEmpty(pageFilter)
-                    && int.TryParse(pageFilter.Split(',')[0].Split('-')[0].Trim(), out var sp))
-                    svgPage = sp;
-                var svg = svgProxy.ViewAsSvg(svgPage);
-                if (svg is null)
-                    Console.Error.WriteLine("SVG preview is not supported by the format-handler plugin.");
-                else
-                    Console.Write(svg);
-            }
             else
             {
                 Console.Error.WriteLine("SVG preview is only supported for .pptx files.");
@@ -1690,14 +1668,6 @@ public class ResidentServer : IDisposable
             {
                 if (_handler is OfficeCli.Handlers.WordHandler wordFormsHandler)
                     Console.WriteLine(wordFormsHandler.ViewAsFormsJson().ToJsonString(OutputFormatter.PublicJsonOptions));
-                else if (_handler is OfficeCli.Core.Plugins.FormatHandlerProxy formsProxy)
-                {
-                    var formsJson = formsProxy.ViewAsFormsJson();
-                    if (formsJson is null)
-                        Console.Error.WriteLine($"Forms view is not supported by the format-handler plugin.");
-                    else
-                        Console.WriteLine(formsJson.ToJsonString(OutputFormatter.PublicJsonOptions));
-                }
                 else
                     Console.Error.WriteLine("Forms view is only supported for .docx files.");
             }
@@ -1710,7 +1680,7 @@ public class ResidentServer : IDisposable
                 throw new OfficeCli.Core.CliException($"Unknown mode: {mode}. Available: text, annotated, outline, stats, issues, html, svg, screenshot, forms")
                 {
                     Code = "invalid_value",
-                    ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                    ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                 };
         }
         else
@@ -1735,14 +1705,10 @@ public class ResidentServer : IDisposable
                     output = _handler switch
                     {
                         OfficeCli.Handlers.WordHandler wfh => wfh.ViewAsForms(),
-                        OfficeCli.Core.Plugins.FormatHandlerProxy fp
-                            => fp.ViewAsFormsJson()?.ToJsonString(OutputFormatter.PublicJsonOptions)
-                               ?? throw new OfficeCli.Core.CliException("Forms view is not supported by the format-handler plugin.")
-                                   { Code = "unsupported_type" },
                         _ => throw new OfficeCli.Core.CliException("Forms view is only supported for .docx files.")
                         {
                             Code = "unsupported_type",
-                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                            ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                         }
                     };
                     break;
@@ -1750,7 +1716,7 @@ public class ResidentServer : IDisposable
                     throw new OfficeCli.Core.CliException($"Unknown mode: {mode}. Available: text, annotated, outline, stats, issues, html, svg, screenshot, forms")
                     {
                         Code = "invalid_value",
-                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "pdf", "forms"]
+                        ValidValues = ["text", "annotated", "outline", "stats", "issues", "html", "svg", "screenshot", "forms"]
                     };
             }
             Console.WriteLine(output);

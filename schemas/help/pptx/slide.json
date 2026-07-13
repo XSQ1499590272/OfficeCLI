@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/slide[N]"]
   },
-  "note": "Layouts are resolved by name (ResolveSlideLayout). 'title'/'text' shorthand inserts title/content text shapes at Add. Transition `morph…` auto-prefixes shape names. Newly added slides have no placeholders — populate via title/text shorthand, `--type placeholder --prop phType=title`, or `--type shape|textbox`.",
+  "note": "Layout 通过名称解析（ResolveSlideLayout）。Add 时，'title'/'text' shorthand 会插入 title/content text shape。Transition morph… 会自动给 shape name 加前缀。新建 slide 没有 placeholder，可使用 title/text shorthand、--type placeholder --prop phType=title，或 --type shape|textbox 填充内容。",
   "properties": {
     "layout": {
       "type": "string",
-      "description": "slide layout name (e.g. 'Title Slide', 'Title and Content'). Resolved against the presentation's slide masters. The `layout` property is metadata only — placeholder slots defined in the layout are NOT auto-materialized on the slide. To populate slots: pass `--prop title=…` to auto-emit a title placeholder shape (phType=title); pass `--prop text=…` to auto-emit a body placeholder shape (phType=body); or add placeholders explicitly with `--type placeholder --prop phType=<role>`.",
+      "description": "slide layout 名称（例如 'Title Slide'、'Title and Content'）。根据 presentation 的 slide master 解析。`layout` property 仅为 metadata——layout 定义的 placeholder slot 不会自动 materialize 到 slide。填充 slot 的方式：传入 `--prop title=…` 自动生成 title placeholder shape（phType=title）；传入 `--prop text=…` 自动生成 body placeholder shape（phType=body）；或使用 `--type placeholder --prop phType=<role>` 显式添加 placeholder。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop layout=\"Title Slide\""],
       "readback": "layout name string",
@@ -25,7 +25,7 @@
     },
     "title": {
       "type": "string",
-      "description": "title text. Creates a Title shape at Add time, carrying <p:ph type=\"title\"/>. To modify or read the title text after creation, target the title shape directly (e.g. /slide[N]/shape[@phType=title]).",
+      "description": "title 文本。Add 时创建带有 <p:ph type=\"title\"/> 的 Title shape。创建后如需修改或读取 title 文本，请直接定位 title shape（例如 /slide[N]/shape[@phType=title]）。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop title=\"Introduction\""],
       "readback": "not surfaced at slide level; descend into the title shape",
@@ -33,7 +33,7 @@
     },
     "text": {
       "type": "string",
-      "description": "content body text. Creates a Content text shape at Add time, carrying <p:ph type=\"body\" idx=\"1\"/> so it binds to the layout's body slot.",
+      "description": "content body 文本。Add 时创建带有 <p:ph type=\"body\" idx=\"1\"/> 的 Content text shape，使其绑定 layout 的 body slot。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop text=\"Body text\""],
       "readback": "not surfaced at slide level",
@@ -41,7 +41,7 @@
     },
     "background": {
       "type": "color",
-      "description": "slide background. Accepts: hex color (`#RGB`, `#RRGGBB`, `#RRGGBBAA` for solid+alpha), scheme color (`accent1`..`accent6`, `dark1`, `dark2`, `light1`, `light2`, `hyperlink`, `followedHyperlink`), `transparent` (or `none`/`clear`), linear gradient `C1-C2[-C3][-angle]` (angle in degrees, also accepts `LINEAR;C1;C2[;angle]`), radial gradient `radial:C1-C2[-focus]` (focus: `tl`/`tr`/`bl`/`br`/`center`), path gradient `path:C1-C2[-focus]`, and image fill `image:/path/to/file` (local path; pair with `background.mode`/`background.alpha`/`background.scale`).",
+      "description": "slide background。接受：hex color（`#RGB`、`#RRGGBB`、表示 solid+alpha 的 `#RRGGBBAA`）、scheme color（`accent1`..`accent6`、`dark1`、`dark2`、`light1`、`light2`、`hyperlink`、`followedHyperlink`）、`transparent`（或 `none`/`clear`）、linear gradient `C1-C2[-C3][-angle]`（angle 单位为度，也接受 `LINEAR;C1;C2[;angle]`）、radial gradient `radial:C1-C2[-focus]`（focus：`tl`/`tr`/`bl`/`br`/`center`）、path gradient `path:C1-C2[-focus]`，以及 image fill `image:/path/to/file`（本地 path；配合 `background.mode`/`background.alpha`/`background.scale`）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop background=#FFFFFF"],
       "readback": "resolved background descriptor",
@@ -49,7 +49,7 @@
     },
     "transition": {
       "type": "string",
-      "description": "transition name (fade, push, wipe, morph, etc.). 'morph...' triggers auto-prefixing of shape names.",
+      "description": "transition 名称（fade、push、wipe、morph 等）。'morph...' 会触发对 shape name 的自动加前缀。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop transition=fade"],
       "readback": "transition name",
@@ -57,7 +57,7 @@
     },
     "advanceTime": {
       "type": "number",
-      "description": "auto-advance time in milliseconds (integer). e.g. 5000 = 5 seconds.",
+      "description": "自动切换时间，单位为毫秒（integer）。例如 5000 = 5 秒。",
       "aliases": ["advancetime"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop advanceTime=5000"],
@@ -66,7 +66,7 @@
     },
     "advanceClick": {
       "type": "bool",
-      "description": "advance on click.",
+      "description": "点击时切换。",
       "aliases": ["advanceclick"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop advanceClick=true"],
@@ -75,7 +75,7 @@
     },
     "notes": {
       "type": "string",
-      "description": "slide notes text. Set-only at creation time.",
+      "description": "slide notes 文本。仅可在创建时 Set。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop notes=\"Speaker notes here\""],
       "readback": "notes text when present",
@@ -83,26 +83,26 @@
     },
     "hidden": {
       "type": "bool",
-      "description": "true when the slide is hidden from slideshow (Slide/@show=false).",
+      "description": "当 slide 在 slideshow 中隐藏时为 true（Slide/@show=false）。",
       "add": true, "set": true, "get": true,
       "readback": "true if slide is hidden in slideshow",
       "enforcement": "report"
     },
     "layoutType": {
       "type": "string",
-      "description": "slide layout type name as encoded on the underlying SlideLayout (e.g. blank, title, titleOnly, twoContent, obj, txAndObj). Distinct from `layout`, which is the user-facing layout display name.",
+      "description": "底层 SlideLayout 编码的 slide layout type 名称（例如 blank、title、titleOnly、twoContent、obj、txAndObj）。不同于用户可见的 layout display name `layout`。",
       "add": false, "set": false, "get": true,
       "readback": "layout type token from SlideLayout/@type",
       "enforcement": "report"
     },
-    "background.alpha":  { "type":"number", "add":false, "set":true,  "get":true, "description":"slide background fill alpha as percent (0..100). Settable on existing solid or image backgrounds: on solid, rewrites the color with the given alpha (equivalent to `background=RRGGBBAA`); on image, emits `<a:alphaModFix/>`. Surfaces on get when the resolved fill carries an alpha channel.", "readback":"integer percent 0..100", "enforcement":"report" },
-    "background.crop":   { "type":"string", "add":false, "set":false, "get":true, "description":"slide background image crop quad in `l,t,r,b` percent units (CT_RelativeRect).", "readback":"comma-separated `l,t,r,b` quad", "enforcement":"report" },
-    "background.mode":   { "type":"string", "add":false, "set":true,  "get":true, "description":"slide background image fill mode — `stretch` (default), `tile`, or `center`. Settable on an existing image background; emitted on get only when non-default.", "readback":"`tile` | `center`", "enforcement":"report" },
-    "background.ref":    { "type":"number", "add":false, "set":false, "get":true, "description":"theme background reference index — bgRef/@idx (1001/1002/1003 etc.) when the slide inherits from the theme.", "readback":"integer theme bg ref id", "enforcement":"report" },
-    "background.scale":  { "type":"number", "add":false, "set":true,  "get":true, "description":"tile-fill scale percent (sx, both axes), 1..500. Settable on an existing image background with background.mode=tile; surfaces on get with background.mode=tile.", "readback":"integer percent", "enforcement":"report" },
-    "matchedShapes":     { "type":"number", "add":false, "set":false, "get":true, "description":"morph transition: number of shapes from the previous slide that matched on the current slide.", "readback":"integer match count", "enforcement":"report" },
-    "morphMode":         { "type":"string", "add":false, "set":false, "get":true, "description":"morph transition mode (byObject default, or other p:morph @option token).", "readback":"morph mode token", "enforcement":"report" },
-    "morphShapes":       { "type":"number", "add":false, "set":false, "get":true, "description":"morph transition: number of candidate shapes considered for matching on this slide.", "readback":"integer candidate count", "enforcement":"report" }
+    "background.alpha":  { "type":"number", "add":false, "set":true,  "get":true, "description":"slide background fill alpha，百分比范围 0..100。可设置到已有 solid 或 image background：solid 时按给定 alpha 重写 color（等同于 `background=RRGGBBAA`）；image 时输出 `<a:alphaModFix/>`。解析后的 fill 带有 alpha channel 时由 get 返回。", "readback":"integer percent 0..100", "enforcement":"report" },
+    "background.crop":   { "type":"string", "add":false, "set":false, "get":true, "description":"slide background image 的 crop quad，使用 `l,t,r,b` 百分比单位（CT_RelativeRect）。", "readback":"comma-separated `l,t,r,b` quad", "enforcement":"report" },
+    "background.mode":   { "type":"string", "add":false, "set":true,  "get":true, "description":"slide background image fill mode——`stretch`（默认）、`tile` 或 `center`。可设置到已有 image background；仅非默认值由 get 输出。", "readback":"`tile` | `center`", "enforcement":"report" },
+    "background.ref":    { "type":"number", "add":false, "set":false, "get":true, "description":"theme background reference index——当 slide 从 theme 继承时为 bgRef/@idx（1001/1002/1003 等）。", "readback":"integer theme bg ref id", "enforcement":"report" },
+    "background.scale":  { "type":"number", "add":false, "set":true,  "get":true, "description":"tile-fill 缩放百分比（sx，两个轴），范围 1..500。可设置到 background.mode=tile 的已有 image background；background.mode=tile 时由 get 返回。", "readback":"integer percent", "enforcement":"report" },
+    "matchedShapes":     { "type":"number", "add":false, "set":false, "get":true, "description":"morph transition：前一张 slide 中与当前 slide 匹配的 shape 数量。", "readback":"integer match count", "enforcement":"report" },
+    "morphMode":         { "type":"string", "add":false, "set":false, "get":true, "description":"morph transition mode（默认 byObject，或其他 p:morph @option token）。", "readback":"morph mode token", "enforcement":"report" },
+    "morphShapes":       { "type":"number", "add":false, "set":false, "get":true, "description":"morph transition：此 slide 上参与匹配的候选 shape 数量。", "readback":"integer candidate count", "enforcement":"report" }
   },
   "children": [
     { "element": "shape",       "pathSegment": "shape",       "cardinality": "0..n" },

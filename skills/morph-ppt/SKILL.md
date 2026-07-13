@@ -1,6 +1,6 @@
 ---
 name: morph-ppt
-description: "Use this skill when the user wants a .pptx with smooth cross-slide animation — PowerPoint Morph transitions, Keynote-style continuous motion, shapes that grow / move / rotate as the slide advances. Trigger on: 'morph', 'morph transition', 'smooth transition', 'continuous animation across slides', 'Keynote-style transition', 'animated slide sequence', 'shape continuity across slides'. Output is a single .pptx. This skill is a scene layer on top of officecli-pptx — inherits every pptx v2 rule (visual floor, grid, palettes, connector canon, Delivery Gate 1–5a). DO NOT invoke for a generic deck, pitch deck, or board review without cross-slide motion — route those to officecli-pptx base or officecli-pitch-deck."
+description: "当用户需要带平滑跨页动画的 .pptx 时使用此 Skill，例如 PowerPoint Morph transition、Keynote 风格连续运动，或随着幻灯片推进而增长/移动/旋转的 shape。触发词包括：'morph'、'morph transition'、'smooth transition'、'continuous animation across slides'、'Keynote-style transition'、'animated slide sequence'、'shape continuity across slides'。输出为单个 .pptx。此 Skill 是 officecli-pptx 的 scene layer，继承 pptx v2 的规则；没有跨页运动的通用 deck、pitch deck 或 board review 不应触发，应转到 officecli-pptx 或 officecli-pitch-deck。"
 ---
 
 # OfficeCLI Morph-PPT Skill
@@ -8,15 +8,6 @@ description: "Use this skill when the user wants a .pptx with smooth cross-slide
 **This skill is a scene layer on top of `officecli-pptx`.** Every pptx hard rule — visual delivery floor (title ≥ 36pt / body ≥ 18pt / title ≥ 2× body), 12-column grid on 33.87×19.05cm, canonical palettes, chart-choice decision table, connector canon, shell escape, resident + batch, Delivery Gate 1–5a — is inherited, not re-taught. This file adds only what **Morph** needs on top: cross-slide shape-name binding, Scene Actors vs content prefixing, ghost discipline, `transition=morph` CLI quirks, 52-style visual library lookup, and a morph-specific fresh-eyes Gate 5b extension.
 
 When the pptx base rules cover it, the text here says `→ see pptx v2 §X`. Read `skills/officecli-pptx/SKILL.md` first if you have not.
-
-## Setup
-
-If `officecli` is missing:
-
-- **macOS / Linux**: `curl -fsSL https://d.officecli.ai/install.sh | bash`
-- **Windows (PowerShell)**: `irm https://d.officecli.ai/install.ps1 | iex`
-
-Verify with `officecli --version` (open a new terminal if PATH hasn't picked up). If install fails, download a binary from https://github.com/iOfficeAI/OfficeCLI/releases.
 
 ## ⚠️ Help-First Rule
 

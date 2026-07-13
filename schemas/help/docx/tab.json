@@ -19,11 +19,11 @@
       "/body/p[@paraId=X]/tab[K]"
     ]
   },
-  "note": "Paragraph tab STOP (w:tab inside <w:tabs> in pPr). Distinct from `ptab` (w:ptab, an inline positional tab living in a run). A tab stop defines WHERE a tab character lands; the tab character itself is a <w:tab/> in a run, produced by `add --type run --prop text='\\t'`. Common recipe — a centered equation with a flush-right equation number on ONE line: set a center tab at the column mid-point and a right tab at the column right edge, then lay out `[tab] equation [tab] (1)`. Aliases: tabstop.",
+  "note": "Paragraph tab STOP（pPr 的 <w:tabs> 中的 w:tab）。它不同于 ptab（w:ptab，位于 run 中的 inline positional tab）。tab stop 定义 tab character 落在哪里；tab character 本身是 run 中的 <w:tab/>，可通过 add --type run --prop text='\\\\t' 生成。常用场景是在一行中让 equation 居中、编号靠右：在列中点设置 center tab，在右边缘设置 right tab，然后排布 [tab] equation [tab] (1)。Alias：tabstop。",
   "properties": {
     "pos": {
       "type": "length",
-      "description": "tab stop position. Accepts twips (bare integer), or a unit-qualified length (6cm / 2in / 360pt). May be negative (OOXML allows a tab stop in the hanging/negative-indent region). Required on add.",
+      "description": "tab stop 位置。接受 twips（不带单位的整数）或带单位的 length（6cm / 2in / 360pt）。可以为负数（OOXML 允许 tab stop 位于 hanging/negative-indent 区域）。Add 时必填。",
       "aliases": [
         "position"
       ],
@@ -40,7 +40,7 @@
     },
     "val": {
       "type": "enum",
-      "description": "tab stop alignment. left/center/right are the everyday values; decimal aligns numbers on the decimal point; bar draws a vertical bar; clear removes an inherited stop; num/start/end are legacy/compat values.",
+      "description": "tab stop 对齐方式。left/center/right 是常用值；decimal 按小数点对齐数字；bar 绘制竖线；clear 移除继承的 stop；num/start/end 是 legacy/compat 值。",
       "values": [
         "left",
         "center",
@@ -68,7 +68,7 @@
     },
     "leader": {
       "type": "enum",
-      "description": "leader characters drawn from the previous text to the tab stop (e.g. dotted leaders in a table of contents).",
+      "description": "从前置文本延伸到 tab stop 的 leader 字符（例如 table of contents 中的点状 leader）。",
       "values": [
         "none",
         "dot",

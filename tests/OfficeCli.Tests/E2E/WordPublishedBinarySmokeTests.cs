@@ -21,6 +21,7 @@ public class WordPublishedBinarySmokeTests
 
             Assert.True(new FileInfo(macBinary).Length > 1_000_000, macBinary);
             Assert.True(new FileInfo(windowsBinary).Length > 1_000_000, windowsBinary);
+            AssertNativeArtifactPortability(repoRoot, macBinary, windowsBinary);
 
             var nativeBinary = GetNativeBinary(macBinary, windowsBinary);
             if (nativeBinary != null)
@@ -61,14 +62,37 @@ public class WordPublishedBinarySmokeTests
         return executable;
     }
 
+    private static void AssertNativeArtifactPortability(
+        string repoRoot,
+        string macBinary,
+        string windowsBinary)
+    {
+        ProcessResult? result = null;
+        if (OperatingSystem.IsMacOS())
+        {
+            var verifier = Path.Combine(repoRoot, "build", "verify-macos-portability.sh");
+            result = RunProcess("/bin/bash", [verifier, macBinary], repoRoot, TimeSpan.FromSeconds(30));
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            var verifier = Path.Combine(repoRoot, "build", "verify-windows-portability.ps1");
+            result = RunProcess(
+                "powershell.exe",
+                ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", verifier, windowsBinary],
+                repoRoot,
+                TimeSpan.FromSeconds(30));
+        }
+
+        if (result != null)
+            Assert.True(result.ExitCode == 0, $"published artifact portability failed.\n{result.Stderr}");
+    }
+
     private static void AssertWordSmoke(string binary, string workingRoot)
     {
         var document = Path.Combine(workingRoot, "published-smoke.docx");
         var environment = new Dictionary<string, string>
         {
-            ["OFFICECLI_NO_AUTO_INSTALL"] = "1",
             ["OFFICECLI_NO_AUTO_RESIDENT"] = "1",
-            ["OFFICECLI_SKIP_UPDATE"] = "1",
         };
 
         var create = RunProcess(binary, ["create", document, "--json"], workingRoot,

@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/slide[N]/group[M]"]
   },
-  "note": "Groups existing shapes on a slide. 'shapes' takes comma-separated shape indices or DOM paths. Group bounding box auto-computed from member transforms. Shapes inside a group are addressable via /slide[N]/group[M]/shape[K] for direct Set/Get. zorder is emitted only when the group appears as a child in slide Query results, not via direct Get on /slide[N]/group[N]. This is a known C# Query/Get inconsistency.",
+  "note": "将 slide 上已有的 shape 组合起来。'shapes' 接受以逗号分隔的 shape index 或 DOM path。Group bounding box 根据成员 transform 自动计算。group 内的 shape 可通过 /slide[N]/group[M]/shape[K] 直接 Set/Get。zorder 仅在 group 作为 slide Query 结果的 child 时返回，直接 Get /slide[N]/group[N] 不返回；这是已知的 C# Query/Get 不一致。",
   "properties": {
     "shapes": {
       "type": "string",
-      "description": "comma-separated shape indices (1,2,3) or paths (/slide[N]/shape[M] or /slide[N]/shape[@id=ID]). Required. NOTE: bare numeric indices count ALL top-level shapes in z-order — including existing groups, pictures, and charts — NOT the <p:sp>-only shape[N] address space. So on a slide whose tree is [group, shapeC, shapeD], `shapes=1,2` selects the group + shapeC (z-order positions 1,2). This is intentional (lets you group any element type, incl. nesting groups); use explicit @id= paths when you need an unambiguous target.",
+      "description": "以逗号分隔的 shape 索引（1,2,3）或路径（/slide[N]/shape[M] 或 /slide[N]/shape[@id=ID]）。必填。注意：裸数字索引按 z-order 统计所有 top-level shape，包括已有 group、picture、chart，而不是仅限 <p:sp> 的 shape[N] 地址空间。例如 slide tree 为 [group, shapeC, shapeD] 时，shapes=1,2 会选择 group 和 shapeC（z-order 位置 1、2）。这是有意设计，以便对任意 element type 分组（包括嵌套 group）；需要明确目标时请使用显式 @id= 路径。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop shapes=1,2"],
       "readback": "n/a (structural)",
@@ -25,7 +25,7 @@
     },
     "ungroup": {
       "type": "boolean",
-      "description": "dissolve the group: promote its members back onto the slide with transforms flattened to slide-absolute coordinates, then remove the empty group. Set-only, terminal (other props on the same command are ignored). Inverse of add-group.",
+      "description": "解散 group：将成员提升回 slide，并把 transforms 展平为 slide-absolute coordinates，然后删除空 group。仅支持 Set，且为终止操作（同一命令中的其他 prop 会被忽略）。与 add-group 相反。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop ungroup=true"],
       "readback": "n/a (structural)",
@@ -33,7 +33,7 @@
     },
     "name": {
       "type": "string",
-      "description": "group name. Defaults to 'Group N'.",
+      "description": "group 名称。默认值：'Group N'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop name=\"Logos\""],
       "readback": "name string",
@@ -41,7 +41,7 @@
     },
     "zorder": {
       "type": "number",
-      "description": "1-based z-order in slide shape tree. On add, positions the group within the shape tree (1 = back). Post-creation reordering is not supported via Set; use Move/Swap on the group, or raw-set the spTree child order.",
+      "description": "slide shape tree 中从 1 开始计数的 z-order。Add 时确定 group 在 shape tree 中的位置（1 表示最底层）。创建后不支持通过 Set 重排；请对 group 使用 Move/Swap，或通过 raw-set 调整 spTree child order。",
       "aliases": ["z-order", "order"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop zorder=1"],
@@ -50,28 +50,28 @@
     },
     "x": {
       "type": "length",
-      "description": "horizontal offset (group origin). Readback in cm via EmuConverter.",
+      "description": "水平偏移（group origin）。Get 通过 EmuConverter 以 cm 返回。",
       "add": false, "set": false, "get": true,
       "readback": "length in cm (e.g. \"2cm\")",
       "enforcement": "report"
     },
     "y": {
       "type": "length",
-      "description": "vertical offset.",
+      "description": "垂直偏移。",
       "add": false, "set": false, "get": true,
       "readback": "length in cm",
       "enforcement": "report"
     },
     "width": {
       "type": "length",
-      "description": "group bounding box width.",
+      "description": "group bounding box 宽度。",
       "add": false, "set": false, "get": true,
       "readback": "length in cm",
       "enforcement": "report"
     },
     "height": {
       "type": "length",
-      "description": "group bounding box height.",
+      "description": "group bounding box 高度。",
       "add": false, "set": false, "get": true,
       "readback": "length in cm",
       "enforcement": "report"

@@ -18,7 +18,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "display units for value axis labels. Applies to role=value|value2.",
+      "description": "value axis labels 的 display units。作用于 role=value|value2。",
       "readback": "display unit token",
       "examples": [
         "--prop dispUnits=thousands"
@@ -30,7 +30,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "major tick interval on the value axis. Applies to role=value|value2.",
+      "description": "value axis 的 major tick 间隔。作用于 role=value|value2。",
       "readback": "numeric interval",
       "examples": [
         "--prop majorUnit=20"
@@ -42,7 +42,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "minor tick interval on the value axis. Applies to role=value|value2.",
+      "description": "value axis 的 minor tick 间隔。作用于 role=value|value2。",
       "readback": "numeric interval",
       "examples": [
         "--prop minorUnit=5"

@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/slide[N]/table[M]/col[C]"]
   },
-  "note": "Adds a GridColumn plus a new TableCell in every existing row at the insertion index.",
+  "note": "在插入位置添加一个 GridColumn，并在每个现有 row 中添加一个新的 TableCell。",
   "properties": {
     "width": {
       "type": "length",
-      "description": "column width in EMU-parseable length. Defaults to average of existing columns or ~2.54cm.",
+      "description": "column 宽度，使用可按 EMU 解析的 length。默认取现有 columns 的平均值，或约 2.54cm。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop width=3cm"],
       "readback": "length in cm (e.g. \"2cm\")",
@@ -26,7 +26,7 @@
     },
     "text": {
       "type": "string",
-      "description": "seed text inserted into every new cell of this column.",
+      "description": "写入该 column 每个新 cell 的初始文本。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop text=Header"],
       "readback": "not surfaced at column level",

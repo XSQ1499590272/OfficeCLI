@@ -19,11 +19,11 @@
       "/footnotes/footnote[N]"
     ]
   },
-  "note": "Footnotes live in FootnotesPart. A FootnoteReference run is inserted at the anchor point; the note body is appended to footnotes.xml. Parent must be a paragraph path (/body/p[N]); use --index N to control position within the paragraph. Run-level parent (/body/p[N]/r[M]) is not accepted -- the footnote reference is inserted as a new run.",
+  "note": "Footnote 保存在 FootnotesPart 中。FootnoteReference run 会插入到 anchor point，note body 会追加到 footnotes.xml。parent 必须是 paragraph path（/body/p[N]）；使用 --index N 控制其在 paragraph 中的位置。不接受 run-level parent（/body/p[N]/r[M]），footnote reference 会作为新 run 插入。",
   "properties": {
     "text": {
       "type": "string",
-      "description": "footnote text. Required.",
+      "description": "footnote 文本。必填。",
       "add": true,
       "set": true,
       "get": true,
@@ -43,7 +43,7 @@
         "dir",
         "bidi"
       ],
-      "description": "Reading direction. 'rtl' writes <w:bidi/> on the footnote content paragraph and cascades <w:rtl/> to the paragraph mark.",
+      "description": "阅读方向。'rtl' 会在 footnote content paragraph 写入 <w:bidi/>，并将 <w:rtl/> 级联到 paragraph mark。",
       "add": true,
       "set": true,
       "get": false,
@@ -62,7 +62,7 @@
         "both",
         "distribute"
       ],
-      "description": "Horizontal alignment applied to the footnote content paragraph (<w:jc/>).",
+      "description": "应用到 footnote content paragraph 的水平对齐（<w:jc/>）。",
       "aliases": [
         "alignment"
       ],
@@ -76,7 +76,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font (rFonts/cs) — Arabic / Hebrew typeface.",
+      "description": "Complex-script font（rFonts/cs），用于 Arabic / Hebrew typeface。",
       "aliases": [
         "font.complexscript",
         "font.complex"
@@ -91,7 +91,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font (rFonts/eastAsia).",
+      "description": "East-Asian font（rFonts/eastAsia）。",
       "aliases": [
         "font.eastasia",
         "font.eastasian"
@@ -106,7 +106,7 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin font slot (rFonts/ascii + hAnsi).",
+      "description": "Latin font slot（rFonts/ascii + hAnsi）。",
       "add": true,
       "set": true,
       "get": false,
@@ -117,7 +117,7 @@
     },
     "bold.cs": {
       "type": "bool",
-      "description": "complex-script bold (<w:bCs/>). Required for Arabic / Hebrew bold rendering.",
+      "description": "complex-script bold（<w:bCs/>）。Arabic / Hebrew 的 bold 渲染需要此属性。",
       "aliases": [
         "font.bold.cs",
         "boldcs"
@@ -132,7 +132,7 @@
     },
     "italic.cs": {
       "type": "bool",
-      "description": "complex-script italic (<w:iCs/>) for the footnote's runs.",
+      "description": "footnote run 的 complex-script italic（<w:iCs/>）。",
       "aliases": [
         "font.italic.cs",
         "italiccs"
@@ -147,7 +147,7 @@
     },
     "size.cs": {
       "type": "font-size",
-      "description": "complex-script font size (<w:szCs/>) for the footnote's runs.",
+      "description": "footnote run 的 complex-script font size（<w:szCs/>）。",
       "aliases": [
         "font.size.cs",
         "sizecs"
@@ -162,7 +162,7 @@
     },
     "id": {
       "type": "number",
-      "description": "OOXML footnote id (w:footnote/@w:id). Assigned by the writer; surfaces only on Get/Query.",
+      "description": "OOXML footnote id（w:footnote/@w:id）。由 writer 分配，仅通过 Get/Query 返回。",
       "add": false,
       "set": false,
       "get": true,

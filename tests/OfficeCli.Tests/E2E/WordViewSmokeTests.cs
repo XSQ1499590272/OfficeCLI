@@ -352,12 +352,11 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
     }
 
     [Fact]
-    public void ViewCli_ScreenshotAndPdfProduceArtifactsOrExplainBackendUnavailable()
+    public void ViewCli_ScreenshotProducesArtifactOrExplainsBackendUnavailable()
     {
         var path = CreateBlankDocx();
         var screenshotPath = Path.Combine(Path.GetTempPath(), $"officecli_screenshot_{Guid.NewGuid():N}.png");
         var gridPath = Path.Combine(Path.GetTempPath(), $"officecli_screenshot_grid_{Guid.NewGuid():N}.png");
-        var pdfPath = Path.Combine(Path.GetTempPath(), $"officecli_export_{Guid.NewGuid():N}.pdf");
         AssertJsonSuccess(RunOfficeCli(
             "add", path, "/body", "--type", "paragraph", "--prop", "text=visual output", "--json"));
 
@@ -400,23 +399,11 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
                 Assert.Contains("Windows", native.Stdout + native.Stderr);
             }
 
-            var pdf = RunOfficeCli("view", path, "pdf", "--out", pdfPath);
-            if (pdf.ExitCode == 0)
-            {
-                Assert.True(File.Exists(pdfPath));
-                Assert.True(new FileInfo(pdfPath).Length > 0);
-            }
-            else
-            {
-                Assert.False(string.IsNullOrWhiteSpace(pdf.Stdout + pdf.Stderr));
-                Assert.Contains("pdf", (pdf.Stdout + pdf.Stderr).ToLowerInvariant());
-            }
         }
         finally
         {
             try { File.Delete(screenshotPath); } catch { }
             try { File.Delete(gridPath); } catch { }
-            try { File.Delete(pdfPath); } catch { }
         }
     }
 
@@ -1689,7 +1676,6 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
         startInfo.ArgumentList.Add(port.ToString());
         startInfo.Environment["OFFICECLI_WATCH_IDLE_SECONDS"] = "60";
         startInfo.Environment["OFFICECLI_NO_AUTO_RESIDENT"] = "1";
-        startInfo.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
 
         Process? watchProcess = null;
         try
@@ -2191,7 +2177,6 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
         };
         startInfo.ArgumentList.Add("mcp");
         startInfo.Environment["OFFICECLI_NO_AUTO_RESIDENT"] = "1";
-        startInfo.Environment["OFFICECLI_SKIP_UPDATE"] = "1";
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start MCP server");
 

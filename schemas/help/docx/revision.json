@@ -10,13 +10,13 @@
     "get": true,
     "query": true,
     "remove": false,
-    "note": "`set: true` covers the action verb (revision.action on a /revision selector or native path). `add: false` here means the *revision element itself* has no Add surface — tracked changes are created indirectly via `revision.type` / `revision.author` / `revision.date` / `revision.id` on the host run/paragraph/table/row/cell/section, where they read as `add: true` / `set: true`. Per-property add/set flags below describe behavior on the synthetic /revision node, not on the host."
+    "note": "operations 中的 set: true 表示 action verb 可用（revision.action 作用于 /revision selector 或 native path）。这里的 add: false 表示 revision element 本身没有 Add surface；tracked change 通过宿主 run/paragraph/table/row/cell/section 上的 revision.type、revision.author、revision.date、revision.id 间接创建，这些属性在宿主上显示为 add: true / set: true。下面的 per-property add/set flags 描述的是 synthetic /revision node 的行为，不是宿主 element 的行为。"
   },
   "paths": {
     "positional": ["/revision[N]", "/body/p[N]/ins[M]", "/body/p[N]/del[M]"],
     "selector": ["/revision", "/revision[@id=N]", "/revision[@id=N][@type=moveFrom|moveTo]", "/revision[@author=NAME]", "/revision[@type=ins|del|format|moveFrom|moveTo]", "/revision[@author=NAME][@type=TYPE]"]
   },
-  "note": "Tracked-change marker. `query revision` enumerates every w:ins / w:del / w:moveFrom / w:moveTo / w:*PrChange in the document. The synthetic Path is `/revision[@id=N]` when the marker carries a stable w:id (true for everything Word/WPS writes), falling back to positional `/revision[N]` only for markers without an id — same precedence as paragraphs (`p[@paraId=…]` → `p[N]`). When the same w:id is shared by more than one marker (canonical case: a moveFrom/moveTo pair binds via shared id), the Path is disambiguated as `/revision[@id=N][@type=moveFrom]` / `[@type=moveTo]` so single-end addressing stays unique. `set /revision[@id=N]` without the type segment still acts on both ends together (pair-wise accept/reject, the usual move-revision intent). Use the @id= form in scripts; positional indexes shift after accept/reject. Both `get /revision[@id=N]` and `set /revision[@id=N] --prop revision.action=…` accept the same path. Two disjoint property namespaces: `revision.type=ins|del|format|moveFrom|moveTo` creates a tracked change (used with add/set on the host run/paragraph/table/row/cell/section), while `revision.action=accept|reject` acts on existing markers via /revision selectors or native paths (/body/p[N], /body/p[N]/r[M], etc.). The two namespaces are mutually exclusive — mixing revision.action with any revision.type/.author/.date/.id key is rejected as ambiguous. Bare `revision=…` is no longer accepted. **Find + revision** (matches Word's Find&Replace with Track Changes on): `set <path> --prop find=PATTERN [--prop regex=true] --prop revision.author=NAME` infers the marker shape from the operation — `--prop replace=NEW` produces a w:del(old) + w:ins(new) pair, `--prop replace=` (empty) produces w:del only, format props (bold, font.color, …) produce one w:rPrChange per matched run, and paragraph-scope props (align, indent, …) produce one w:pPrChange per matched paragraph. The handler auto-allocates a fresh revision.id per marker, so `--prop revision.id=…` is rejected on find (would collide across markers). `revision.type=ins|del|moveFrom|moveTo` and `revision.action=…` are also rejected on find — the shape is inferred and the action verb belongs on the selector, not the creation context. `find` / `replace` / `regex` themselves are cross-cutting Set keywords (not revision-specific properties; not listed below) — pairing any of them with `revision.author` routes the find pass through the track-changes pipeline. Separate from `revisionNumber` on / (document save counter) and `trackChanges` on /settings (track-mode toggle).",
+  "note": "Tracked-change marker。query revision 会枚举文档中的 w:ins、w:del、w:moveFrom、w:moveTo 和各种 w:*PrChange。marker 有稳定 w:id 时使用 /revision[@id=N]，没有 id 时回退到 /revision[N]；共享同一 w:id 的 moveFrom/moveTo 会追加 type 以保持单端定位唯一。set /revision[@id=N] 不带 type 时会同时作用于两端，执行成对 accept/reject。脚本应优先使用 @id= path，因为 accept/reject 后 positional index 会变化。revision.type=ins|del|format|moveFrom|moveTo 用于在宿主 element 上创建 tracked change；revision.action=accept|reject 用于通过 /revision selector 或 native path 处理已有 marker。两组 namespace 不能混用，bare revision= 已不再接受。find/replace/regex 配合 revision.author 时会进入 Track Changes pipeline：replace 生成 w:del + w:ins，空 replace 只生成 w:del，格式和 paragraph 属性分别生成 rPrChange/pPrChange；handler 为每个 marker 自动分配 revision.id，find 中不能手动指定。",
   "properties": {
     "type": {
       "type": "enum",
@@ -28,7 +28,7 @@
     },
     "text": {
       "type": "string",
-      "description": "text content for ins / content marker for del (read-only).",
+      "description": "ins 的文本内容 / del 的内容标记（只读）。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "concatenated text (read-only)",
@@ -36,7 +36,7 @@
     },
     "author": {
       "type": "string",
-      "description": "Author of the revision. Surfaced on `query revision` nodes and on host elements (run/paragraph/…) that carry an ins/del/*PrChange ancestor. Supply via --prop revision.author=… on the host element to create. **Run host is stricter:** `set <run> --prop revision.author=X` alone is rejected — without an action to attribute, the legacy fallback wrote an empty-snapshot rPrChange (recording no change). Either pair revision.author with a real format prop (`--prop bold=true`), or pass `--prop revision.type=ins|del|moveFrom|moveTo` so the wrap itself is the action. The same strictness applies to bare `revision.type=format` on Run. Non-Run hosts (paragraph/table/row/cell/section) still accept bare attribution and emit an empty-snapshot *PrChange — needed for dump→batch round-trip of table-level markers whose pre-change baseline can't be reconstructed. Also accepted alongside `find` (and `replace` / format / paragraph props) — the find dispatch wraps each match in the matching marker shape and attributes it to this author.",
+      "description": "修订作者。会在 query revision 节点，以及带有 ins/del/*PrChange 祖先节点的宿主元素（run/paragraph 等）上返回。创建时在宿主元素传入 --prop revision.author=… 。Run 宿主要求更严格：单独使用 set <run> --prop revision.author=X 会被拒绝，因为没有可归属的操作时，旧的兜底实现会写入未记录任何变化的空快照 rPrChange。请将 revision.author 与实际格式属性配对（--prop bold=true），或传入 --prop revision.type=ins|del|moveFrom|moveTo，使包裹操作本身成为记录的变化。Run 上单独使用 revision.type=format 也受同样限制。非 Run 宿主（paragraph/table/row/cell/section）仍接受单独指定作者，并写入空快照 *PrChange；这对 table 级 marker 的 dump→batch round-trip 是必要的，因为其修改前基线无法重建。也可与 find（以及 replace / format / paragraph props）配合；find dispatch 会用相应 marker 包裹每个匹配项，并将作者设为此值。",
       "add": false, "set": false, "get": true,
       "examples": [
         "query /revision[@author=Alice]",
@@ -50,7 +50,7 @@
     },
     "date": {
       "type": "string",
-      "description": "ISO-8601 timestamp (read-only on the revision node). Supply via --prop revision.date=… on the host element to create.",
+      "description": "ISO-8601 时间戳（revision node 上只读）。创建时在宿主元素传入 --prop revision.date=… 。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "Date attribute (read-only)",
@@ -58,7 +58,7 @@
     },
     "id": {
       "type": "integer",
-      "description": "w:id attribute. Stable across save; pair moveFrom/moveTo by reusing the same id. Supply via --prop revision.id=… on the host element.",
+      "description": "w:id 属性。保存后保持稳定；将 moveFrom/moveTo 配对时请复用同一 id。可在宿主元素传入 --prop revision.id=… 。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "revision id (read-only on the revision node)",
@@ -66,7 +66,7 @@
     },
     "nativePath": {
       "type": "string",
-      "description": "Path to the underlying w:ins/w:del/w:moveFrom/w:moveTo/w:*PrChange element in document DOM terms (e.g. /body/p[2]/ins[1]). Use it to address the revision via the action native-path form: `set <nativePath> --prop revision.action=accept|reject`. Emitted on `query revision` synthetic nodes only.",
+      "description": "底层 w:ins/w:del/w:moveFrom/w:moveTo/w:*PrChange 元素在 document DOM 中的路径（如 /body/p[2]/ins[1]）。可通过 action 的 native-path 形式定位该 revision：set <nativePath> --prop revision.action=accept|reject。仅在 query revision 的 synthetic node 上返回。",
       "add": false, "set": false, "get": true,
       "examples": ["set /body/p[2]/ins[1] --prop revision.action=accept"],
       "readback": "DOM path to the revision element (read-only)",
@@ -75,7 +75,7 @@
     "action": {
       "type": "enum",
       "values": ["accept", "reject"],
-      "description": "Accept / reject verb. Lives in a disjoint namespace from the creation keys above; mixing with revision.type/.author/.date/.id throws. Walks matching elements in reverse document order so /revision[N] paths don't shift mid-batch.",
+      "description": "接受 / 拒绝操作。它与上述创建键属于互斥命名空间；与 revision.type/.author/.date/.id 混用会报错。会按 document 的逆序遍历匹配元素，避免批处理中 /revision[N] 路径发生偏移。",
       "add": false, "set": true, "get": false,
       "examples": [
         "set /revision --prop revision.action=accept",
@@ -91,7 +91,7 @@
     },
     "paraMarkIns.author": {
       "type": "string",
-      "description": "Author of a paragraph-mark-only insertion (w:rPr/w:ins inside the paragraph's pPr/rPr — the ¶ mark itself is part of the inserted change, distinct from a run-level w:ins wrapping content). Surfaced on paragraph nodes via get/query; on dump→batch the emitter rewrites it to bare revision.author on the synthetic paragraph + strips revision.type so the bare-attribution path defaults the type to ins.",
+      "description": "仅段落标记插入的作者（段落 pPr/rPr 内的 w:rPr/w:ins；¶ 标记本身属于插入变化，区别于用 run-level w:ins 包裹内容）。通过 get/query 在 paragraph node 返回；dump→batch 时 emitter 会把它改写为 synthetic paragraph 上的裸 revision.author，并移除 revision.type，从而让裸 attribution 路径默认 type=ins。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "paragraph-mark insertion author (read-only)",
@@ -99,7 +99,7 @@
     },
     "paraMarkIns.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to paraMarkIns.author.",
+      "description": "paraMarkIns.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "paragraph-mark insertion date (read-only)",
@@ -107,37 +107,37 @@
     },
     "paraMarkIns.id": {
       "type": "int",
-      "description": "w:id of the paragraph-mark insertion. Get-only companion to paraMarkIns.author/.date.",
+      "description": "段落标记插入的 w:id。只读，对应 paraMarkIns.author/.date。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "paraMarkDel.author": {
       "type": "string",
-      "description": "Author of a paragraph-mark deletion (w:rPr/w:del in pPr/rPr — the ¶ join is tracked as a deletion). Deletion counterpart of paraMarkIns.author. Get-only.",
+      "description": "段落标记删除的作者（pPr/rPr 中的 w:rPr/w:del；¶ 的连接操作会记录为删除）。是 paraMarkIns.author 的删除对应项。只读。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "paraMarkDel.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to paraMarkDel.author.",
+      "description": "paraMarkDel.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "paraMarkDel.id": {
       "type": "int",
-      "description": "w:id of the paragraph-mark deletion. Get-only.",
+      "description": "段落标记删除的 w:id。只读。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "revision.beforeLost": {
       "type": "bool",
-      "description": "Get-only signal: true when a *PrChange 'before' property snapshot cannot round-trip through dump→batch (the prior-formatting baseline is lost on replay). Lets the batch emitter warn rather than silently drop it.",
+      "description": "只读信号：当 *PrChange 的修改前属性快照无法通过 dump→batch round-trip 时为 true（重放时会丢失修改前的格式基线）。batch emitter 可据此发出警告，而不是静默丢弃。",
       "add": false, "set": false, "get": true,
       "enforcement": "report"
     },
     "sectPrChange.author": {
       "type": "string",
-      "description": "Author of a w:sectPrChange on a section (revision.type=format equivalent at section scope; surfaced as a distinct key because the snapshot lives in a different OOXML wrapper than rPrChange/pPrChange).",
+      "description": "section 上 w:sectPrChange 的作者（等同于 section scope 的 revision.type=format；因快照位于不同于 rPrChange/pPrChange 的 OOXML wrapper 中，故作为独立键返回）。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "section property-change author (read-only)",
@@ -145,7 +145,7 @@
     },
     "sectPrChange.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to sectPrChange.author.",
+      "description": "sectPrChange.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "section property-change date (read-only)",
@@ -153,7 +153,7 @@
     },
     "sectPrChange.id": {
       "type": "string",
-      "description": "Stable w:id companion to sectPrChange.author; preserved across dump→batch so the marker's identity survives the round-trip.",
+      "description": "sectPrChange.author 对应的稳定 w:id；会跨 dump→batch 保留，以维持 marker 的身份。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "section property-change id (read-only)",
@@ -161,7 +161,7 @@
     },
     "tblPrChange.author": {
       "type": "string",
-      "description": "Author of a w:tblPrChange on a table (table-properties revision — borders/style/layout snapshot).",
+      "description": "table 上 w:tblPrChange 的作者（table-properties revision：borders/style/layout 快照）。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "table property-change author (read-only)",
@@ -169,7 +169,7 @@
     },
     "tblPrChange.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to tblPrChange.author.",
+      "description": "tblPrChange.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "table property-change date (read-only)",
@@ -177,7 +177,7 @@
     },
     "trPrChange.author": {
       "type": "string",
-      "description": "Author of a w:trPrChange on a table row (row-properties revision — row height/header/cantSplit snapshot). Separate from w:trPr/w:ins (= row insertion as tracked change).",
+      "description": "table row 上 w:trPrChange 的作者（row-properties revision：row height/header/cantSplit 快照）。不同于 w:trPr/w:ins，后者表示作为 tracked change 的 row insertion。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "row property-change author (read-only)",
@@ -185,7 +185,7 @@
     },
     "trPrChange.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to trPrChange.author.",
+      "description": "trPrChange.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "row property-change date (read-only)",
@@ -193,7 +193,7 @@
     },
     "tcPrChange.author": {
       "type": "string",
-      "description": "Author of a w:tcPrChange on a table cell (cell-properties revision — borders/shading/width snapshot). Separate from w:tcPr/w:cellIns/w:cellDel (= cell insertion/deletion).",
+      "description": "table cell 上 w:tcPrChange 的作者（cell-properties revision：borders/shading/width 快照）。不同于 w:tcPr/w:cellIns/w:cellDel，后者表示 cell insertion/deletion。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "cell property-change author (read-only)",
@@ -201,7 +201,7 @@
     },
     "tcPrChange.date": {
       "type": "string",
-      "description": "ISO-8601 timestamp companion to tcPrChange.author.",
+      "description": "tcPrChange.author 对应的 ISO-8601 时间戳。",
       "add": false, "set": false, "get": true,
       "examples": [],
       "readback": "cell property-change date (read-only)",

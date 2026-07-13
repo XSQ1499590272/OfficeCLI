@@ -12,7 +12,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "radar chart subtype. Values: standard|line, marker, filled|fill.",
+      "description": "radar chart 子类型。可选值：standard|line、marker、filled|fill。",
       "examples": [
         "--prop radarstyle=filled"
       ]
@@ -22,7 +22,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "round the chart-area outer corners.",
+      "description": "圆化 chart-area 外角。",
       "examples": [
         "--prop roundedcorners=true"
       ]
@@ -35,7 +35,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "convenience shortcut for /chart[N]/axis[@role=...] visible (on role=value); see chart-axis schema for full axis-level options",
+      "description": "/chart[N]/axis[@role=...] 的 visible 快捷入口，作用于 role=value；完整的 axis 级选项请参见 chart-axis schema。",
       "examples": [
         "--prop valaxisvisible=false"
       ]

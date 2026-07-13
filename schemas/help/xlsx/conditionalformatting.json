@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/SheetName/cf[N]"]
   },
-  "note": "Aliases: cf, cfextended. Type names map to xlsx CF rules (cellIs, colorScale, dataBar, iconSet, containsText, top/bottom N, etc.).",
+  "note": "Aliases：cf、cfextended。type name 映射到 xlsx CF rule（cellIs、colorScale、dataBar、iconSet、containsText、top/bottom N 等）。",
   "properties": {
     "type": {
       "type": "enum",
-      "description": "CF rule type.",
+      "description": "CF rule 类型。",
       "values": ["cellIs", "colorScale", "dataBar", "iconSet", "containsText", "notContainsText", "beginsWith", "endsWith", "top", "topN", "top10", "topPercent", "bottom", "bottomN", "bottomPercent", "aboveAverage", "belowAverage", "duplicateValues", "uniqueValues", "containsBlanks", "containsErrors", "notContainsBlanks", "notContainsErrors", "formula", "dateOccurring", "today", "yesterday", "tomorrow", "thisWeek", "lastWeek", "nextWeek", "thisMonth", "lastMonth", "nextMonth"],
       "aliases": ["rule"],
       "add": true, "set": true, "get": true,
@@ -28,7 +28,7 @@
     },
     "ref": {
       "type": "string",
-      "description": "target cell range.",
+      "description": "目标单元格范围。",
       "aliases": ["range", "sqref"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop ref=A1:A10", "--prop sqref=A1:A10"],
@@ -37,7 +37,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "background fill color for matched cells. Use this for cellIs, text, top/bottom, and formula rules.",
+      "description": "匹配单元格的背景 fill 颜色。适用于 cellIs、text、top/bottom 和 formula rules。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop fill=FFFF00"],
       "readback": "#-prefixed hex",
@@ -45,7 +45,7 @@
     },
     "operator": {
       "type": "string",
-      "description": "operator for cellIs/text rules.",
+      "description": "cellIs/text rules 使用的 operator。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop operator=greaterThan"],
       "readback": "operator",
@@ -53,7 +53,7 @@
     },
     "value": {
       "type": "string",
-      "description": "threshold / comparison value.",
+      "description": "阈值或比较值。",
       "aliases": ["formula1", "formula"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop value=100", "--prop formula=$A1>5"],
@@ -62,7 +62,7 @@
     },
     "color": {
       "type": "color",
-      "description": "bar color for dataBar rules only. For cellIs/text/formula rules, use 'fill' instead.",
+      "description": "仅用于 dataBar rules 的 bar 颜色。cellIs/text/formula rules 请改用 'fill'。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop color=#FFFF00"],
       "readback": "#-prefixed hex",
@@ -70,7 +70,7 @@
     },
     "value2": {
       "type": "string",
-      "description": "second threshold for between/notBetween cellIs rules. Alias: maxvalue.",
+      "description": "between/notBetween cellIs rules 的第二个阈值。别名：maxvalue。",
       "aliases": ["maxvalue"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop value=10 --prop value2=20"],
@@ -79,7 +79,7 @@
     },
     "text": {
       "type": "string",
-      "description": "needle for containsText/notContainsText/beginsWith/endsWith rules.",
+      "description": "containsText/notContainsText/beginsWith/endsWith rules 用于匹配的文本。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=containsText --prop text=ERROR"],
       "readback": "needle string",
@@ -87,7 +87,7 @@
     },
     "rank": {
       "type": "number",
-      "description": "rank for top/bottom N rules. Aliases: top, bottomN.",
+      "description": "top/bottom N rules 的 rank。别名：top、bottomN。",
       "aliases": ["top", "bottomN"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=topN --prop rank=10"],
@@ -96,7 +96,7 @@
     },
     "percent": {
       "type": "bool",
-      "description": "treat 'rank' as a percentile rather than count (top/bottom rules).",
+      "description": "在 top/bottom rules 中，将 'rank' 视为百分位数而非数量。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=top --prop rank=10 --prop percent=true"],
       "readback": "true/false",
@@ -104,7 +104,7 @@
     },
     "bottom": {
       "type": "bool",
-      "description": "select bottom-N instead of top-N (top/bottom rules).",
+      "description": "在 top/bottom rules 中选择 bottom-N 而不是 top-N。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=bottom --prop rank=5"],
       "readback": "true/false",
@@ -112,7 +112,7 @@
     },
     "aboveAverage": {
       "type": "bool",
-      "description": "aboveAverage rule: true=above, false=below. Alias: above.",
+      "description": "aboveAverage rule：true 表示高于平均值，false 表示低于平均值。别名：above。",
       "aliases": ["above"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop type=aboveAverage --prop aboveAverage=true"],
@@ -121,7 +121,7 @@
     },
     "stdDev": {
       "type": "number",
-      "description": "stdDev offset for aboveAverage rules (1 = 1σ above mean). Add-time only — Get does not surface this back today.",
+      "description": "aboveAverage rules 的 stdDev 偏移量（1 表示高于均值 1σ）。仅 add 时生效，目前 Get 不会返回此值。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop stdDev=1"],
       "readback": "n/a",
@@ -129,7 +129,7 @@
     },
     "equalAverage": {
       "type": "bool",
-      "description": "include the mean in aboveAverage matching. Add-time only — Get does not surface this back today.",
+      "description": "aboveAverage 匹配时是否包含均值。仅 add 时生效，目前 Get 不会返回此值。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop equalAverage=true"],
       "readback": "n/a",
@@ -137,7 +137,7 @@
     },
     "period": {
       "type": "string",
-      "description": "time-period token for dateOccurring rules (today, yesterday, tomorrow, thisWeek, lastWeek, nextWeek, thisMonth, lastMonth, nextMonth). Aliases: timePeriod.",
+      "description": "dateOccurring rules 的时间周期 token（today、yesterday、tomorrow、thisWeek、lastWeek、nextWeek、thisMonth、lastMonth、nextMonth）。别名：timePeriod。",
       "aliases": ["timePeriod", "timeperiod"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop type=dateOccurring --prop period=lastWeek"],
@@ -146,7 +146,7 @@
     },
     "min": {
       "type": "string",
-      "description": "data-bar minimum value (numeric or 'auto'). Used by dataBar rules.",
+      "description": "data bar 最小值（数字或 'auto'），用于 dataBar rules。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop type=dataBar --prop min=0 --prop max=100"],
       "readback": "number or token",
@@ -154,7 +154,7 @@
     },
     "max": {
       "type": "string",
-      "description": "data-bar maximum value (numeric or 'auto'). Used by dataBar rules.",
+      "description": "data bar 最大值（数字或 'auto'），用于 dataBar rules。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop type=dataBar --prop max=100"],
       "readback": "number or token",
@@ -162,7 +162,7 @@
     },
     "showValue": {
       "type": "bool",
-      "description": "show numeric label alongside data bar / icon set. Alias: showvalue.",
+      "description": "是否在 data bar / icon set 旁显示数值标签。别名：showvalue。",
       "aliases": ["showvalue"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop showValue=false"],
@@ -171,7 +171,7 @@
     },
     "negativeColor": {
       "type": "color",
-      "description": "data-bar fill color for negative values.",
+      "description": "负值的 data bar fill 颜色。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop negativeColor=#FF0000"],
       "readback": "#-prefixed hex",
@@ -179,7 +179,7 @@
     },
     "axisColor": {
       "type": "color",
-      "description": "data-bar axis color (separator between positive and negative bars).",
+      "description": "data bar axis 颜色（正负 bar 之间的分隔线）。",
       "add": true, "set": false, "get": true,
       "examples": ["--prop axisColor=#000000"],
       "readback": "#-prefixed hex",
@@ -188,7 +188,7 @@
     "axisPosition": {
       "type": "enum",
       "values": ["automatic", "middle", "none"],
-      "description": "data-bar axis position. Default: automatic. Add-time only — Get does not surface this back today.",
+      "description": "data bar axis 位置。默认 automatic。仅 add 时生效，目前 Get 不会返回此值。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop axisPosition=middle"],
       "readback": "n/a",
@@ -196,7 +196,7 @@
     },
     "minColor": {
       "type": "color",
-      "description": "color-scale color at the minimum stop. Alias: mincolor.",
+      "description": "color scale 最小 stop 的颜色。别名：mincolor。",
       "aliases": ["mincolor"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=colorScale --prop minColor=#F8696B"],
@@ -205,7 +205,7 @@
     },
     "maxColor": {
       "type": "color",
-      "description": "color-scale color at the maximum stop. Alias: maxcolor.",
+      "description": "color scale 最大 stop 的颜色。别名：maxcolor。",
       "aliases": ["maxcolor"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop maxColor=#63BE7B"],
@@ -214,7 +214,7 @@
     },
     "midColor": {
       "type": "color",
-      "description": "color-scale color at the midpoint stop. Alias: midcolor.",
+      "description": "color scale 中间 stop 的颜色。别名：midcolor。",
       "aliases": ["midcolor"],
       "add": true, "set": false, "get": true,
       "examples": ["--prop midColor=#FFEB84"],
@@ -223,7 +223,7 @@
     },
     "midPoint": {
       "type": "string",
-      "description": "color-scale midpoint value (numeric or percentile). Alias: midpoint. Add-time only — Get does not surface this back today.",
+      "description": "color scale 中间 stop 的值（数字或百分位数）。别名：midpoint。仅 add 时生效，目前 Get 不会返回此值。",
       "aliases": ["midpoint"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop midPoint=50"],
@@ -232,7 +232,7 @@
     },
     "iconset": {
       "type": "string",
-      "description": "icon-set name (e.g. 3TrafficLights1, 3Arrows, 5Rating). Alias: icons.",
+      "description": "icon set 名称（如 3TrafficLights1、3Arrows、5Rating）。别名：icons。",
       "aliases": ["icons"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=iconSet --prop iconset=3TrafficLights1"],
@@ -241,7 +241,7 @@
     },
     "reverse": {
       "type": "bool",
-      "description": "reverse the icon-set ordering.",
+      "description": "反转 icon set 的顺序。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop reverse=true"],
       "readback": "true/false",
@@ -249,7 +249,7 @@
     },
     "formula": {
       "type": "string",
-      "description": "formulaCf expression (without leading '=').",
+      "description": "formulaCf 表达式（不含开头的 '='）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop type=formula --prop formula=ISERROR(A1)"],
       "readback": "formula expression",
@@ -258,14 +258,14 @@
     "type": {
       "type": "enum",
       "values": ["dataBar", "colorScale", "iconSet", "formula", "topN", "aboveAverage", "duplicateValues", "uniqueValues", "containsText", "cellIs", "timePeriod"],
-      "description": "Canonical Get-only CF rule type token (camelCase). One key per semantic value — previously split as ruleType + cfType.",
+      "description": "规范的只读 CF rule type token（camelCase）。每个语义值对应一个键，替代此前拆分的 ruleType + cfType。",
       "add": false, "set": false, "get": true,
       "readback": "canonical CF type token",
       "enforcement": "report"
     },
     "dxfId": {
       "type": "int",
-      "description": "Get-only readback of the differential format index referenced by this rule (links to the workbook-level dxfs table).",
+      "description": "此 rule 引用的 differential format 索引，只能由 Get 返回（关联 workbook 级 dxfs table）。",
       "add": false, "set": false, "get": true,
       "readback": "0-based dxf index",
       "enforcement": "report"

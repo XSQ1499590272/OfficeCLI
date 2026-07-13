@@ -5,7 +5,7 @@
   "properties": {
     "indent": {
       "type": "length",
-      "description": "left indentation. Routed through SpacingConverter — accepts twips int or unit-qualified (2cm/0.5in/24pt). Aliases: leftindent/leftIndent/indentleft.",
+      "description": "左缩进。经由 SpacingConverter 处理，接受 twips 整数或带单位的值（2cm/0.5in/24pt）。别名：leftindent/leftIndent/indentleft。",
       "aliases": [
         "leftindent",
         "leftIndent"
@@ -21,7 +21,7 @@
     },
     "lineSpacing": {
       "type": "string",
-      "description": "multiplier (e.g. 1.5x, 150%) or fixed length (e.g. 18pt)",
+      "description": "倍数（例如 1.5x、150%）或固定长度（例如 18pt）。",
       "aliases": [
         "linespacing"
       ],
@@ -37,7 +37,7 @@
     },
     "text": {
       "type": "string",
-      "description": "Sets plain text on the paragraph by creating an implicit single run. Do not also add a 'run' child with text on the same paragraph — they will duplicate.",
+      "description": "通过创建隐式的单个 run 设置段落纯文本。不要在同一段落中再添加带文本的 'run' 子元素，否则文本会重复。",
       "add": true,
       "set": true,
       "get": true,

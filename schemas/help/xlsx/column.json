@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/SheetName/col[X]"]
   },
-  "note": "X is a column letter (A,B,…) or 1-based index. Insert/move/clone at an occupied slot shifts every column at or past the slot right by one, and every range-bearing structure on the sheet (mergeCells, CF/DV sqref, autoFilter, hyperlink/table refs, named ranges, formula cell-refs) follows the displacement. 'add --from /SheetName/col[L]' with --before/--after clones cells + single-col mergeCells; relative formula refs are delta-shifted to the new anchor (Excel 'Insert Copied Cells' parity). Excel-style whole-column references (B:B; B:D spans on set) are accepted as input aliases for col[X]; readback paths stay canonical.",
+  "note": "X 可以是 column letter（A、B、…）或从 1 开始的 index。在已占用 slot 上 insert/move/clone 会将该 slot 及右侧所有 column 向右移动，sheet 上所有带 range 的结构（mergeCells、CF/DV sqref、autoFilter、hyperlink/table refs、named ranges、formula cell-refs）也会跟随位移。使用 add --from /SheetName/col[L] 配合 --before/--after 会复制 cells 和单列 mergeCells；相对 formula refs 会按新 anchor 做 delta shift，行为对齐 Excel Insert Copied Cells。Excel 风格的整列引用（B:B、B:D span）可作为 col[X] 的输入 alias，readback path 仍保持 canonical。",
   "properties": {
     "name": {
       "type": "string",
-      "description": "column letter to insert at (e.g. 'C'). If omitted, uses index position or appends.",
+      "description": "要插入的 column letter（如 'C'）。省略时使用 index position 或追加到末尾。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop name=C"],
       "readback": "n/a (used only for addressing)",
@@ -26,7 +26,7 @@
     },
     "width": {
       "type": "length",
-      "description": "column width in Excel character units (parsed by ParseColWidthChars). Accepts bare number or unit-qualified.",
+      "description": "column width，单位为 Excel character units（由 ParseColWidthChars 解析）。支持裸数字或带单位值。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop width=20"],
       "readback": "raw double (character units)",
@@ -34,7 +34,7 @@
     },
     "hidden": {
       "type": "bool",
-      "description": "hide column.",
+      "description": "隐藏 column。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop hidden=true"],
       "readback": "true when hidden, key absent otherwise",
@@ -42,7 +42,7 @@
     },
     "outline": {
       "type": "int",
-      "description": "outline/group level 0-7. Currently Set-only. Aliases: outlineLevel, group.",
+      "description": "outline/group level，范围 0–7。当前仅支持 Set。别名：outlineLevel、group。",
       "aliases": ["outlinelevel", "group"],
       "add": false, "set": true, "get": false,
       "examples": ["--prop outline=1"],
@@ -51,7 +51,7 @@
     },
     "collapsed": {
       "type": "bool",
-      "description": "collapse column group. Currently Set-only.",
+      "description": "折叠 column group。当前仅支持 Set。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop collapsed=true"],
       "readback": "not surfaced by Get",
@@ -59,7 +59,7 @@
     },
     "numberformat": {
       "type": "string",
-      "description": "Excel format code applied to the whole column via a style ref on col@s (number, date, percentage, currency, text @). Mirrors the cell-level numberformat; resolved back through the column's style index on Get.",
+      "description": "通过 col@s 上的 style ref 应用到整个 column 的 Excel format code（number、date、percentage、currency、text @）。与 cell 级 numberformat 一致；Get 会通过 column 的 style index 解析返回。",
       "aliases": ["numfmt", "format"],
       "add": false, "set": true, "get": true,
       "examples": ["--prop numberformat=\"#,##0.00\"", "--prop numberformat=0.00%", "--prop numberformat=yyyy-mm-dd"],
@@ -68,14 +68,14 @@
     },
     "customWidth": {
       "type": "bool",
-      "description": "Get-only readback. True when the column has an explicit width set (i.e. width is not the sheet default). Mirrors OOXML col@customWidth.",
+      "description": "仅 Get 读取。当 column 设置了显式宽度（即 width 不是 sheet 默认值）时为 true。对应 OOXML col@customWidth。",
       "add": false, "set": false, "get": true,
       "readback": "true when column has explicit width",
       "enforcement": "report"
     },
     "autofit": {
       "type": "bool",
-      "description": "auto-fit width to cell content. Set-only by design (meaningless at Add since new column has no data).",
+      "description": "根据 cell 内容自动调整宽度。设计上仅支持 Set（新 column 没有数据，Add 时没有意义）。",
       "add": false, "set": true, "get": false,
       "examples": ["--prop autofit=true"],
       "readback": "resolves to width at Set time",

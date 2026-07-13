@@ -13,11 +13,11 @@
   "paths": {
     "positional": ["/SheetName/rowbreak[N]", "/SheetName/colbreak[N]"]
   },
-  "note": "Dispatcher: routes to rowbreak or colbreak based on which of 'col'/'column' or 'row' is supplied. See xlsx/rowbreak.json and xlsx/colbreak.json for the resolved surfaces.",
+  "note": "Dispatcher 会根据提供的是 col/column 还是 row，将请求路由到 colbreak 或 rowbreak。具体 surface 参见 xlsx/rowbreak.json 和 xlsx/colbreak.json。",
   "properties": {
     "row": {
       "type": "int",
-      "description": "row index — routes to rowbreak. Add-time only — Set is not supported (re-add to relocate). Get does not surface this back today; use sheet.rowBreaks for the indexed list.",
+      "description": "row index，会路由到 rowbreak。仅支持 Add；不支持 Set（需要重新 Add 才能移动）。当前 Get 不会返回该值，请使用 sheet.rowBreaks 获取带 index 的列表。",
       "add": true, "set": false, "get": false,
       "examples": ["--prop row=20"],
       "readback": "n/a (see sheet.rowBreaks)",
@@ -25,7 +25,7 @@
     },
     "col": {
       "type": "string",
-      "description": "column index/letter — routes to colbreak. Alias: column. Add-time only — Set is not supported (re-add to relocate). Get does not surface this back today; use sheet.colBreaks for the indexed list.",
+      "description": "column index/letter，会路由到 colbreak。Alias: column。仅支持 Add；不支持 Set（需要重新 Add 才能移动）。当前 Get 不会返回该值，请使用 sheet.colBreaks 获取带 index 的列表。",
       "aliases": ["column"],
       "add": true, "set": false, "get": false,
       "examples": ["--prop col=F"],

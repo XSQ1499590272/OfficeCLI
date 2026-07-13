@@ -9,7 +9,7 @@
     "get": true,
     "remove": false
   },
-  "note": "Axes are created/destroyed implicitly by chartType changes — no direct Add/Remove; Set/Get only operates on existing axes. At chart-creation time, configure axes via the chart's axis* props (axismin/axismax/axistitle/axisfont/…); chart-axis covers post-creation only. Known gaps: `labelFont` writes the title run (not tick labels); `lineWidth`/`lineDash` Set on an axis path applies to all plot-area series — use chart-series for series-specific line styling.",
+  "note": "axis 会随 chartType 变化隐式创建或销毁，不提供直接 Add/Remove；Set/Get 只能作用于已有 axis。创建 chart 时通过 chart 的 axis* props（axismin、axismax、axistitle、axisfont/…）配置；chart-axis 仅覆盖创建后的操作。已知限制：labelFont 写入 title run，而不是 tick labels；在 axis path 上 Set lineWidth/lineDash 会作用于所有 plot-area series；要设置单个 series 的线型，请使用 chart-series。",
   "addressing": {
     "key": "role",
     "pathForm": "/slide[N]/chart[N]/axis[@role=ROLE]",

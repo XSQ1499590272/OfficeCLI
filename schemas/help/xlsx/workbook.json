@@ -15,7 +15,7 @@
       "/"
     ]
   },
-  "note": "Root container. Get returns sheet list and workbook-level metadata. Set exists for workbook-wide properties (defaultFont, defaultFontSize, calc.mode, calc.iterate, author, title, subject). Sheets are mutated via /SheetName paths.",
+  "note": "Root container。Get 返回 sheet list 和 workbook-level metadata。Set 支持 workbook-wide properties（defaultFont、defaultFontSize、calc.mode、calc.iterate、author、title、subject）。Sheet 通过 /SheetName path 修改。",
   "children": [
     {
       "element": "sheet",
@@ -27,7 +27,7 @@
   "properties": {
     "defaultFont": {
       "type": "string",
-      "description": "default font for all cells (fontname alias). Not implemented in ExcelHandler — Add/Set/Get all return n/a today; manage cell fonts directly.",
+      "description": "所有 cell 的默认字体（fontname 别名）。ExcelHandler 尚未实现；当前 Add/Set/Get 均返回 n/a，请直接管理 cell 字体。",
       "aliases": [
         "fontName",
         "fontname"
@@ -43,7 +43,7 @@
     },
     "defaultFontSize": {
       "type": "length",
-      "description": "default font size. Not implemented in ExcelHandler — Add/Set/Get all return n/a today; manage cell fonts directly.",
+      "description": "默认字体大小。ExcelHandler 尚未实现；当前 Add/Set/Get 均返回 n/a，请直接管理 cell 字体。",
       "aliases": [
         "fontSize",
         "fontsize"
@@ -59,7 +59,7 @@
     },
     "author": {
       "type": "string",
-      "description": "document author (core properties).",
+      "description": "document 作者（core properties）。",
       "aliases": [
         "creator"
       ],
@@ -90,7 +90,7 @@
         "manual",
         "autoExceptTables"
       ],
-      "description": "workbook formula calculation mode. 'auto' recalculates on every change, 'manual' requires F9, 'autoExceptTables' skips data tables.",
+      "description": "workbook formula 计算模式。'auto' 在每次变更时重新计算，'manual' 需要按 F9，'autoExceptTables' 跳过 data table。",
       "aliases": [
         "calcmode"
       ],
@@ -106,7 +106,7 @@
     },
     "calc.iterate": {
       "type": "bool",
-      "description": "enable iterative calculation for circular references.",
+      "description": "为 circular reference 启用迭代计算。",
       "aliases": [
         "iterate"
       ],
@@ -122,7 +122,7 @@
     },
     "calc.iterateCount": {
       "type": "number",
-      "description": "maximum number of iterations when calc.iterate is enabled.",
+      "description": "启用 calc.iterate 时的最大迭代次数。",
       "add": false,
       "set": true,
       "get": true,
@@ -134,7 +134,7 @@
     },
     "calc.iterateDelta": {
       "type": "number",
-      "description": "maximum change between iterations to consider the calculation converged.",
+      "description": "视为计算收敛时，迭代之间允许的最大变化量。",
       "add": false,
       "set": true,
       "get": true,
@@ -146,7 +146,7 @@
     },
     "calc.fullPrecision": {
       "type": "bool",
-      "description": "if true, calculations use full precision rather than the displayed value.",
+      "description": "为 true 时，计算使用完整精度而非显示值。",
       "add": false,
       "set": true,
       "get": true,
@@ -164,7 +164,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "from docProps/core.xml lastModifiedBy field.",
+      "description": "来自 docProps/core.xml 的 lastModifiedBy 字段。",
       "examples": [
         "--prop lastModifiedBy=\"Alice\""
       ],
@@ -176,7 +176,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "creation timestamp ISO-8601.",
+      "description": "创建时间戳，格式为 ISO-8601。",
       "readback": "ISO-8601 timestamp",
       "enforcement": "report"
     },
@@ -185,7 +185,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "last modification timestamp ISO-8601.",
+      "description": "最后修改时间戳，格式为 ISO-8601。",
       "readback": "ISO-8601 timestamp",
       "enforcement": "report"
     },
@@ -194,7 +194,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "from docProps/app.xml application identifier (e.g. \"Microsoft Excel\").",
+      "description": "来自 docProps/app.xml 的 application 标识符（例如 \"Microsoft Excel\"）。",
       "readback": "application string",
       "enforcement": "report"
     },
@@ -203,7 +203,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/core.xml Category field.",
+      "description": "docProps/core.xml 中的 Category 字段。",
       "examples": [
         "--prop category=Reports"
       ],
@@ -215,7 +215,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/core.xml Description field.",
+      "description": "docProps/core.xml 中的 Description 字段。",
       "examples": [
         "--prop description=\"Annual revenue summary\""
       ],
@@ -227,7 +227,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/core.xml Keywords field.",
+      "description": "docProps/core.xml 中的 Keywords 字段。",
       "examples": [
         "--prop keywords=\"finance,2026\""
       ],
@@ -239,7 +239,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "docProps/core.xml Revision field — workbook save counter.",
+      "description": "docProps/core.xml 中的 Revision 字段，即 workbook 保存计数器。",
       "examples": [
         "--prop revisionNumber=3"
       ],
@@ -251,7 +251,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "workbook BookViews activeTab — index of the sheet active when the file opens.",
+      "description": "workbook BookViews 的 activeTab，即文件打开时活动 sheet 的索引。",
       "readback": "integer (0-based)",
       "enforcement": "report"
     },
@@ -260,7 +260,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "workbook BookViews firstSheet — index of the leftmost visible sheet.",
+      "description": "workbook BookViews 的 firstSheet，即最左侧可见 sheet 的索引。",
       "readback": "integer (0-based)",
       "enforcement": "report"
     },
@@ -269,7 +269,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "CalculationProperties FullCalculationOnLoad flag — force a full recalc when the workbook opens.",
+      "description": "CalculationProperties 的 FullCalculationOnLoad 标记：workbook 打开时强制完整重新计算。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -278,7 +278,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "CalculationProperties ReferenceMode (A1 or R1C1).",
+      "description": "CalculationProperties 的 ReferenceMode（A1 或 R1C1）。",
       "readback": "reference mode string",
       "enforcement": "report"
     },
@@ -287,7 +287,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "WorkbookProperties BackupFile flag — Excel keeps a backup .bak alongside saves.",
+      "description": "WorkbookProperties 的 BackupFile 标记：Excel 会在保存时同时保留 .bak 备份。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -296,7 +296,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "WorkbookProperties CodeName — VBA project workbook codename (e.g. ThisWorkbook).",
+      "description": "WorkbookProperties 的 CodeName，即 VBA project 的 workbook codename（例如 ThisWorkbook）。",
       "readback": "codename string",
       "enforcement": "report"
     },
@@ -305,7 +305,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "WorkbookProperties Date1904 flag — true means dates use the 1904 epoch (Mac legacy).",
+      "description": "WorkbookProperties 的 Date1904 标记：为 true 时日期使用 1904 epoch（旧版 Mac 兼容）。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -315,7 +315,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProperties DateCompatibility flag — controls 1900 vs 1904 date system compatibility.",
+      "description": "WorkbookProperties 的 DateCompatibility 标记：控制 1900 与 1904 日期系统兼容性。",
       "examples": [
         "--prop workbook.dateCompatibility=true"
       ],
@@ -328,7 +328,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProperties FilterPrivacy flag — when true, Excel hides personal info from filter saves.",
+      "description": "WorkbookProperties 的 FilterPrivacy 标记：为 true 时，Excel 在 filter 保存中隐藏个人信息。",
       "examples": [
         "--prop workbook.filterPrivacy=true"
       ],
@@ -342,7 +342,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProperties ShowObjects — visibility of embedded objects (charts, pictures, shapes) in the workbook view.",
+      "description": "WorkbookProperties 的 ShowObjects：workbook view 中嵌入 object（chart、picture、shape）的可见性。",
       "examples": [
         "--prop workbook.showObjects=all",
         "--prop workbook.showObjects=none"
@@ -356,7 +356,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProtection LockStructure flag — when true, sheets cannot be added/deleted/renamed/reordered.",
+      "description": "WorkbookProtection 的 LockStructure 标记：为 true 时，不能 add/delete/rename/reorder sheet。",
       "examples": [
         "--prop workbook.lockStructure=true"
       ],
@@ -369,7 +369,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProtection LockWindows flag — when true, workbook window size and position are locked.",
+      "description": "WorkbookProtection 的 LockWindows 标记：为 true 时，workbook window 的大小和位置被锁定。",
       "examples": [
         "--prop workbook.lockWindows=true"
       ],
@@ -382,7 +382,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProtection legacy password (ECMA-376 short hash). Set the plaintext to apply; pass empty or 'none' to clear. Get returns '***' when present (the plaintext is not recoverable from the stored hash). Known weak — back-compat only.",
+      "description": "WorkbookProtection 的 legacy password（ECMA-376 short hash）。Set 时传入 plaintext；传入空值或 'none' 可清除。存在时 Get 返回 '***'（无法从保存的 hash 恢复 plaintext）。安全性较弱，仅用于 back-compat。",
       "examples": [
         "--prop workbook.password=secret",
         "--prop workbook.password=none"

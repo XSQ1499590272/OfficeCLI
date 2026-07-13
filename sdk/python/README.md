@@ -13,30 +13,11 @@ the exact same effect. One uniform verb instead of dozens of per-element named
 methods: same power, nothing extra to memorize, and new officecli features work
 the day they ship without an SDK update.
 
-## The officecli CLI (auto-installed if missing)
+## The officecli CLI
 
-`pip install officecli-sdk` installs **only this SDK** (the Python library); the
-real work is done by the `officecli` binary. You don't have to install it
-yourself — if `officecli` isn't found on your `PATH` (or in the default install
-location), the SDK **provisions it on first use**: it runs officecli's official
-installer (`install.sh` on macOS/Linux, `install.ps1` on Windows), fetching from
-the `d.officecli.ai` mirror with GitHub as a fallback. A one-line notice is
-printed before it installs — it never does so silently. Pass `auto_install=False`
-to `open()`/`create()` to disable this and require a pre-installed CLI instead.
-
-To install the CLI ahead of time (or to control where it lands):
-
-```bash
-python -m officecli install      # runs officecli's official installer
-# …or directly:
-curl -fsSL https://d.officecli.ai/install.sh | bash
-# Windows (PowerShell):
-irm https://d.officecli.ai/install.ps1 | iex
-```
-
-`officecli.install()` does the same from Python. If the CLI can't be found or
-installed, the SDK raises a clear error pointing here (never a cryptic
-`FileNotFoundError`).
+`pip install officecli-sdk` installs only this SDK. The `officecli` binary must
+already be on `PATH`, or be supplied through the `binary` argument to
+`open()`/`create()`. If it cannot be found, the SDK raises a clear error.
 
 ## Install
 

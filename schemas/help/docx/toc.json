@@ -14,11 +14,11 @@
   "paths": {
     "positional": ["/toc", "/tableofcontents"]
   },
-  "note": "Aliases: tableofcontents. Inserts a TOC field (complex fldChar). Word rebuilds the rendered entries on open unless 'pre-render' is used.",
+  "note": "Aliases：tableofcontents。插入 TOC field（complex fldChar）。除非使用 'pre-render'，否则 Word 打开文档时会重新构建渲染后的条目。",
   "properties": {
     "levels": {
       "type": "string",
-      "description": "heading range (e.g. '1-3').",
+      "description": "heading 层级范围（例如 '1-3'）。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop levels=1-3"],
       "readback": "levels string",
@@ -26,7 +26,7 @@
     },
     "title": {
       "type": "string",
-      "description": "optional caption above the TOC.",
+      "description": "TOC 上方可选的 caption。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop title=\"Contents\""],
       "readback": "caption text",
@@ -34,7 +34,7 @@
     },
     "hyperlinks": {
       "type": "bool",
-      "description": "generate clickable links.",
+      "description": "生成可点击的 links。",
       "add": true, "set": true, "get": true,
       "examples": ["--prop hyperlinks=true"],
       "readback": "true/false",
@@ -42,7 +42,7 @@
     },
     "pageNumbers": {
       "type": "bool",
-      "description": "include page numbers in TOC entries (Add/Set use lowercase alias 'pagenumbers').",
+      "description": "在 TOC 条目中包含页码（Add/Set 使用小写 alias 'pagenumbers'）。",
       "aliases": ["pagenumbers"],
       "add": true, "set": true, "get": true,
       "examples": ["--prop pageNumbers=false"],

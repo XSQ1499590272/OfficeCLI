@@ -20,7 +20,7 @@
       "/body/p[N]/r[N]"
     ]
   },
-  "note": "effective.* keys (effective.size, effective.bold, effective.color, ...) are read-only inheritance-resolved values: the run does not set the property directly, but resolves it by walking the run/paragraph style chain up to docDefaults. Each carries a paired effective.X.src pointer (e.g. \"/styles/Heading1\" or \"/docDefaults\") so callers can locate the writing layer. effective.* never appears when the run has the corresponding direct value — direct always wins. Run-level formatting can also be applied by character offset without addressing individual runs: `set <paragraph-or-body-path> --prop range=START:END --prop bold=true` (0-based, half-open; several disjoint spans as `range=0:5,12:15`) splits the run(s) covering each span and applies the format props to just that slice — the offset-based sibling of `find` (which locates the span by text). Offsets are relative to the concatenated run text of the path scope: a /body/p[N] path is that paragraph, /body spans every paragraph. Mind the two bases: the path `[N]` positions are 1-based (XPath-style, `/p[2]` = 2nd paragraph); range START:END are 0-based half-open (`range=0:1` = first character). `find` and `range` are mutually exclusive on one call; `range` is run-level formatting only (no text=/replace/revision — use find or an explicit run path for those).",
+  "note": "effective.*（如 effective.size、effective.bold、effective.color）是只读的继承解析值，run 会沿 run/paragraph style chain 解析到 docDefaults；每个值带 effective.X.src 指向实际写入层。设置 direct value 后不会返回对应 effective.*。也可以不定位单个 run，使用 set <paragraph-or-body-path> --prop range=START:END --prop bold=true 按字符偏移格式化（0-based、半开区间；支持多个不连续 span），handler 会拆分覆盖该范围的 run 并只格式化对应片段。path 的 [N] 是 1-based，range 是 0-based；find 与 range 不能同时使用，range 仅用于 run-level formatting。",
   "extends": [
     "_shared/run",
     "_shared/run.docx-pptx",
@@ -29,7 +29,7 @@
   "properties": {
     "highlight": {
       "type": "color",
-      "description": "Word built-in highlight color. Accepts named colors (yellow, green, cyan, magenta, blue, red, ...).",
+      "description": "Word 内置突出显示颜色。接受命名颜色（yellow、green、cyan、magenta、blue、red 等）。",
       "add": true,
       "set": true,
       "get": true,
@@ -41,7 +41,7 @@
     },
     "strike": {
       "type": "bool",
-      "description": "single strikethrough.",
+      "description": "单删除线。",
       "aliases": [
         "strikethrough",
         "font.strike",
@@ -58,7 +58,7 @@
     },
     "dstrike": {
       "type": "bool",
-      "description": "double strikethrough.",
+      "description": "双删除线。",
       "aliases": [
         "doublestrike",
         "doubleStrike"
@@ -74,7 +74,7 @@
     },
     "caps": {
       "type": "bool",
-      "description": "render text in all caps (display only; underlying text unchanged).",
+      "description": "以全大写呈现文本（仅显示效果；底层文本不变）。",
       "aliases": [
         "allCaps"
       ],
@@ -89,7 +89,7 @@
     },
     "smallcaps": {
       "type": "bool",
-      "description": "render lowercase as small caps.",
+      "description": "将小写字母呈现为小型大写字母。",
       "aliases": [
         "smallCaps"
       ],
@@ -104,7 +104,7 @@
     },
     "vanish": {
       "type": "bool",
-      "description": "hidden text (not rendered, but present in the file).",
+      "description": "隐藏文本（不呈现，但仍保留在文件中）。",
       "add": true,
       "set": true,
       "get": true,
@@ -116,7 +116,7 @@
     },
     "outline": {
       "type": "bool",
-      "description": "outline (text effect).",
+      "description": "轮廓（文本效果）。",
       "add": true,
       "set": true,
       "get": true,
@@ -128,7 +128,7 @@
     },
     "shadow": {
       "type": "bool",
-      "description": "shadow (text effect).",
+      "description": "阴影（文本效果）。",
       "add": true,
       "set": true,
       "get": true,
@@ -140,7 +140,7 @@
     },
     "emboss": {
       "type": "bool",
-      "description": "emboss (text effect).",
+      "description": "浮雕（文本效果）。",
       "add": true,
       "set": true,
       "get": true,
@@ -152,7 +152,7 @@
     },
     "imprint": {
       "type": "bool",
-      "description": "imprint / engrave (text effect).",
+      "description": "凹印 / 雕刻（文本效果）。",
       "add": true,
       "set": true,
       "get": true,
@@ -164,7 +164,7 @@
     },
     "noproof": {
       "type": "bool",
-      "description": "exclude this run from spell/grammar checking.",
+      "description": "将此 run 排除在拼写/语法检查之外。",
       "aliases": [
         "noProof"
       ],
@@ -179,7 +179,7 @@
     },
     "rtl": {
       "type": "bool",
-      "description": "right-to-left text (legacy alias of 'direction'). Get surfaces this as direction=rtl|ltr.",
+      "description": "从右到左文本（'direction' 的 legacy 别名）。Get 将其以 direction=rtl|ltr 返回。",
       "add": true,
       "set": true,
       "get": false,
@@ -194,7 +194,7 @@
         "ltr",
         "rtl"
       ],
-      "description": "run reading direction. Use 'rtl' for Arabic / Hebrew, 'ltr' to clear. Canonical key for run direction; matches paragraph/section vocabulary.",
+      "description": "run 阅读方向。Arabic / Hebrew 请使用 'rtl'，传入 'ltr' 清除。run direction 的标准 key，与 paragraph/section 的词汇一致。",
       "aliases": [
         "dir"
       ],
@@ -209,7 +209,7 @@
     },
     "font.cs": {
       "type": "string",
-      "description": "Complex-script font slot (rFonts/cs) — Arabic / Hebrew / Thai typefaces.",
+      "description": "complex-script 字体槽位（rFonts/cs）——Arabic / Hebrew / Thai 字体。",
       "aliases": [
         "font.complexscript",
         "font.complex"
@@ -224,7 +224,7 @@
     },
     "font.ea": {
       "type": "string",
-      "description": "East-Asian font slot (rFonts/eastAsia) — Chinese / Japanese / Korean typefaces.",
+      "description": "East-Asian 字体槽位（rFonts/eastAsia）——Chinese / Japanese / Korean 字体。",
       "aliases": [
         "font.eastasia",
         "font.eastasian"
@@ -239,7 +239,7 @@
     },
     "font.latin": {
       "type": "string",
-      "description": "Latin font slots (rFonts/ascii + hAnsi) — ASCII / Western text.",
+      "description": "Latin 字体槽位（rFonts/ascii + hAnsi）——ASCII / Western 文本。",
       "add": true,
       "set": true,
       "get": true,
@@ -250,7 +250,7 @@
     },
     "font.hint": {
       "type": "string",
-      "description": "Font slot hint (rFonts/hint) — tells Word which slot (eastAsia / cs / default) to use for ambiguous characters (CJK digits, punctuation) so they render with the intended font. Values: eastAsia, cs, default.",
+      "description": "字体槽位 hint（rFonts/hint）——告诉 Word 对歧义字符（CJK 数字、标点）使用哪个槽位（eastAsia / cs / default），从而使用预期字体呈现。可选值：eastAsia、cs、default。",
       "add": true,
       "set": true,
       "get": true,
@@ -261,7 +261,7 @@
     },
     "font.asciiTheme": {
       "type": "string",
-      "description": "Theme font binding for the ascii slot (rFonts/asciiTheme). Values: minorHAnsi, majorHAnsi, minorEastAsia, majorEastAsia, minorBidi, majorBidi.",
+      "description": "ascii 槽位的 Theme font binding（rFonts/asciiTheme）。可选值：minorHAnsi、majorHAnsi、minorEastAsia、majorEastAsia、minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -272,7 +272,7 @@
     },
     "font.hAnsiTheme": {
       "type": "string",
-      "description": "Theme font binding for the hAnsi slot (rFonts/hAnsiTheme).",
+      "description": "hAnsi 槽位的 Theme font binding（rFonts/hAnsiTheme）。",
       "add": true,
       "set": true,
       "get": true,
@@ -283,7 +283,7 @@
     },
     "font.eaTheme": {
       "type": "string",
-      "description": "Theme font binding for the East-Asia slot (rFonts/eastAsiaTheme). Values: minorEastAsia, majorEastAsia.",
+      "description": "East-Asia 槽位的 Theme font binding（rFonts/eastAsiaTheme）。可选值：minorEastAsia、majorEastAsia。",
       "aliases": [
         "font.eastAsiaTheme"
       ],
@@ -297,7 +297,7 @@
     },
     "font.csTheme": {
       "type": "string",
-      "description": "Theme font binding for the complex-script slot (rFonts/cstheme). Values: minorBidi, majorBidi.",
+      "description": "complex-script 槽位的 Theme font binding（rFonts/cstheme）。可选值：minorBidi、majorBidi。",
       "add": true,
       "set": true,
       "get": true,
@@ -308,7 +308,7 @@
     },
     "bold.cs": {
       "type": "bool",
-      "description": "complex-script bold (<w:bCs/>). Word renders Arabic / Hebrew bold via this flag, NOT <w:b/>. Required for Arabic bold to actually render.",
+      "description": "complex-script 粗体（<w:bCs/>）。Word 通过此标记而非 <w:b/> 呈现 Arabic / Hebrew 粗体；Arabic 粗体要实际呈现必须设置此项。",
       "aliases": [
         "font.bold.cs",
         "boldcs"
@@ -324,7 +324,7 @@
     },
     "italic.cs": {
       "type": "bool",
-      "description": "complex-script italic (<w:iCs/>). Same role as bold.cs for italic styling on Arabic / Hebrew text.",
+      "description": "complex-script 斜体（<w:iCs/>）。对 Arabic / Hebrew 文本的斜体样式，其作用与 bold.cs 对粗体的作用相同。",
       "aliases": [
         "font.italic.cs",
         "italiccs"
@@ -340,7 +340,7 @@
     },
     "size.cs": {
       "type": "font-size",
-      "description": "complex-script font size (<w:szCs/>). Independent from the bare 'size' (<w:sz/>) which only sizes Latin text.",
+      "description": "complex-script 字体大小（<w:szCs/>）。独立于不带子字段的 'size'（<w:sz/>），后者仅设置 Latin 文本大小。",
       "aliases": [
         "font.size.cs",
         "sizecs"
@@ -357,7 +357,7 @@
     },
     "lang.latin": {
       "type": "string",
-      "description": "Latin-script language tag (<w:lang w:val=.../>). e.g. en-US, fr-FR.",
+      "description": "Latin-script language tag（<w:lang w:val=.../>），例如 en-US、fr-FR。",
       "aliases": [
         "lang",
         "lang.val"
@@ -373,7 +373,7 @@
     },
     "lang.ea": {
       "type": "string",
-      "description": "EastAsian-script language tag (<w:lang w:eastAsia=.../>). e.g. zh-CN, ja-JP.",
+      "description": "EastAsian-script language tag（<w:lang w:eastAsia=.../>），例如 zh-CN、ja-JP。",
       "aliases": [
         "lang.eastAsia",
         "lang.eastAsian"
@@ -389,7 +389,7 @@
     },
     "lang.cs": {
       "type": "string",
-      "description": "ComplexScript language tag (<w:lang w:bidi=.../>). e.g. ar-SA, he-IL.",
+      "description": "ComplexScript language tag（<w:lang w:bidi=.../>），例如 ar-SA、he-IL。",
       "aliases": [
         "lang.complexScript",
         "lang.bidi"
@@ -405,7 +405,7 @@
     },
     "vertAlign": {
       "type": "enum",
-      "description": "vertical text alignment. Values: superscript|super, subscript|sub, baseline.",
+      "description": "垂直文本对齐。可选值：superscript|super、subscript|sub、baseline。",
       "aliases": [
         "vertalign"
       ],
@@ -427,7 +427,7 @@
     },
     "kern": {
       "type": "int",
-      "description": "kerning activation threshold (<w:kern w:val=.../>): font sizes at or above this point size get automatic pair kerning. Value is an integer in half-points (28 = 14pt threshold); a 'pt' suffix is NOT accepted (unlike pptx kern). Valid range 0-3277 half-points (~164pt); an empty value clears it.",
+      "description": "kerning 启用阈值（<w:kern w:val=.../>）：达到或超过此 point size 的字体会自动应用字偶距调整。值为 half-points 整数（28 = 14pt 阈值）；不接受 'pt' 后缀（不同于 pptx kern）。有效范围为 0–3277 half-points（约 164pt）；空值可清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -439,7 +439,7 @@
     },
     "position": {
       "type": "length",
-      "description": "vertical baseline shift (<w:position w:val=.../>): positive raises text above the baseline, negative lowers it, 0 = baseline. Keeps the full glyph size (distinct from vertAlign=super|sub, which also shrinks the glyph). Accepts a 'pt' value (e.g. 6pt) or a bare integer in half-points; an empty value clears it.",
+      "description": "垂直 baseline 位移（<w:position w:val=.../>）：正值将文本抬高到 baseline 之上，负值降低，0 = baseline。会保持完整 glyph 大小（不同于 vertAlign=super|sub，后者也会缩小 glyph）。接受 'pt' 值（例如 6pt）或 half-points 的整数；空值可清除。",
       "add": true,
       "set": true,
       "get": true,
@@ -452,7 +452,7 @@
     },
     "charSpacing": {
       "type": "length",
-      "description": "character spacing (letter spacing) in points. Stored as twips × 20.",
+      "description": "字符间距（letter spacing），单位为 points。以 twips × 20 存储。",
       "aliases": [
         "charspacing",
         "letterspacing",
@@ -471,7 +471,7 @@
     },
     "fill": {
       "type": "color",
-      "description": "run background shading (w:shd @fill). A solid background reads back as this canonical key (matching table cells and paragraphs). Accepts a solid color — hex ('FF0000'), '#'-prefixed hex ('#FF0000'), named color ('red'), or rgb(...) notation. For a true pattern shading (pct*/stripe/cross) or a foreground pattern color, pass the legacy `shading`/`shd` triplet form 'PATTERN;FILL[;COLOR]' instead; those read back via the shading.* detail keys. Distinct from `highlight` (w:highlight marker) and the w14 text shadow.",
+      "description": "run 背景 shading（w:shd @fill）。纯色背景会以此标准 key 读取（与 table cell 和 paragraph 一致）。接受纯色：hex（'FF0000'）、带 '#' 的 hex（'#FF0000'）、命名颜色（'red'）或 rgb(...)。若需真实的 pattern shading（pct*/stripe/cross）或前景 pattern color，请传入旧版 `shading`/`shd` 三段形式 'PATTERN;FILL[;COLOR]'；读取结果会通过 shading.* detail key 返回。它不同于 `highlight`（w:highlight marker）和 w14 text shadow。",
       "aliases": [
         "shading",
         "shd"
@@ -489,7 +489,7 @@
     },
     "shading": {
       "type": "color",
-      "description": "background shading color or '<pattern>;<fill>;<color>' triplet. Set-side alias for `fill`; a solid background reads back via the canonical `fill` key.",
+      "description": "背景 shading 颜色或 '<pattern>;<fill>;<color>' 三元组。Set 侧是 `fill` 的别名；纯色背景通过标准 `fill` key 返回。",
       "aliases": [
         "shd"
       ],
@@ -504,7 +504,7 @@
     },
     "shading.val": {
       "type": "string",
-      "description": "shading pattern value. Emitted on get only for a true pattern shading (pct*/stripe/cross); a solid background reads back as the canonical `fill` key. Add/Set use `fill`/`shading`/`shd`.",
+      "description": "shading pattern 值。仅真实 pattern shading（pct*/stripe/cross）在 get 时输出；纯色背景以标准 `fill` key 返回。Add/Set 使用 `fill`/`shading`/`shd`。",
       "add": false,
       "set": false,
       "get": true,
@@ -513,7 +513,7 @@
     },
     "shading.fill": {
       "type": "string",
-      "description": "shading fill color hex. Emitted on get only for a true pattern shading; a solid background reads back as the canonical `fill` key.",
+      "description": "shading fill color hex。仅真实 pattern shading 在 get 时输出；纯色背景以标准 `fill` key 返回。",
       "add": false,
       "set": false,
       "get": true,
@@ -522,7 +522,7 @@
     },
     "shading.color": {
       "type": "string",
-      "description": "shading foreground (pattern) color hex. Pattern shading only.",
+      "description": "shading 前景（pattern）颜色 hex。仅 pattern shading 支持。",
       "add": false,
       "set": false,
       "get": true,
@@ -531,7 +531,7 @@
     },
     "textOutline": {
       "type": "string",
-      "description": "w14 text outline 'WIDTHpt-COLOR' (e.g. '1pt-FF0000'). Width first, color second; '-' or ';' separator.",
+      "description": "w14 text outline：'WIDTHpt-COLOR'（例如 '1pt-FF0000'）。先 width 后 color；使用 '-' 或 ';' 分隔。",
       "aliases": [
         "textoutline"
       ],
@@ -546,7 +546,7 @@
     },
     "textFill": {
       "type": "string",
-      "description": "w14 text fill (color or gradient spec).",
+      "description": "w14 text fill（颜色或 gradient spec）。",
       "aliases": [
         "textfill"
       ],
@@ -561,7 +561,7 @@
     },
     "w14shadow": {
       "type": "string",
-      "description": "w14 text shadow effect.",
+      "description": "w14 text shadow 效果。",
       "add": true,
       "set": true,
       "get": true,
@@ -573,7 +573,7 @@
     },
     "w14glow": {
       "type": "string",
-      "description": "w14 text glow effect.",
+      "description": "w14 text glow 效果。",
       "add": true,
       "set": true,
       "get": true,
@@ -585,7 +585,7 @@
     },
     "w14reflection": {
       "type": "string",
-      "description": "w14 text reflection effect.",
+      "description": "w14 text reflection 效果。",
       "add": true,
       "set": true,
       "get": true,
@@ -597,7 +597,7 @@
     },
     "effective.size.src": {
       "type": "string",
-      "description": "source pointer for effective.size — path of the writing layer (e.g. \"/styles/Heading1\", \"/docDefaults\"). Documented but not emitted today; only the resolved `effective.size` value surfaces on Get.",
+      "description": "effective.size 的来源指针，即写入层的路径（例如 \"/styles/Heading1\"、\"/docDefaults\"）。已有文档说明但当前不输出；Get 仅返回解析后的 `effective.size` 值。",
       "add": false,
       "set": false,
       "get": false,
@@ -606,7 +606,7 @@
     },
     "effective.font.ascii": {
       "type": "string",
-      "description": "inheritance-resolved Latin/ASCII font slot (read-only).",
+      "description": "按继承关系解析的 Latin/ASCII 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -615,7 +615,7 @@
     },
     "effective.font.ascii.src": {
       "type": "string",
-      "description": "source pointer for effective.font.ascii. Documented but not emitted today.",
+      "description": "effective.font.ascii 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -624,7 +624,7 @@
     },
     "effective.font.eastAsia": {
       "type": "string",
-      "description": "inheritance-resolved East-Asian font slot (read-only).",
+      "description": "按继承关系解析的 East-Asian 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -633,7 +633,7 @@
     },
     "effective.font.eastAsia.src": {
       "type": "string",
-      "description": "source pointer for effective.font.eastAsia. Documented but not emitted today.",
+      "description": "effective.font.eastAsia 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -642,7 +642,7 @@
     },
     "effective.font.hAnsi": {
       "type": "string",
-      "description": "inheritance-resolved High-ANSI font slot (read-only).",
+      "description": "按继承关系解析的 High-ANSI 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -651,7 +651,7 @@
     },
     "effective.font.hAnsi.src": {
       "type": "string",
-      "description": "source pointer for effective.font.hAnsi. Documented but not emitted today.",
+      "description": "effective.font.hAnsi 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -660,7 +660,7 @@
     },
     "effective.font.cs": {
       "type": "string",
-      "description": "inheritance-resolved complex-script font slot (read-only).",
+      "description": "按继承关系解析的 complex-script 字体槽位（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -669,7 +669,7 @@
     },
     "effective.font.cs.src": {
       "type": "string",
-      "description": "source pointer for effective.font.cs. Documented but not emitted today.",
+      "description": "effective.font.cs 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -678,7 +678,7 @@
     },
     "effective.bold.src": {
       "type": "string",
-      "description": "source pointer for effective.bold. Documented but not emitted today.",
+      "description": "effective.bold 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -687,7 +687,7 @@
     },
     "effective.italic": {
       "type": "bool",
-      "description": "inheritance-resolved italic (read-only). Surfaced only when the run does not set 'italic' directly.",
+      "description": "按继承关系解析的斜体（只读）。仅当 run 未直接设置 'italic' 时输出。",
       "add": false,
       "set": false,
       "get": true,
@@ -696,7 +696,7 @@
     },
     "effective.italic.src": {
       "type": "string",
-      "description": "source pointer for effective.italic. Documented but not emitted today.",
+      "description": "effective.italic 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -705,7 +705,7 @@
     },
     "effective.color.src": {
       "type": "string",
-      "description": "source pointer for effective.color. Documented but not emitted today.",
+      "description": "effective.color 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -714,7 +714,7 @@
     },
     "effective.underline": {
       "type": "string",
-      "description": "inheritance-resolved underline style (read-only).",
+      "description": "按继承关系解析的下划线样式（只读）。",
       "add": false,
       "set": false,
       "get": true,
@@ -723,7 +723,7 @@
     },
     "effective.underline.src": {
       "type": "string",
-      "description": "source pointer for effective.underline. Documented but not emitted today.",
+      "description": "effective.underline 的来源指针。已有文档说明但当前不输出。",
       "add": false,
       "set": false,
       "get": false,
@@ -732,7 +732,7 @@
     },
     "effective.rtl": {
       "type": "bool",
-      "description": "inheritance-resolved right-to-left flag (read-only). Emitted even when 'rtl' is set directly so callers can compare direct vs cascade-resolved state.",
+      "description": "按继承关系解析的从右到左标记（只读）。即使直接设置 'rtl' 也会输出，以便调用方比较直接设置与 cascade 解析后的状态。",
       "add": false,
       "set": false,
       "get": true,
@@ -741,7 +741,7 @@
     },
     "effective.rtl.src": {
       "type": "string",
-      "description": "source pointer for effective.rtl.",
+      "description": "effective.rtl 的来源指针。",
       "add": false,
       "set": false,
       "get": true,
@@ -753,7 +753,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "true when the run is flagged as dirty (rPr/dirty=1) — Word treats it as needing reflow on next open.",
+      "description": "当 run 被标记为 dirty（rPr/dirty=1）时为 true——Word 在下次打开时会将其视为需要 reflow。",
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -762,7 +762,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "individual rFonts @ascii slot readback. On Add/Set use the unified `font.latin` key (which writes both ascii + hAnsi).",
+      "description": "单独 rFonts @ascii 槽位的读取结果。Add/Set 请使用统一的 `font.latin` key（会同时写入 ascii + hAnsi）。",
       "readback": "font family name",
       "enforcement": "report"
     },
@@ -771,7 +771,7 @@
       "add": false,
       "set": false,
       "get": false,
-      "description": "legacy alias for the rFonts @eastAsia slot. Get emits only the canonical `font.ea` key (for runs, paragraphs, and styles alike); use `font.ea` on Add/Set/Get.",
+      "description": "rFonts @eastAsia 槽位的 legacy 别名。Get 仅输出标准 `font.ea` key（run、paragraph、style 均如此）；Add/Set/Get 请使用 `font.ea`。",
       "readback": "see font.ea",
       "enforcement": "report"
     },
@@ -780,7 +780,7 @@
       "add": false,
       "set": false,
       "get": true,
-      "description": "individual rFonts @hAnsi slot readback. On Add/Set use the unified `font.latin` key (which writes both ascii + hAnsi).",
+      "description": "单独 rFonts @hAnsi 槽位的读取结果。Add/Set 请使用统一的 `font.latin` key（会同时写入 ascii + hAnsi）。",
       "readback": "font family name",
       "enforcement": "report"
     },

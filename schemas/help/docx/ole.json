@@ -18,7 +18,7 @@
       "/footer[N]/p[@paraId=X]/r[N]"
     ]
   },
-  "note": "Aliases: oleobject, object, embed. Embeds a binary package plus a preview image. Source accepted as file path, URL, or data-URI. The OLE object is a run-level drawing: Query/Get address it at the run path (/body/p[@paraId=X]/r[N]), the same form as picture.",
+  "note": "Aliases：oleobject、object、embed。嵌入 binary package 和 preview image。source 接受 file path、URL 或 data-URI。OLE object 是 run-level drawing；Query/Get 通过 run path（/body/p[@paraId=X]/r[N]）访问，形式与 picture 相同。",
   "extends": [
     "_shared/ole",
     "_shared/ole.docx-pptx"
@@ -26,7 +26,7 @@
   "properties": {
     "objectType": {
       "type": "string",
-      "description": "kind of embedded object (e.g. 'ole'). Get-only readback.",
+      "description": "embedded object 的类型（例如 'ole'）。仅用于 Get 读回。",
       "add": false,
       "set": false,
       "get": true,
@@ -35,7 +35,7 @@
     },
     "display": {
       "type": "string",
-      "description": "how the object is shown: 'icon' (DrawAspect=Icon) or 'content'. Get-only readback.",
+      "description": "object 的显示方式：'icon'（DrawAspect=Icon）或 'content'。仅用于 Get 读回。",
       "add": false,
       "set": false,
       "get": true,
@@ -44,7 +44,7 @@
     },
     "relId": {
       "type": "string",
-      "description": "relationship id of the embedded OLE package part. Get-only readback (use to inspect the embedded binary).",
+      "description": "embedded OLE package part 的 relationship id。仅用于 Get 读回（可据此检查 embedded binary）。",
       "add": false,
       "set": false,
       "get": true,
@@ -53,7 +53,7 @@
     },
     "fileSize": {
       "type": "number",
-      "description": "byte size of the embedded OLE package part. Get-only readback.",
+      "description": "embedded OLE package part 的字节大小。仅用于 Get 读回。",
       "add": false,
       "set": false,
       "get": true,
@@ -62,7 +62,7 @@
     },
     "contentType": {
       "type": "string",
-      "description": "MIME content type of the embedded OLE package part. Accepted on Add as a round-trip carrier and echoed back by Get.",
+      "description": "embedded OLE package part 的 MIME content type。Add 时可作为 round-trip carrier 传入，Get 时会原样返回。",
       "add": true,
       "set": false,
       "get": true,
