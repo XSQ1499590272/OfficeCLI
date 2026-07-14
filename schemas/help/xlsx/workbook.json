@@ -306,7 +306,10 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProperties 的 Date1904 标记：为 true 时日期使用 1904 epoch（旧版 Mac 兼容）。",
+      "description": "WorkbookProperties Date1904 flag — true means dates use the 1904 epoch (Mac legacy). This is the attribute that actually controls the workbook date system; set it to toggle the epoch.",
+      "examples": [
+        "--prop workbook.date1904=true"
+      ],
       "readback": "true|false",
       "enforcement": "report"
     },
@@ -316,7 +319,7 @@
       "add": false,
       "set": true,
       "get": true,
-      "description": "WorkbookProperties 的 DateCompatibility 标记：控制 1900 与 1904 日期系统兼容性。",
+      "description": "WorkbookProperties DateCompatibility flag (a distinct OOXML attribute, NOT the 1904-epoch toggle — use workbook.date1904 to change the date system).",
       "examples": [
         "--prop workbook.dateCompatibility=true"
       ],

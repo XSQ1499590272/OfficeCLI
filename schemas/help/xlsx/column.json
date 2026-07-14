@@ -51,8 +51,8 @@
     },
     "collapsed": {
       "type": "bool",
-      "description": "折叠 column group。当前仅支持 Set。",
-      "add": false, "set": true, "get": false,
+      "description": "collapsed column-group flag; omitted from Get when not collapsed.",
+      "add": false, "set": true, "get": true,
       "examples": ["--prop collapsed=true"],
       "readback": "true when the column group is collapsed",
       "enforcement": "report"

@@ -23,7 +23,7 @@ static partial class CommandBuilder
         var pageOpt = new Option<string?>("--page") { Description = "页面过滤器（例如 1、2-5、1,3,5）。html mode 默认 all；screenshot mode 默认 1（使用 --page 1-N 捕获更多页面，或使用 --grid N 生成整份文档的缩略图 contact sheet）。" };
         var browserOpt = new Option<bool>("--browser") { Description = "在 browser 中打开输出（html / svg mode）" };
         var outOpt = new Option<string?>("--out", "-o") { Description = "输出文件路径（html、screenshot mode；html 默认 stdout，screenshot 默认临时文件）" };
-        var clipOpt = new Option<string?>("--range") { Description = "将输出限制到指定区域。Screenshot：xlsx 单元格范围或元素 data-path；text（仅 xlsx）：单元格范围或单个单元格。它不是 set 的字符偏移 range 参数。" };
+        var clipOpt = new Option<string?>("--range") { Description = "Restrict output to a region. Screenshot mode: an xlsx cell range ('Sheet1!A1:C3' or '/Sheet1/A1:C3') or any element data-path ('/slide[1]/shape[@id=N]', '/body/table[1]'); the PNG is cropped to the target's bounding box. Text mode (xlsx only): a cell range or single cell — emits just those rows/cells, saving context on large sheets. Not the character-offset `range=` prop of `set` (that one formats a text span like 3:7)." };
         var screenshotWidthOpt = new Option<int>("--screenshot-width") { Description = "Screenshot viewport 宽度（默认 1600）", DefaultValueFactory = _ => 1600 };
         var screenshotHeightOpt = new Option<int>("--screenshot-height") { Description = "Screenshot viewport 高度（默认 1200）", DefaultValueFactory = _ => 1200 };
         var gridOpt = new Option<string?>("--grid")

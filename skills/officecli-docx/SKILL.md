@@ -245,7 +245,7 @@ officecli add "$FILE" / --type footer --prop type=default --prop align=center --
 
 ### 目录
 
-任何有 3+ 个 heading 的 document：
+For any document with 3+ headings, first verify that the requested range has real sources. A TOC source must use a built-in Heading style or a custom paragraph style with `outlineLvl`; bold or large Normal text is not a source. If no eligible source exists, stop and fix the heading structure instead of inserting a TOC that renders "Error! No table of contents entries found."
 
 ```bash
 # Built-in Heading styles are TOC sources.
@@ -256,14 +256,13 @@ officecli add "$FILE" /styles --type style --prop id=ThesisH1 --prop type=paragr
 officecli add "$FILE" /body --type toc --prop levels="1-3" --prop title="Table of Contents" --prop hyperlinks=true --index 0
 ```
 
-page number 默认会 render（可用 `--prop pageNumbers=true` 显式开启）。可直接访问 TOC：`/toc[1]` 或 `/tableofcontents` 会解析为第一个 TOC field，供 `get` / `set` / `remove` 使用，无需手动遍历 XPath。
+Page numbers need pagination; OfficeCLI cannot calculate TOC page numbers itself. Set `updateFields=true` so Word recomputes the TOC (and all fields) on open. Without a Word-compatible field engine, report the TOC as dynamic and uncomputed; do not claim ready page numbers or guess a static TOC.
 
-**TOC 交付步骤（交接前必须执行）。** live TOC field 在重新计算前只是 placeholder。部分 viewer 会在首次打开时填充它，另一些则会一直显示字面量 `Update field to see table of contents`，直至读者重新计算。按收件人的能力选择：
+```bash
+officecli set "$FILE" /settings --prop updateFields=true
+```
 
-- **会重新计算（或按 F9）：**运行 `officecli set "$FILE" /settings --prop updateFields=true`，使 Word 在打开时计算 TOC（以及所有 field）；也可添加可见提示“按 F9 刷新 TOC 和页码”。
-- **不能或不会重新计算：**使用**静态 TOC fallback — recipe (f)**。live field 在重新计算前只能显示 placeholder，任何 headless pipeline 都无法提前填充它。
-
-交付检查：只要读者不会重新计算，`officecli query "$FILE" 'p:contains("Update field to see")'` 就必须返回空；若有匹配，切换至 recipe (f)。
+Address the TOC directly with `/toc[1]` or `/tableofcontents` for `get`/`set`/`remove`.
 
 ### 图片
 
@@ -311,16 +310,16 @@ officecli set "$FILE" / --prop pageWidth=12240 --prop pageHeight=15840 --prop ma
 officecli set "$FILE" / --prop columns=2 --prop columnSpace=720
 ```
 
-### 强制分页：双重保障
+### Forcing page breaks
 
-有两种机制，但**任一机制单独使用都不能在所有 viewer 中可靠生效**。不同 viewer 或前置内容可能忽略 `<w:pageBreakBefore/>`，也可能把 `<w:br w:type="page"/>` 渲染为 soft break。对需要另起页的每个 H1、TOC heading 和 cover 末尾 paragraph，同时应用两者：
+Use exactly one page-break mechanism per logical boundary. The default is `pageBreakBefore=true` on the target heading. Alternatively, insert one explicit `pagebreak` before the heading. Never combine both mechanisms for the same boundary: the resulting double break can create a blank page. Never set `pageBreakBefore` on `p[last()]` immediately after adding a `pagebreak`.
 
 ```bash
 # Default: apply the break directly to the heading.
 officecli add "$FILE" /body --type paragraph --prop text="Introduction" --prop style=Heading1 --prop pageBreakBefore=true
 ```
 
-`--prop break=newPage` 是 `pageBreakBefore=true` 的简写 alias（接受 `newPage|page|nextPage|pageBreak`）。两者生成相同 XML，仍应遵循上述双重保障规则。使用 `view html` 预览并核对页数。
+`--prop break=newPage` is an alias for `pageBreakBefore=true`. Preview with `view html` and check for blank pages.
 
 ### 报告级 recipe
 
@@ -384,15 +383,7 @@ officecli set "$FILE" "/body/tbl[1]/tr[1]/tc[1]/p[1]" --prop listStyle=bullet
 
 若首个 paragraph 落在底部，使用以下命令重新排序：`officecli move "$FILE" "/body/tbl[1]/tr[1]/tc[1]/p[N]" --index 0`。
 
-**(f) Static TOC fallback（跨 viewer 稳定）。** 交付给不会自动重新计算的 viewer 时，live TOC field 会显示字面量 `Update field to see table of contents`。纯 CLI pipeline 无法像 Word 一样在保存时预填 TOC field。解决方法是 `remove` TOC field，保留可见 heading，并为每个 heading 手动写入带 dot leader 的目录项。
-
-```bash
-officecli query "$FILE" 'p:contains("Update field to see")'        # note the /body/p[N] paths, then:
-officecli remove "$FILE" "/body/p[N]"                              # repeat per hit
-officecli add "$FILE" /body --type paragraph --prop text="Contents" --prop style=TOCHeading --prop size=14pt --prop bold=true --index <pos>
-officecli add "$FILE" /body --type paragraph --prop text="1. Executive Summary ......................................... 3" --prop size=11pt --index <pos+1>
-# … one per heading. Page numbers manual; eyeball positions via view html. Live --type toc remains correct for recipients who recalculate.
-```
+**(f) TOC without a field engine.** A CLI-only pipeline cannot calculate reliable page numbers. Keep the live TOC, set `updateFields=true`, and tell the recipient to open the document in Word or another compatible field engine. Do not replace it with guessed static page numbers.
 
 ### Template 交付：分离 Template Notes 与最终用户内容
 
@@ -471,7 +462,7 @@ echo "Delivery Gate PASS"
 field 的 cached value 在写入时可能过期或为空；应通过**structure 而不是 text**确认其存在。
 
 - **Footer PAGE：**`get /footer[N] --depth 3` 会列出 begin / instrText / separate / cached / end 的 run chain：单一 PAGE 至少 5 个 run，组合 “Page X of Y” 至少 11 个。只有一个包含 `"Page"` 的 run 表示 field 缺失；使用 `--prop field=page` 重新添加。
-- **TOC：**`get /toc[1] --depth 2` 显示 field structure。在重新计算前，page number 可能显示为 `1 1 1 1` 或 `Update field to see…`（见 TOC 交付步骤）。
+- **TOC:** `get /toc[1] --depth 2` shows field structure. Page numbers may read `1 1 1 1` or `Update field to see…` until recalculated (see §Table of Contents — set `updateFields=true`).
 - **MERGEFIELD：**`query 'field[fieldType=mergefield]'` 应为每个 slot 返回一个结果，其他位置不应存在字面量 `{{name}}`。
 
 ### 已知局限
@@ -510,7 +501,7 @@ field 的 cached value 在写入时可能过期或为空；应通过**structure 
 | 在 run 上设置 `listStyle` | `listStyle` 是 paragraph property |
 | 依赖前导空格缩进 | 使用 `indent=720` / `firstLineIndent=360` / `hangingIndent=720`（dotted `ind.left` / `ind.firstLine` 也可） |
 | 用 `set differentFirstPage=true` 隐藏 cover page number | 不支持；添加 first-type footer：`--type footer --prop type=first --prop text=""` |
-| 单独使用 `--type pagebreak` 或 `pageBreakBefore` | 两者同时使用（见“强制分页”） |
+| Need a fresh chapter page | Use `pageBreakBefore=true` on the heading; use an explicit `pagebreak` only as an alternative, never both |
 | 把多个 bullet paragraph 合并到一个 cell | `c1="a\nb"` 会得到 `<w:br/>` 换行（同一 paragraph）；独立 bullet paragraph 使用 recipe (e) |
 | 何时用 dotted property / `raw-set` | 优先选择 L2 dotted property，L3 `raw-set` 仅作最后手段 |
 | 后一个 paragraph 继承了前一个 heading style | 在下一个 paragraph 显式设置 `--prop style=Normal` |

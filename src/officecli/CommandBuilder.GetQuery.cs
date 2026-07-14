@@ -171,8 +171,8 @@ static partial class CommandBuilder
         var selectorArg = new Argument<string>("selector") { Description = "CSS 风格 selector（例如 paragraph[style=Normal] > run[font!=Arial]）" };
 
         var queryFindOpt = new Option<string?>("--find") { Description = "将结果过滤为包含此文本的元素（不区分大小写的子串）" };
-        var queryCompactOpt = new Option<bool>("--compact") { Description = "每个元素输出一行：path、标签、文本；末行输出 total。仅支持 pptx/docx，xlsx 请使用 view text --range。可用 --fields 追加 Format 字段。" };
-        var queryFieldsOpt = new Option<string?>("--fields") { Description = "在 --compact 输出中追加的 Format 字段，逗号分隔（例如 x,y,width）" };
+        var queryCompactOpt = new Option<bool>("--compact") { Description = "One line per element in document order: path<TAB>[label]<TAB>\"text(truncated at 60, … mark)\"; empty text shows (empty); tables fold to [table RxC]. Final line is always 'total: N of M elements / K slides' (pptx) or 'total: N of M elements' (docx — never gains a container segment): N = element lines above (lineCount-1 == N proves you read everything), M = all top-level frames. Full-document listing: selector '*' (pptx) or 'paragraph, table' (docx) makes N == M. Labels are a closed set (pptx: title/placeholder/textbox/shape/picture/chart/connector/group/equation + 'table RxC'; docx: style name). This format is a stability contract: columns/labels may be added, never changed or reordered. pptx/docx only (xlsx: use 'view text --range'). Add columns with --fields." };
+        var queryFieldsOpt = new Option<string?>("--fields") { Description = "Comma-separated Format keys appended as extra k=v columns in --compact output (e.g. x,y,width)" };
 
         var queryCommand = new Command("query", "使用 CSS 风格 selector 查询文档元素");
         queryCommand.Add(queryFileArg);
@@ -279,8 +279,37 @@ static partial class CommandBuilder
     }
 
     /// <summary>
-    /// `query --compact` 的稳定逐行格式。已有列的顺序和含义保持不变，
-    /// 只允许在末尾追加新列。
+    /// `query --compact` line format. STABILITY CONTRACT — this output is
+    /// consumed programmatically (parsed line-by-line, counted for
+    /// read-completeness accounting); treat every token below as API:
+    /// column order, the TAB separator, the `…` truncation mark, `(empty)`,
+    /// the `[label]` bracket form, and the total-line shape may only gain
+    /// NEW trailing columns, never change or reorder existing ones. Any
+    /// change lands in the CHANGELOG.
+    ///
+    ///   {path}\t[{label}]\t"{text ≤60 chars, \t/\n/\"/\\ escaped}"
+    ///   {path}\t[table {R}x{C}]                     (tables fold; no text col)
+    ///   {path}\t[{label}]\t(empty)                  (no text)
+    ///   ...--fields k1,k2 appends \tk1=v1\tk2=v2 columns (missing key → k=)
+    ///   total: {N} of {M} elements / {K} slides     (pptx)
+    ///   total: {N} of {M} elements                  (docx)
+    ///
+    /// N = exactly the number of lines above the total line (post-filter;
+    /// a folded table counts as 1) so `lineCount - 1 == N` proves the reader
+    /// saw the whole result. M = all top-level frames in the document
+    /// (pptx: shapes/pictures/tables/charts/connectors/groups across slides;
+    /// docx: body-level blocks). The total line is always emitted (N=0
+    /// included) and is always the last line, exactly once. The docx total
+    /// has NO container segment — that absence is itself frozen (appending
+    /// one later would be a total-line change, which the contract forbids).
+    ///
+    /// Element lines are in document order: pptx sorts by slide index then
+    /// z-order (multi-type selectors like '*' would otherwise group by type),
+    /// docx follows document flow. Labels are a CLOSED SET per format —
+    /// pptx: title/placeholder/textbox/shape/picture/chart/connector/group/
+    /// equation + the folded 'table RxC'; docx: the paragraph's style name
+    /// (open set of values, fixed [style] position). New label values may be
+    /// added; existing ones never change meaning.
     /// </summary>
     internal static string FormatNodesCompact(IDocumentHandler handler, List<DocumentNode> results, string? fields)
     {

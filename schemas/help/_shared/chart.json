@@ -939,7 +939,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "仅适用于 line/scatter/radar series 的 marker symbol（其他类型会静默跳过）。格式：'symbol'、'symbol:size' 或 'symbol:size:color'。symbol 可为 none、auto、circle、square、diamond、triangle、x、plus、star、dash、dot。（picture marker 尚未实现。）chart 级 Get 不返回 marker，因为其适用性取决于 chart type；请通过 /chart[N]/series[K] 按 series 读取（chart-series schema 声明 marker get:true）。",
+      "description": "marker symbol for line/scatter/radar series only (other types silently skipped). Format: 'symbol' or 'symbol:size' or 'symbol:size:color'. Symbols: none, auto, circle, square, diamond, triangle, x, plus, star, dash, dot. (picture markers are not implemented.) Chart-level Get surfaces a first-series representative value once any series carries a marker (the dump emitter relies on it for uniform-marker charts); the authoritative per-series read is /chart[N]/series[K] (chart-series schema declares marker get:true).",
       "examples": [
         "--prop marker=circle",
         "--prop marker=square:8:FF0000"
