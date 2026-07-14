@@ -171,7 +171,7 @@ static partial class CommandBuilder
         var selectorArg = new Argument<string>("selector") { Description = "CSS 风格 selector（例如 paragraph[style=Normal] > run[font!=Arial]）" };
 
         var queryFindOpt = new Option<string?>("--find") { Description = "将结果过滤为包含此文本的元素（不区分大小写的子串）" };
-        var queryCompactOpt = new Option<bool>("--compact") { Description = "按文档顺序每个元素输出一行：path<TAB>[label]<TAB>\"text\"；文本最多 60 字（… 表示截断），空文本为 (empty)，table 折叠为 [table RxC]。末行固定为 total：PPTX 为 'total: N of M elements / K slides'，docx 为 'total: N of M elements'（不会出现容器后缀）；N 是上方元素行数（lineCount-1 == N 表示已完整读取），M 是全部顶级元素。完整列出文档时：PPTX 使用 selector '*'，docx 使用 'paragraph, table'，可使 N == M。label 是稳定集合：PPTX 为 title/placeholder/textbox/shape/picture/chart/connector/group/equation 加 'table RxC'；docx 为 style 名。该格式是稳定契约：已有列和 label 不会变更或重排，只会在末尾追加列。仅支持 pptx/docx；xlsx 请使用 'view text --range'。可用 --fields 追加 Format 字段。" };
+        var queryCompactOpt = new Option<bool>("--compact") { Description = "按文档顺序每个元素输出一行：path<TAB>[label]<TAB>\"text\"；文本最多 60 字符（… 表示截断），空文本为 (empty)，table 折叠为 [table RxC]。末行固定为 total：PPTX 为 'total: N of M elements / K slides'，docx 为 'total: N of M elements'（不会出现容器后缀）；N 是上方元素行数（lineCount-1 == N 表示已完整读取），M 是全部顶级元素。完整列出文档时：PPTX 使用 selector '*'，docx 使用 'paragraph, table'，可使 N == M。label 是稳定集合：PPTX 为 title/placeholder/textbox/shape/picture/chart/connector/group/equation 加 'table RxC'；docx 为 style 名。该格式是稳定契约：已有列和 label 不会变更或重排，只会在末尾追加列。仅支持 pptx/docx；xlsx 请使用 'view text --range'。可用 --fields 追加 Format 字段。" };
         var queryFieldsOpt = new Option<string?>("--fields") { Description = "配合 --compact 在末尾追加的 Format 字段，逗号分隔（例如 x,y,width）；每项输出为 k=v，缺失值输出 k=" };
 
         var queryCommand = new Command("query", "使用 CSS 风格 selector 查询文档元素");

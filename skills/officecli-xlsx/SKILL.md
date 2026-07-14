@@ -386,7 +386,7 @@ officecli set "$FILE" "/Sheet1/chart[1]/axis[@role=category]" --prop title="Mont
    ```
 4. `officecli validate "$FILE"`：打开 resident 后的安全检查；`validate` 会自行将待写入的编辑 flush 到磁盘。
 5. **视觉检查：通过 HTML preview 检查每个 sheet。** 运行 `officecli view "$FILE" html` 并读取返回的 HTML path。每个 sheet 会将 chart inline render。检查 `###`、截断的 title、placeholder token（`$fy$24`、`{var}`、`<TODO>`）、裁切 chart、纯白 pie slice 与空 chart anchor；发现任一问题都应在声明完成前停止并修复。`validate` 通过不等于可以交付；交付目标是 preview 看起来像真实 workbook。人工预览可运行 `officecli watch "$FILE"`（用户按需打开 live preview），或直接在 Excel / WPS / Numbers 中打开 `.xlsx`。
-6. **修复 print layout（宽 table / 多 chart sheet）。** sheet 含 chart 或宽 table 且用户将打印时，应设置每页 layout，但 fit mode 必须匹配 sheet 高度：
+6. **Print layout 修复（宽 table / 多 chart sheet）。** sheet 含 chart 或宽 table 且用户将打印时，应设置每页 layout，但 fit mode 必须匹配 sheet 高度：
    ```bash
    # 短的 summary / chart sheet：压到单页。
    officecli set "$FILE" "/Summary" --prop orientation=landscape --prop fitToPage=true
