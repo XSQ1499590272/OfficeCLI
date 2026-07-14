@@ -13,7 +13,7 @@
     "stable":     ["/<sheetName>"],
     "positional": ["/Sheet1", "/Sheet2"]
   },
-  "note": "Add accepts name, position, autoFilter, tabColor, and hidden. autoFilter/tabColor/hidden forward to the same code paths Set uses; position is Add-only (reorder an existing sheet with the move command); freeze remains Set-only.",
+  "note": "Add 接受 name、position、autoFilter、tabColor、hidden。autoFilter/tabColor/hidden 会转发到 Set 使用的相同 code path；position 仅支持 Add，既有 sheet 的重排请使用 move；freeze 仍只支持 Set。",
   "properties": {
     "name": {
       "type": "string",
@@ -66,7 +66,7 @@
     },
     "zoom": {
       "type": "number",
-      "description": "sheetView zoom percentage (10-400; out-of-range throws). Alias: zoomscale. Emitted only when non-default (≠100).",
+      "description": "sheetView 缩放百分比（10–400；超出范围会报错）。别名：zoomscale。仅在非默认值（≠100）时写入。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop zoom=150"],
       "readback": "zoom percentage 10-400",

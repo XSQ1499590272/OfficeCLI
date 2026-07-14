@@ -57,17 +57,17 @@ Help 与已安装的 CLI 版本一致。如本 Skill 与 Help 不一致，**以 
 
 如果上述任何一项失败，请在宣布完成之前停止并修复。
 
-**Print layout.** Any sheet the user may print or send as a board pack needs page setup. Default portrait + no fit-to-page splits wide tables and charts mid-way. Pick the fit mode by sheet shape:
+**Print layout。** 用户可能打印或作为 board pack 发送的任何 sheet 都需要 page setup。默认 portrait 且不 fit-to-page 会把宽 table 和 chart 拆到多页。应按 sheet 形状选择 fit mode：
 
 ```bash
-# Summary / chart / dashboard sheet (small, ≤ ~40 rows): fit to a single page.
+# 短的 summary / chart / dashboard sheet（约不超过 40 row）：压到单页。
 officecli set "$FILE" "/Summary" --prop orientation=landscape --prop fitToPage=true
-# Tall data table (dozens+ rows): fit WIDTH only, let height paginate naturally.
-# fitToPage=true here crushes every row onto one page → unreadable (### dates, 5px rows).
+# 高的数据 table（数十 row 以上）：只适配宽度，让高度自然分页。
+# 此处 fitToPage=true 会把所有 row 压到一页，导致不可读（### 日期、5px row）。
 officecli set "$FILE" "/Data" --prop orientation=landscape --prop fitToPage=1x0
 ```
 
-`fitToPage=true` == `1x1` == fit both axes to one page — correct only when the sheet is already short. `1x0` = fit 1 page wide, unlimited pages tall. Trigger: sheet holds a chart, or > 8 columns, or the user's ask mentions print / board / investor.
+`fitToPage=true` 等于 `1x1`，即宽高都压到一页，只适合原本就短的 sheet；`1x0` 表示宽度压到 1 页、高度不限。触发条件：sheet 含 chart、超过 8 个 column，或用户需求提到 print / board / investor。
 
 ### 仅限 financial model：template、tracker、CSV import 或 operational sheet 可跳过
 
@@ -386,14 +386,14 @@ officecli set "$FILE" "/Sheet1/chart[1]/axis[@role=category]" --prop title="Mont
    ```
 4. `officecli validate "$FILE"`：打开 resident 后的安全检查；`validate` 会自行将待写入的编辑 flush 到磁盘。
 5. **视觉检查：通过 HTML preview 检查每个 sheet。** 运行 `officecli view "$FILE" html` 并读取返回的 HTML path。每个 sheet 会将 chart inline render。检查 `###`、截断的 title、placeholder token（`$fy$24`、`{var}`、`<TODO>`）、裁切 chart、纯白 pie slice 与空 chart anchor；发现任一问题都应在声明完成前停止并修复。`validate` 通过不等于可以交付；交付目标是 preview 看起来像真实 workbook。人工预览可运行 `officecli watch "$FILE"`（用户按需打开 live preview），或直接在 Excel / WPS / Numbers 中打开 `.xlsx`。
-6. **Print layout fix (wide tables / multi-chart sheets).** When a sheet holds a chart or a wide table and the user will print it, set per-sheet page layout — but match the fit mode to the sheet's height:
+6. **修复 print layout（宽 table / 多 chart sheet）。** sheet 含 chart 或宽 table 且用户将打印时，应设置每页 layout，但 fit mode 必须匹配 sheet 高度：
    ```bash
-   # Short summary / chart sheet → fit to one page.
+   # 短的 summary / chart sheet：压到单页。
    officecli set "$FILE" "/Summary" --prop orientation=landscape --prop fitToPage=true
-   # Tall data table → fit width only (fitToPage=true would crush all rows onto one unreadable page).
+   # 高的数据 table：只适配宽度；fitToPage=true 会把 row 压到不可读。
    officecli set "$FILE" "/Data" --prop orientation=landscape --prop fitToPage=1x0
    ```
-   Outcome: charts/wide tables print without mid-chart splits; tall tables stay readable across natural page breaks. Apply to every sheet that holds a chart or a > 8-column table.
+结果是：chart 和宽 table 不会在中间断开；高 table 可跨自然分页保持可读。适用于含 chart 或超过 8 column table 的每个 sheet。
 7. 发现任一问题后先修复，再**重新运行完整循环**；一次修复常会引入另一个问题。
 
 `officecli view issues` + `view html` 构成结构 QA 组合：`issues` 捕获 broken formula 与 empty sheet，`view html`（读取返回 HTML path）捕获 `###`、截断与 token 泄漏。chart fill color / theme tint 可能因 viewer 而异；color fidelity 很重要时，应在用户的 target viewer 中 spot-check。

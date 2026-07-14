@@ -66,7 +66,7 @@
     },
     "totalRow": {
       "type": "bool",
-      "description": "show total row. Aliases: totalsRow, showTotals.",
+      "description": "是否显示 total row。别名：totalsRow、showTotals。",
       "aliases": [
         "totalsRow",
         "showTotals"

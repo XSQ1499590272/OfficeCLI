@@ -318,7 +318,7 @@
         "--prop chartType=waterfall"
       ],
       "readback": "normalized chartType string without modifiers (modifiers surface as separate flags in later iterations)",
-      "setNote": "chart type is fixed at creation; changing it post-hoc would require rebuilding the chart XML (series/axes differ per type). Remove and re-add the chart to change its type, or use combotypes for per-series type overrides.",
+      "setNote": "chart type 在创建时固定；事后修改需要重建 chart XML，因为不同 type 的 series/axis 结构不同。要改变 type，请删除后重新添加 chart；或使用 combotypes 为单个 series 指定 type 覆盖。",
       "enforcement": "strict"
     },
     "chartareafill": {
@@ -939,7 +939,7 @@
       "add": true,
       "set": true,
       "get": false,
-      "description": "marker symbol for line/scatter/radar series only (other types silently skipped). Format: 'symbol' or 'symbol:size' or 'symbol:size:color'. Symbols: none, auto, circle, square, diamond, triangle, x, plus, star, dash, dot. (picture markers are not implemented.) Chart-level Get surfaces a first-series representative value once any series carries a marker (the dump emitter relies on it for uniform-marker charts); the authoritative per-series read is /chart[N]/series[K] (chart-series schema declares marker get:true).",
+      "description": "仅适用于 line/scatter/radar series 的 marker symbol（其他类型会静默跳过）。格式：'symbol'、'symbol:size' 或 'symbol:size:color'。symbol 可为 none、auto、circle、square、diamond、triangle、x、plus、star、dash、dot。（picture marker 尚未实现。）只要任一 series 带有 marker，chart 级 Get 会返回第一个 series 的代表值，以支持统一 marker chart 的 dump；按 series 的权威读取方式仍是 /chart[N]/series[K]（chart-series schema 声明 marker get:true）。",
       "examples": [
         "--prop marker=circle",
         "--prop marker=square:8:FF0000"

@@ -51,10 +51,10 @@
     },
     "collapsed": {
       "type": "bool",
-      "description": "collapsed column-group flag; omitted from Get when not collapsed.",
+      "description": "折叠 column group 标记；未折叠时 Get 会省略该字段。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop collapsed=true"],
-      "readback": "true when the column group is collapsed",
+      "readback": "column group 折叠时为 true",
       "enforcement": "report"
     },
     "numberformat": {

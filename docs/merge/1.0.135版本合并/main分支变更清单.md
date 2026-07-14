@@ -5,9 +5,8 @@
 - 共同基线：`fe58b0b0`。
 - 合并前的 `dev`：`f7a21528`。
 - 合并时的 `main`：`25382af4`。
-- 当前合并提交：`30437b72`。
-- 本文的“已合并”表示代码已经进入当前 `dev` 工作区（其中本轮新增内容尚待提交）；“部分合并”表示底层代码存在，但 CLI 入口或完整链路没有接上；“未合并”表示 main 的功能代码没有进入当前 dev。
-  已提交的合并基线：`30437b72`
+- main 非冲突功能合并基线：`30437b72`；Help/Skill 语义英文基线：`a68abbcc`。
+- 本文的“已合并”表示代码已经进入当前 `dev`；“部分合并”表示底层代码存在，但 CLI 入口或完整链路没有接上；“未合并”表示 main 的功能代码没有进入当前 dev。
 - `main` 从共同基线之后共有约 191 个提交，其中 188 个是非 merge 提交。多数提交是 Excel 兼容性修复，不是完全独立的新功能。
   Git 提交：`25382af4`, `fe58b0b0`
 
@@ -19,8 +18,8 @@
 | 查询和 selector | 查询条件、错误提示、批量命令和未知参数处理更准确 | 已合并 | `33c851e0`, `06abe02f`, `3a5e4772` |
 | Word/PPTX/渲染 | Word 预览和 round-trip 更稳定，PPTX 文本适配修复 | 已合并 | `bfccf47d`, `69a04774`, `4e1ed33f` |
 | Resident 和核心稳定性 | 单文件只允许一个 resident，自动保存和子进程通信更稳 | 已合并 | `2285bfcf`, `8062abc8`, `f7acea3a` |
-| `query --compact --fields` | 面向 AI/脚本的一行一元素输出，可选择追加格式字段 | 已合并（待提交） | `ae7fcd54`, `16c7c6ae` |
-| `view --range` | 只查看 Excel 小区域，或只截 PPTX/Word 某个元素 | 已合并（待提交） | `f6272850`, `d9cfa304`, `4cde9aad` |
+| `query --compact --fields` | 面向 AI/脚本的一行一元素输出，可选择追加格式字段；CLI help 已按 main 完整同步，main 没有对应 Skill 改动 | 已合并 | `ae7fcd54`, `16c7c6ae` |
+| `view --range` | 只查看 Excel 小区域，或只截 PPTX/Word 某个元素；CLI help 已说明 text/screenshot 的范围语义 | 已合并 | `f6272850`, `d9cfa304`, `4cde9aad` |
 | 插件生态和 PDF | 支持额外文件格式、插件预览和 PDF 导出 | 未合并 | `2b32d4b3`, `b439d14e`, `fa2bfd9f` |
 | 安装、更新、skills install | 自动安装 binary、skill、MCP，后台检查和升级 | 未合并 | `1ed7b355`, `ab52656d`, `6ca4486d` |
 | SDK 自动安装 | Node/Python SDK 找不到 CLI 时自动下载或安装 | 未合并 | `1648b007`, `6ce96cd3`, `186a0e5e` |
@@ -188,7 +187,9 @@
 
 ### 5.4 CLI 辅助能力：已合入与未合入项
 
-1. **`query --compact --fields` 已合并（待提交）。** 已提供稳定的 TSV 输出：一行一个元素、最后一行 total；`--fields` 可追加 Format 字段。CLI 入口、direct 模式和 resident 模式均已接通。
+1. **`query --compact --fields` 已合并。** 已提供稳定的 TSV 输出：一行一个元素、最后一行 total；`--fields` 可追加 Format 字段。CLI 入口、direct 模式和 resident 模式均已接通。
+   - **CLI help：已同步。** 已写入中文完整契约：PPTX 按 slide/z-order 的文档顺序、文本 60 字截断和转义、table 折叠、docx/PPTX 的 total 行差异、`N/M` 计数、label 稳定性，以及 xlsx 应改用 `view text --range`。
+   - **Skill：main 没有对应改动。** `ae7fcd54`、`16c7c6ae` 只修改 CLI help 和实现；为保持与 main 的语义范围一致，Skill 不新增由当前 dev 推导出的使用说明。
    Git 提交：`ae7fcd54`, `16c7c6ae`
 
 2. **`officecli --output-schema-crc` 公开参数未合并。** 这是给 SDK/自动化工具判断 schema 是否变化的兼容性指纹。
@@ -197,7 +198,7 @@
 3. **CLI 文件日志未合并。** main 支持 `officecli config log true`，把命令、输出和错误记录到 `~/.officecli/officecli.log`。
    Git 提交：`2c6bae41`
 
-4. **`@` 属性参数的 response-file 兼容修复已合并（待提交）。** 已关闭 `@...` 的 response-file 自动替换，使 `--prop @height=25` 可以到达 selector 解析器。
+4. **`@` 属性参数的 response-file 兼容修复已合并。** 已关闭 `@...` 的 response-file 自动替换，使 `--prop @height=25` 可以到达 selector 解析器。
    Git 提交：`769e7374`
 
 5. **Mermaid 缓存的每日刷新未合并。** 这项能力依赖后台更新检查，只会刷新已经存在的缓存，不会首次主动下载。
@@ -208,7 +209,7 @@
 1. **main 的英文 README、CONTRIBUTING 和安装说明未合并。** 当前 dev 保留中文帮助和中文 skill，这是有意选择，不是遗漏。
    Git 提交：`6e3682de`, `b0502fe7`, `28d799e6`, `f7a21528`
 
-2. **main 的 skill 文档结构和 TOC 文案更新未按英文版本合入。** 当前 dev 保留中文正文；功能代码和 schema 行为仍以当前 dev 为准。
+2. **main 的 Skill 英文正文没有整体照搬。** 当前 dev 保留中文正文；但与功能语义直接相关的 main Skill 变更已经同步并中文化：docx 的 TOC source / 单一分页机制，xlsx 的 `fitToPage=1x1` 与 `1x0` 选择规则，以及 academic-paper 对上述 TOC 规则的引用。功能代码和 schema 行为仍以当前 dev 为准。
    Git 提交：`1171d919`, `0fede920`, `4e06c139`, `f7a21528`
 
 3. **main 的版本号 1.0.135 和对应 CHANGELOG 未合入。** 当前 dev 仍保持 `1.0.132`，避免直接覆盖当前分支的版本线。

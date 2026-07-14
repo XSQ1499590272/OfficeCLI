@@ -13,7 +13,7 @@
   "paths": {
     "positional": ["/SheetName/row[N]"]
   },
-  "note": "Row index N is 1-based. Add/Set asymmetry: all formatting props are currently Set-only. Insert/move/clone at an occupied slot shifts every row at or past the slot down by one, and every range-bearing structure on the sheet (mergeCells, CF/DV sqref, autoFilter, hyperlink/table refs, named ranges, formula cell-refs) follows the displacement. 'add --from /SheetName/row[K]' with --before/--after clones cells + single-row mergeCells; relative formula refs are delta-shifted to the new anchor (Excel 'Insert Copied Cells' parity). Excel-style whole-row references (1:1; 2:5 spans on set) are accepted as input aliases for row[N]; readback paths stay canonical. Set also accepts TABLE COLUMN names as prop keys (`--prop Salary=9000` writes that column's cell in the row, symmetric with query row[Salary>5000]). When a key names BOTH a row property and a table column (e.g. a column headed 'Height'), the bare key is rejected as ambiguous (invalid_selector) — force the side with `--prop col.Height=180` (column cell) or `--prop @height=25` (row property); same col./@ escape vocabulary as query row[col.X…]/row[@X…].",
+  "note": "Row index N 从 1 开始。Add/Set 不对称：当前所有 formatting props 只支持 Set。在已占用 slot 上 insert/move/clone 会将该 slot 及下方所有 row 向下移动，sheet 上所有带 range 的结构（mergeCells、CF/DV sqref、autoFilter、hyperlink/table refs、named ranges、formula cell-refs）也会跟随位移。使用 add --from /SheetName/row[K] 配合 --before/--after 会复制 cells 和单行 mergeCells；相对 formula refs 会按新 anchor 做 delta shift，行为对齐 Excel Insert Copied Cells。Excel 风格整行引用（1:1、2:5 span）可作为 row[N] 的输入 alias，readback path 仍保持 canonical。Set 也接受 table column 名作为 prop key（如 `--prop Salary=9000` 写入该 row 的对应 cell），与 query 的 row[Salary>5000] 对称。若某 key 同时是 row property 与 table column（如名为 Height 的列），裸 key 会以 invalid_selector 拒绝；用 `--prop col.Height=180` 强制写 column cell，或用 `--prop @height=25` 强制写 row property，和 query 的 row[col.X…]/row[@X…] 使用同一套转义方式。",
   "examples": [
     {
       "title": "Filter rows by column name (resolves against a ListObject or a detected header-row table)",
@@ -87,10 +87,10 @@
     },
     "collapsed": {
       "type": "bool",
-      "description": "collapsed row-group flag; omitted from Get when not collapsed.",
+      "description": "折叠 row group 标记；未折叠时 Get 会省略该字段。",
       "add": false, "set": true, "get": true,
       "examples": ["--prop collapsed=true"],
-      "readback": "true when the row group is collapsed",
+      "readback": "row group 折叠时为 true",
       "enforcement": "report"
     },
     "customHeight": { "type":"bool", "add":false, "set":false, "get":true, "description":"row 带有显式 height 时为 true（Row @customHeight）。仅 Get flag。", "readback":"true when row has a custom height", "enforcement":"report" }
