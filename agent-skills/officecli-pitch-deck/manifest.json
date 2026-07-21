@@ -1,0 +1,6 @@
+{
+  "name": "pitch-deck",
+  "description": "Fundraising pitch decks through host Office tools.",
+  "trigger": "fundraising / investor decks (seed, Series A/B/C)",
+  "references": []
+}

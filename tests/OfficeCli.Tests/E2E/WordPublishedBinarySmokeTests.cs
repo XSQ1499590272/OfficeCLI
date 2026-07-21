@@ -24,8 +24,17 @@ public class WordPublishedBinarySmokeTests
             AssertNativeArtifactPortability(repoRoot, macBinary, windowsBinary);
 
             var nativeBinary = GetNativeBinary(macBinary, windowsBinary);
-            if (nativeBinary != null)
-                AssertWordSmoke(nativeBinary, publishRoot);
+            if (nativeBinary == null)
+            {
+                var nativeRid = GetNativeRuntimeIdentifier();
+                Assert.NotNull(nativeRid);
+                nativeBinary = Publish(
+                    repoRoot, nativeRid, Path.Combine(publishRoot, "native"));
+            }
+
+            AssertWordSmoke(nativeBinary, publishRoot);
+            AssertAgentGuidanceSmoke(nativeBinary, publishRoot);
+            AssertDefaultCliSurfaceStillWorks(nativeBinary, publishRoot);
         }
         finally
         {
@@ -119,12 +128,91 @@ public class WordPublishedBinarySmokeTests
         Assert.True(validateDocument.RootElement.GetProperty("success").GetBoolean(), validate.Stdout);
     }
 
+    /// <summary>
+    /// Phase-0 Agent guidance resources must survive single-file publish.
+    /// </summary>
+    private static void AssertAgentGuidanceSmoke(string binary, string workingRoot)
+    {
+        var environment = new Dictionary<string, string>
+        {
+            ["OFFICECLI_NO_AUTO_RESIDENT"] = "1",
+        };
+
+        var help = RunProcess(binary, ["help", "--surface", "agent-json"], workingRoot,
+            TimeSpan.FromSeconds(30), environment);
+        Assert.True(help.ExitCode == 0, help.Stderr);
+        Assert.Contains("{{OFFICE_BATCH_TOOL}}", help.Stdout, StringComparison.Ordinal);
+        Assert.Contains("{{OFFICE_RUN_TOOL}}", help.Stdout, StringComparison.Ordinal);
+        Assert.DoesNotContain("--commands", help.Stdout, StringComparison.Ordinal);
+        Assert.DoesNotContain("tool.file.office.", help.Stdout, StringComparison.Ordinal);
+
+        var catalog = RunProcess(binary, ["load_skill", "--surface", "agent-json"], workingRoot,
+            TimeSpan.FromSeconds(30), environment);
+        Assert.True(catalog.ExitCode == 0, catalog.Stderr);
+        foreach (var name in new[] { "word", "excel", "pptx", "word-form", "morph-ppt" })
+            Assert.Contains($"## {name}", catalog.Stdout, StringComparison.Ordinal);
+
+        foreach (var name in new[] { "word", "excel", "pptx", "word-form" })
+        {
+            var skill = RunProcess(binary, ["load_skill", name, "--surface", "agent-json"], workingRoot,
+                TimeSpan.FromSeconds(30), environment);
+            Assert.True(skill.ExitCode == 0, $"{name}: {skill.Stderr}");
+            Assert.Contains("{{OFFICE_BATCH_TOOL}}", skill.Stdout, StringComparison.Ordinal);
+            Assert.DoesNotContain("tool.file.office.", skill.Stdout, StringComparison.Ordinal);
+        }
+
+        var morph = RunProcess(binary, ["load_skill", "morph-ppt", "--surface", "agent-json"], workingRoot,
+            TimeSpan.FromSeconds(30), environment);
+        Assert.True(morph.ExitCode == 0, morph.Stderr);
+
+        var morphRef = RunProcess(
+            binary,
+            ["load_skill", "morph-ppt", "--surface", "agent-json", "--path", "references/decision-rules.md"],
+            workingRoot, TimeSpan.FromSeconds(30), environment);
+        Assert.True(morphRef.ExitCode == 0, morphRef.Stderr);
+        Assert.Contains("audience", morphRef.Stdout, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("officecli help", morphRef.Stdout, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void AssertDefaultCliSurfaceStillWorks(string binary, string workingRoot)
+    {
+        var environment = new Dictionary<string, string>
+        {
+            ["OFFICECLI_NO_AUTO_RESIDENT"] = "1",
+        };
+
+        var help = RunProcess(binary, ["help"], workingRoot, TimeSpan.FromSeconds(30), environment);
+        Assert.True(help.ExitCode == 0, help.Stderr);
+        Assert.Contains("Schema 参考", help.Stdout, StringComparison.Ordinal);
+        Assert.DoesNotContain("{{OFFICE_BATCH_TOOL}}", help.Stdout, StringComparison.Ordinal);
+
+        var skill = RunProcess(binary, ["load_skill", "word"], workingRoot,
+            TimeSpan.FromSeconds(30), environment);
+        Assert.True(skill.ExitCode == 0, skill.Stderr);
+        Assert.DoesNotContain("{{OFFICE_BATCH_TOOL}}", skill.Stdout, StringComparison.Ordinal);
+    }
+
     private static string? GetNativeBinary(string macBinary, string windowsBinary)
     {
         if (OperatingSystem.IsMacOS())
             return RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? macBinary : null;
         if (OperatingSystem.IsWindows())
             return RuntimeInformation.ProcessArchitecture == Architecture.X64 ? windowsBinary : null;
+        return null;
+    }
+
+    private static string? GetNativeRuntimeIdentifier()
+    {
+        var architecture = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.X64 => "x64",
+            Architecture.Arm64 => "arm64",
+            _ => null,
+        };
+        if (architecture == null) return null;
+        if (OperatingSystem.IsMacOS()) return $"osx-{architecture}";
+        if (OperatingSystem.IsWindows()) return $"win-{architecture}";
+        if (OperatingSystem.IsLinux()) return $"linux-{architecture}";
         return null;
     }
 

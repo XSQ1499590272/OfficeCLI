@@ -305,6 +305,7 @@ public sealed class ExcelWorkbookIntegrationTests : ExcelTestBase
 
         using (var handler = OpenEditable(path))
         {
+            handler.Add("/", "sheet", null, Props(("name", "Visible")));
             handler.Set("/Sheet1", Props(("visibility", setVisibility)));
             handler.Save();
         }

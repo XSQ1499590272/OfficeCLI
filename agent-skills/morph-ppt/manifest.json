@@ -1,0 +1,10 @@
+{
+  "name": "morph-ppt",
+  "description": "Cross-slide Morph animation workflows through host Office tools.",
+  "trigger": "cross-slide Morph animation / continuous motion",
+  "references": [
+    "references/decision-rules.md",
+    "references/design-rules.md",
+    "references/style-catalog.md"
+  ]
+}

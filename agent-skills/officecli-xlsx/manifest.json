@@ -1,0 +1,6 @@
+{
+  "name": "excel",
+  "description": "Create and edit Excel workbooks through host Office tools.",
+  "trigger": "spreadsheets, financial models, dashboards",
+  "references": []
+}

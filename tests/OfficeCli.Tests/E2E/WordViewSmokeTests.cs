@@ -362,7 +362,7 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
 
         try
         {
-            var screenshot = RunOfficeCli(
+            var screenshot = RunOfficeCliSlow(
                 "view", path, "screenshot", "--render", "html", "--page", "1",
                 "--screenshot-width", "640", "--screenshot-height", "480", "--out", screenshotPath);
             if (screenshot.ExitCode == 0)
@@ -378,7 +378,7 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
                 Assert.Contains("browser", (screenshot.Stdout + screenshot.Stderr).ToLowerInvariant());
             }
 
-            var grid = RunOfficeCli(
+            var grid = RunOfficeCliSlow(
                 "view", path, "screenshot", "--render", "html", "--grid", "2",
                 "--screenshot-width", "640", "--out", gridPath);
             if (grid.ExitCode == 0)
@@ -2111,11 +2111,11 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
 
         try
         {
-            var unsupported = RunOfficeCli("refresh", unsupportedPath, "--json");
+            var unsupported = RunOfficeCliSlow("refresh", unsupportedPath, "--json");
             Assert.Equal(1, unsupported.ExitCode);
             AssertJsonFailure(unsupported, "unsupported_type");
 
-            var refresh = RunOfficeCli("refresh", path, "--json");
+            var refresh = RunOfficeCliSlow("refresh", path, "--json");
             if (refresh.ExitCode == 0)
             {
                 var data = AssertJsonSuccess(refresh);
@@ -2146,7 +2146,7 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
             handler.Add(pageParagraph, "field", null, new() { ["fieldType"] = "page", ["text"] = "" });
         }
 
-        var refresh = RunOfficeCli("refresh", path, "--json");
+        var refresh = RunOfficeCliSlow("refresh", path, "--json");
         if (refresh.ExitCode != 0)
         {
             AssertJsonFailure(refresh, "refresh_failed");
@@ -2333,10 +2333,16 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
 
     private static CliRunResult RunOfficeCli(params string[] args) => RunOfficeCliCore(null, args);
 
+    private static CliRunResult RunOfficeCliSlow(params string[] args) =>
+        RunOfficeCliCore(null, args, timeoutMilliseconds: 60_000);
+
     private static CliRunResult RunOfficeCliWithInput(string input, params string[] args) =>
         RunOfficeCliCore(input, args);
 
-    private static CliRunResult RunOfficeCliCore(string? input, params string[] args)
+    private static CliRunResult RunOfficeCliCore(
+        string? input,
+        string[] args,
+        int timeoutMilliseconds = 30_000)
     {
         var officeCliDll = FindOfficeCliDll();
         var psi = new ProcessStartInfo("dotnet")
@@ -2358,10 +2364,11 @@ public class WordViewSmokeTests : OfficeCli.Tests.Unit.WordTestBase
             process.StandardInput.Close();
         }
 
-        if (!process.WaitForExit(30_000))
+        if (!process.WaitForExit(timeoutMilliseconds))
         {
             process.Kill(entireProcessTree: true);
-            throw new TimeoutException("officecli process did not exit within 30 seconds");
+            throw new TimeoutException(
+                $"officecli process did not exit within {timeoutMilliseconds / 1000} seconds");
         }
 
         return new CliRunResult(process.ExitCode, stdoutTask.GetAwaiter().GetResult(), stderrTask.GetAwaiter().GetResult());

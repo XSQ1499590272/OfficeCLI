@@ -10,7 +10,29 @@ permissions:
   contents: read
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Agent guidance gate
+        run: |
+          dotnet test tests/OfficeCli.Tests/OfficeCli.Tests.csproj --nologo \
+            --filter 'FullyQualifiedName~AgentHelpSurfaceTests|FullyQualifiedName~AgentCoreSkillSurfaceTests|FullyQualifiedName~AgentPresentationSkillSurfaceTests|FullyQualifiedName~AgentBusinessSkillSurfaceTests|FullyQualifiedName~AgentGuidanceConformanceTests'
+
+      - name: Solution tests
+        run: dotnet test officecli.slnx --nologo
+
   build:
+    needs: verify
     strategy:
       matrix:
         include:
@@ -155,6 +177,39 @@ jobs:
           publish/${{ matrix.name }} get test_smoke.docx '/body/p[1]'
           publish/${{ matrix.name }} close test_smoke.docx
           rm -f test_smoke.docx
+
+      - name: Smoke test - Agent guidance resources
+        if: >-
+          (matrix.rid == 'osx-arm64' && runner.arch == 'ARM64') ||
+          (matrix.rid == 'osx-x64' && runner.arch == 'X64') ||
+          (matrix.rid == 'linux-x64' && runner.os == 'Linux') ||
+          (matrix.rid == 'win-x64' && runner.os == 'Windows')
+        env:
+          MSYS_NO_PATHCONV: '1'
+          MSYS2_ARG_CONV_EXCL: '*'
+          OFFICECLI_NO_AUTO_RESIDENT: '1'
+        run: |
+          chmod +x publish/${{ matrix.name }}
+          BIN=publish/${{ matrix.name }}
+          "$BIN" help --surface agent-json | tee agent-help.txt
+          grep -F '{{OFFICE_BATCH_TOOL}}' agent-help.txt
+          grep -F '{{OFFICE_RUN_TOOL}}' agent-help.txt
+          ! grep -F -- '--commands' agent-help.txt
+          ! grep -F 'tool.file.office.' agent-help.txt
+          "$BIN" load_skill --surface agent-json | tee agent-catalog.txt
+          grep -F '## word' agent-catalog.txt
+          grep -F '## morph-ppt' agent-catalog.txt
+          for skill in word excel pptx word-form morph-ppt; do
+            "$BIN" load_skill "$skill" --surface agent-json | tee "agent-$skill.txt"
+            grep -F '{{OFFICE_BATCH_TOOL}}' "agent-$skill.txt"
+            ! grep -F 'tool.file.office.' "agent-$skill.txt"
+          done
+          "$BIN" load_skill morph-ppt --surface agent-json --path references/decision-rules.md | tee agent-morph-ref.txt
+          grep -i 'audience' agent-morph-ref.txt
+          # default CLI surface still works without Agent tokens
+          "$BIN" help | tee cli-help.txt
+          ! grep -F '{{OFFICE_BATCH_TOOL}}' cli-help.txt
+          rm -f agent-help.txt agent-catalog.txt agent-*.txt cli-help.txt
 
       - name: Smoke test - .NET 8-only runtime (linux-x64)
         if: matrix.rid == 'linux-x64' && runner.os == 'Linux'

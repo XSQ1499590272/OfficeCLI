@@ -57,43 +57,7 @@ if (args.Length == 1 && args[0] == "mcp-serve")
 
 // Read-only access to embedded guidance remains available to both CLI and MCP.
 if (args.Length >= 1 && args[0] == "load_skill")
-{
-    string? skillRelPath = null;
-    var positional = new List<string>();
-    for (var i = 1; i < args.Length; i++)
-    {
-        if (args[i] == "--path" && i + 1 < args.Length)
-        {
-            skillRelPath = args[++i];
-            continue;
-        }
-        positional.Add(args[i]);
-    }
-
-    if (positional.Count == 0 && string.IsNullOrEmpty(skillRelPath))
-    {
-        Console.Out.Write(OfficeCli.Core.SkillCatalog.BuildSkillCatalog());
-        return 0;
-    }
-    if (positional.Count == 1)
-    {
-        try
-        {
-            Console.Out.Write(string.IsNullOrEmpty(skillRelPath)
-                ? OfficeCli.Core.SkillCatalog.LoadSkillContent(positional[0])
-                : OfficeCli.Core.SkillCatalog.LoadSkillFile(positional[0], skillRelPath));
-            return 0;
-        }
-        catch (ArgumentException ex)
-        {
-            Console.Error.WriteLine(ex.Message);
-            return 1;
-        }
-    }
-
-    OfficeCli.CommandBuilder.WriteEarlyDispatchUsage("load_skill", Console.Error);
-    return 1;
-}
+    return OfficeCli.Core.LoadSkillCli.Dispatch(args.Skip(1).ToArray(), Console.Out, Console.Error);
 
 var rootCommand = OfficeCli.CommandBuilder.BuildRootCommand();
 if (args.Length == 0)

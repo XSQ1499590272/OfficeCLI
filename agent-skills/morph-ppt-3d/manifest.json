@@ -1,0 +1,6 @@
+{
+  "name": "morph-ppt-3d",
+  "description": "3D Morph decks with approved GLB inputs through host Office tools.",
+  "trigger": "3D Morph decks (GLB models, camera)",
+  "references": []
+}

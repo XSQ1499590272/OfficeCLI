@@ -1,0 +1,47 @@
+name: Agent Guidance
+
+on:
+  pull_request:
+    paths:
+      - 'README_zh.md'
+      - 'src/officecli/**'
+      - 'schemas/help/**'
+      - 'skills/**'
+      - 'agent-skills/**'
+      - 'tests/OfficeCli.Tests/**'
+      - '.github/workflows/**'
+  push:
+    branches: [main, master]
+    paths:
+      - 'README_zh.md'
+      - 'src/officecli/**'
+      - 'schemas/help/**'
+      - 'skills/**'
+      - 'agent-skills/**'
+      - 'tests/OfficeCli.Tests/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  agent-guidance:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Agent guidance focused tests
+        run: |
+          dotnet test tests/OfficeCli.Tests/OfficeCli.Tests.csproj --nologo \
+            --filter 'FullyQualifiedName~AgentHelpSurfaceTests|FullyQualifiedName~AgentCoreSkillSurfaceTests|FullyQualifiedName~AgentPresentationSkillSurfaceTests|FullyQualifiedName~AgentBusinessSkillSurfaceTests|FullyQualifiedName~AgentGuidanceConformanceTests'
+
+      - name: Solution tests
+        run: dotnet test officecli.slnx --nologo

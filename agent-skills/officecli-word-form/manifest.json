@@ -1,0 +1,6 @@
+{
+  "name": "word-form",
+  "description": "Fill and inspect Word content-control forms through host Office tools.",
+  "trigger": "fillable forms, content controls, protected docs",
+  "references": []
+}

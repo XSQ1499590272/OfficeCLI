@@ -1,0 +1,6 @@
+{
+  "name": "financial-model",
+  "description": "Formula-driven financial models through host Office tools.",
+  "trigger": "financial models / projections",
+  "references": []
+}

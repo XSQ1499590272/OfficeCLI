@@ -1,0 +1,6 @@
+{
+  "name": "word",
+  "description": "Create and edit Word documents through host Office tools.",
+  "trigger": "Word docs, reports, letters, memos",
+  "references": []
+}

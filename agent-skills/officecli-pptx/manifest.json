@@ -1,0 +1,6 @@
+{
+  "name": "pptx",
+  "description": "Create and edit PowerPoint presentations through host Office tools.",
+  "trigger": "slide decks / presentations",
+  "references": []
+}

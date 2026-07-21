@@ -1,0 +1,6 @@
+{
+  "name": "data-dashboard",
+  "description": "Excel data dashboards through host Office tools.",
+  "trigger": "data dashboards",
+  "references": []
+}

@@ -41,7 +41,7 @@ public sealed class ExcelTablesFiltersValidationIntegrationTests : ExcelTestBase
             table.Type.Should().Be("table");
             table.Text.Should().Be("SalesTable");
             table.Format.Should().Contain("name", "SalesTable");
-            table.Format.Should().Contain("ref", "A1:C3");
+            table.Format.Should().Contain("ref", "A1:C4");
             table.Format.Should().Contain("style", "TableStyleMedium2");
             Query(readOnly, "table").Should().ContainSingle(n => n.Type == "table");
             Query(readOnly, "listobject").Should().ContainSingle(n => n.Path == "/Sheet1/table[1]");

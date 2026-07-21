@@ -66,7 +66,7 @@ public sealed class ExcelCellsAndFormulasTests : ExcelTestBase
         ReadNode(readOnly, "/Sheet1/B1").Text.Should().Be("42");
         ReadNode(readOnly, "/Sheet1/C1").Format.Should().Contain("numberformat", "yyyy-mm-dd");
         var booleanCell = ReadNode(readOnly, "/Sheet1/D1");
-        booleanCell.Text.Should().Be("1");
+        booleanCell.Text.Should().Be("TRUE");
         booleanCell.Format.Should().Contain("type", "Boolean");
         Query(readOnly, "cell").Select(n => n.Path).Should().Contain(new[] { "/Sheet1/A1", "/Sheet1/B1", "/Sheet1/C1", "/Sheet1/D1" });
         readOnly.Validate().Should().BeEmpty();
@@ -188,10 +188,13 @@ public sealed class ExcelCellsAndFormulasTests : ExcelTestBase
 
         using var readOnly = OpenReadOnly(path);
         var richCell = ReadNode(readOnly, "/Sheet1/A1");
-        richCell.Text.Should().Be(" Bold");
+        richCell.Text.Should().Be("Intro Bold");
         richCell.Format.Should().Contain("richtext", true);
-        richCell.ChildCount.Should().Be(1);
-        var run = ReadNode(readOnly, "/Sheet1/A1/run[1]");
+        richCell.ChildCount.Should().Be(2);
+        var originalRun = ReadNode(readOnly, "/Sheet1/A1/run[1]");
+        originalRun.Text.Should().Be("Intro");
+        originalRun.Format.Should().NotContainKey("bold");
+        var run = ReadNode(readOnly, "/Sheet1/A1/run[2]");
         run.Text.Should().Be(" Bold");
         run.Format.Should().Contain("bold", true);
         run.Format.Should().Contain("color", "#00AA00");

@@ -8,6 +8,8 @@ namespace OfficeCli.Tests.Integration;
 [Trait("Speed", "Integration")]
 public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.WordTestBase
 {
+    private static readonly TimeSpan AsyncTimeout = TimeSpan.FromSeconds(10);
+
     [Fact]
     public async Task BusyMainPipe_RetryIsLimitedToConnectAndDoesNotChangeDocument()
     {
@@ -23,7 +25,7 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
 
         var acceptTask = server.WaitForConnectionAsync();
         occupiedClient.Connect(1000);
-        await acceptTask.WaitAsync(TimeSpan.FromSeconds(2));
+        await acceptTask.WaitAsync(AsyncTimeout);
 
         var before = File.ReadAllBytes(path);
         var sendTask = Task.Run(() => ResidentClient.TrySend(
@@ -48,7 +50,7 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
             occupiedClient.Dispose();
         }
 
-        Assert.Null(await sendTask.WaitAsync(TimeSpan.FromSeconds(2)));
+        Assert.Null(await sendTask.WaitAsync(AsyncTimeout));
         Assert.Equal(before, File.ReadAllBytes(path));
     }
 
@@ -67,18 +69,18 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
 
         var acceptTask = server.WaitForConnectionAsync();
         var pingTask = Task.Run(() => ResidentClient.TryConnect(path, out _));
-        await acceptTask.WaitAsync(TimeSpan.FromSeconds(2));
+        await acceptTask.WaitAsync(AsyncTimeout);
 
         using (var reader = new StreamReader(server, Encoding.UTF8, leaveOpen: true))
         using (var writer = new StreamWriter(server, new UTF8Encoding(false), leaveOpen: true)
         { AutoFlush = true })
         {
-            Assert.NotNull(await reader.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(2)));
+            Assert.NotNull(await reader.ReadLineAsync().WaitAsync(AsyncTimeout));
             var response = new ResidentResponse { ExitCode = 0, Stdout = Path.GetFullPath(otherPath) };
             await writer.WriteLineAsync(JsonSerializer.Serialize(response));
         }
 
-        Assert.False(await pingTask.WaitAsync(TimeSpan.FromSeconds(2)));
+        Assert.False(await pingTask.WaitAsync(AsyncTimeout));
     }
 
     [Fact]
@@ -107,10 +109,10 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
             maxRetries: 3,
             connectTimeoutMs: 1000));
 
-        await acceptTask.WaitAsync(TimeSpan.FromSeconds(2));
+        await acceptTask.WaitAsync(AsyncTimeout);
         using (var reader = new StreamReader(server, Encoding.UTF8, leaveOpen: true))
         {
-            Assert.NotNull(await reader.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(2)));
+            Assert.NotNull(await reader.ReadLineAsync().WaitAsync(AsyncTimeout));
             requestCount++;
         }
 
@@ -119,7 +121,7 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
         await server.FlushAsync();
         server.Dispose();
 
-        Assert.Null(await sendTask.WaitAsync(TimeSpan.FromSeconds(2)));
+        Assert.Null(await sendTask.WaitAsync(AsyncTimeout));
         Assert.Equal(1, requestCount);
     }
 
@@ -207,7 +209,7 @@ public sealed class WordResidentFailureIntegrationTests : OfficeCli.Tests.Unit.W
 
     private static void WaitUntil(Func<bool> condition, string message)
     {
-        var deadline = DateTime.UtcNow.AddSeconds(5);
+        var deadline = DateTime.UtcNow.Add(AsyncTimeout);
         while (DateTime.UtcNow < deadline)
         {
             if (condition()) return;

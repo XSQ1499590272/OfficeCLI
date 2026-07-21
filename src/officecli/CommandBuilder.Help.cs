@@ -15,6 +15,11 @@ static partial class CommandBuilder
     private static readonly string[] HelpVerbs =
         { "add", "set", "get", "query", "remove" };
 
+    // Agent Help 额外接受的 verb filter：用于“不支持则明确提示”的读取/检查命令。
+    // 不并入 HelpVerbs，避免改变默认 CLI 对同名 element（例如 raw）的消歧。
+    private static readonly string[] AgentExtraHelpVerbs =
+        { "view", "raw", "validate", "import", "move", "swap" };
+
     // MCP and load_skill are dispatched before System.CommandLine sees them,
     // so help renders their usage directly.
     /// <summary>
@@ -50,9 +55,12 @@ static partial class CommandBuilder
                 "  officecli load_skill                         列出全部 Skill 及其触发条件",
                 "  officecli load_skill <name>                 输出该 Skill 的 SKILL.md 及内嵌参考文件清单",
                 "  officecli load_skill <name> --path <relpath> 输出一个内嵌参考文件（例如 --path reference/decision-rules.md）",
+                "  officecli load_skill ... --surface agent-json  输出宿主中立 Agent Tool JSON 说明面（独立 agent-skills/）",
+                "  officecli load_skill ... --surface cli         显式使用默认 CLI Skill 说明面（可省略，等同未传）",
                 "",
                 "Skill：pptx、word、excel、word-form、morph-ppt、morph-ppt-3d、pitch-deck、academic-paper、data-dashboard、financial-model",
                 "二进制参考资源不能通过文本通道输出。",
+                "未知 --surface 值会被拒绝；agent-json 与 cli 互不回退。",
             },
         };
 
@@ -100,6 +108,12 @@ static partial class CommandBuilder
         {
             Description = "（仅 help all）输出 NDJSON：每行一个 JSON object，不加 envelope。",
         };
+        // Agent guidance surface：未传时保持 CLI；显式 agent-json 走投影 renderer。
+        // 未知 surface 必须 fail-closed，禁止静默回退 CLI。
+        var surfaceOption = new Option<string?>("--surface")
+        {
+            Description = "说明面：省略或 cli=人类 CLI；agent-json=宿主中立 Tool JSON。",
+        };
 
         var command = new Command("help", "显示 officecli 基于 schema 的命令参考。");
         command.Add(formatArg);
@@ -107,6 +121,7 @@ static partial class CommandBuilder
         command.Add(thirdArg);
         command.Add(jsonOption);
         command.Add(jsonlOption);
+        command.Add(surfaceOption);
 
         command.SetAction(result =>
         {
@@ -115,6 +130,27 @@ static partial class CommandBuilder
             var format = result.GetValue(formatArg);
             var second = result.GetValue(secondArg);
             var third = result.GetValue(thirdArg);
+            var surfaceRaw = result.GetValue(surfaceOption);
+
+            // surface 必须先于参数消歧解析：Agent 使用更宽的 verb 集合。
+            if (!GuidanceSurface.TryParse(surfaceRaw, out var surface, out var surfaceError))
+            {
+                Console.Error.WriteLine(surfaceError);
+                return 1;
+            }
+
+            // Agent surface 与 --json/--jsonl 是两套输出协议，禁止同呼。
+            if (surface == GuidanceSurfaceKind.AgentJson && (json || jsonl))
+            {
+                Console.Error.WriteLine(
+                    "错误：--surface agent-json 不能与 --json 或 --jsonl 同时使用。");
+                return 1;
+            }
+
+            // Agent 消歧额外接受 view/raw/validate 等，便于输出“不支持”提示；CLI 不变。
+            var verbSet = surface == GuidanceSurfaceKind.AgentJson
+                ? HelpVerbs.Concat(AgentExtraHelpVerbs).ToArray()
+                : HelpVerbs;
 
             // Disambiguate middle arg: is it a verb or an element?
             string? verb = null;
@@ -129,7 +165,7 @@ static partial class CommandBuilder
                     // a document format token, not a verb; leave verb=null so Case 1b
                     // handles it by showing SCL help for the command.
                     // CONSISTENCY(args-rewrite): mirrors the 2-arg guard below.
-                    if (HelpVerbs.Contains(second, StringComparer.OrdinalIgnoreCase))
+                    if (verbSet.Contains(second, StringComparer.OrdinalIgnoreCase))
                     {
                         verb = second;
                         element = third;
@@ -141,7 +177,7 @@ static partial class CommandBuilder
                         // silently falling through to Case 2 (which would list all
                         // elements, ignoring user input).
                         Console.Error.WriteLine(
-                            $"错误：未知动词“{second}”。可用值：{string.Join(", ", HelpVerbs)}。");
+                            $"错误：未知动词“{second}”。可用值：{string.Join(", ", verbSet)}。");
                         return 1;
                     }
                     // else: format is a HelpVerb (CRUD-verb-as-format from the
@@ -149,7 +185,7 @@ static partial class CommandBuilder
                     // token, third is the element — fall through with verb=null,
                     // element=null so Case 1b shows SCL command help.
                 }
-                else if (HelpVerbs.Contains(second, StringComparer.OrdinalIgnoreCase))
+                else if (verbSet.Contains(second, StringComparer.OrdinalIgnoreCase))
                 {
                     // 2 args where second is a verb: filter listing by verb.
                     verb = second;
@@ -161,10 +197,91 @@ static partial class CommandBuilder
                 }
             }
 
+            if (surface == GuidanceSurfaceKind.AgentJson)
+                return SafeRun(() => RunAgentHelp(format, verb, element, verbSet), json: false);
+
             return SafeRun(() => RunHelp(format, verb, element, json, jsonl, rootCommand), json);
         });
 
         return command;
+    }
+
+    /// <summary>
+    /// Agent-json Help dispatcher. Isolated from <see cref="RunHelp"/> so the
+    /// default CLI path keeps its existing SCL/flat/schema renderer behavior.
+    /// Never falls back to CLI surface on unknown format/element.
+    /// </summary>
+    private static int RunAgentHelp(
+        string? format, string? verb, string? element, IReadOnlyList<string> verbSet)
+    {
+        // Case 0: help all — 全 corpus Agent 投影（非 CLI flat dump）
+        if (string.Equals(format, "all", StringComparison.OrdinalIgnoreCase))
+        {
+            if (verb != null || element != null)
+            {
+                Console.Error.WriteLine(
+                    "错误：'help all' 不接受额外参数。");
+                return 1;
+            }
+
+            Console.WriteLine(SchemaHelpAgentRenderer.RenderAll());
+            return 0;
+        }
+
+        // Case 0b: help <format> all
+        if (format != null
+            && SchemaHelpLoader.IsKnownFormat(format)
+            && verb == null
+            && string.Equals(element, "all", StringComparison.OrdinalIgnoreCase))
+        {
+            var canonicalAll = SchemaHelpLoader.NormalizeFormat(format);
+            Console.WriteLine(SchemaHelpAgentRenderer.RenderAll(canonicalAll));
+            return 0;
+        }
+
+        // Case 1: no-args banner — 角色占位符 + Batch/Run 路由，不调用 SCL help
+        if (format == null)
+        {
+            Console.WriteLine(SchemaHelpAgentRenderer.RenderBanner());
+            return 0;
+        }
+
+        // Agent surface 不转发 top-level CLI/SCL help，避免把 shell 用法喂给 LLM
+        if (!SchemaHelpLoader.IsKnownFormat(format))
+        {
+            Console.Error.WriteLine(
+                $"错误：未知 format “{GuidanceSurface.TruncateForError(format)}”。" +
+                "Agent Help 仅接受 docx/xlsx/pptx（及别名）或 all。");
+            return 1;
+        }
+
+        if (verb != null && !verbSet.Contains(verb, StringComparer.OrdinalIgnoreCase))
+        {
+            Console.Error.WriteLine(
+                $"错误：未知动词“{GuidanceSurface.TruncateForError(verb)}”。" +
+                $"可用值：{string.Join(", ", verbSet)}。");
+            return 1;
+        }
+
+        var canonicalFormat = SchemaHelpLoader.NormalizeFormat(format);
+
+        // Case 2: format (+ optional verb) — 元素列表
+        if (element == null)
+        {
+            var all = SchemaHelpLoader.ListElements(canonicalFormat);
+            var filtered = verb == null
+                ? all
+                : all.Where(el => SchemaHelpLoader.ElementSupportsVerb(canonicalFormat, el, verb!))
+                    .ToList();
+            Console.WriteLine(
+                SchemaHelpAgentRenderer.RenderElementList(canonicalFormat, verb, filtered));
+            return 0;
+        }
+
+        // Case 3: format + element — schema 投影为 Agent Tool JSON
+        using var doc = SchemaHelpLoader.LoadSchema(format, element);
+        Console.WriteLine(SchemaHelpAgentRenderer.RenderElement(doc, verb));
+        return 0;
     }
 
     private static int RunHelp(string? format, string? verb, string? element, bool json, bool jsonl, RootCommand? rootCommand)
